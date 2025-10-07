@@ -6,11 +6,13 @@ import Register from './pages/AuthPage/Register'
 import { default as RegisterVerification } from './pages/AuthPage/RegisterVerification'
 import ResetPassword from './pages/AuthPage/ResetPassword'
 import ChatPage from './pages/ChatPage/ChatPage'
+import MapPage from './pages/Map/Map'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* AuthPage */}
         <Route path='/' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route
@@ -21,6 +23,9 @@ function App() {
         <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='/message' element={<ChatPage />} />
         <Route path='/otp-verification' element={<OtpVerification />} />
+
+        {/* MapPage */}
+        <Route path='/map' element={<MapPage />} />
 
         <Route
           path='*'
