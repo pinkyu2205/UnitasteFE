@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import AIChatApi from '../api/GeminiApi'
+import AIChatApi from '../api/AIChatApi'
 // ⚠️ Điều chỉnh đường dẫn này
 
 // 💡 IMPORT FILE CSS MỚI
