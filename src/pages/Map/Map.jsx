@@ -1,40 +1,153 @@
 import {
   AdvancedMarker,
   APIProvider,
+  InfoWindow,
   Map,
   Pin,
 } from '@vis.gl/react-google-maps'
+import { useEffect, useRef, useState } from 'react'
 
-//AI chat
+// AI chat
+import RestaurantsApi from '../../api/restaurantApi.js'
+
 import ChatPopup from '../../components/ChatPopup'
+import SearchBox from '../../components/SearchBox'
 
-// Key API
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
-
-// Tọa độ trung tâm và mức zoom
-const INITIAL_POSITION = { lat: 10.8231, lng: 106.6297 }
+const DEFAULT_CENTER = { lat: 10.8231, lng: 106.6297 }
 
 const MapPage = () => {
+  const [currentPosition, setCurrentPosition] = useState(DEFAULT_CENTER)
+  const [isLocationLoading, setIsLocationLoading] = useState(true)
+  const [displayedRestaurants, setDisplayedRestaurants] = useState([])
+
+  const [selectedRestaurantDetail, setSelectedRestaurantDetail] = useState(null)
+  const mapRef = useRef(null)
+
+  // Lấy vị trí người dùng
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude
+          const lng = pos.coords.longitude
+          const userLocation = { lat, lng }
+
+          setCurrentPosition(userLocation)
+          setIsLocationLoading(false)
+        },
+        (err) => {
+          console.error('Lỗi Geolocation:', err.message)
+          setIsLocationLoading(false)
+        },
+        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+      )
+    } else {
+      console.error('Trình duyệt không hỗ trợ Geolocation.')
+      setIsLocationLoading(false)
+    }
+  }, [])
+
+  // ✅ Xử lý khi tìm kiếm
+  const handleSearchResults = (restaurants) => {
+    setDisplayedRestaurants(restaurants)
+
+    if (restaurants.length > 0 && mapRef.current) {
+      const first = restaurants[0]
+      const newCenter = {
+        lat: parseFloat(first.latitude),
+        lng: parseFloat(first.longitude),
+      }
+
+      mapRef.current.panTo(newCenter)
+      mapRef.current.setZoom(17)
+    }
+  }
+
+  // ✅ Khi click vào marker
+  const handleMarkerClick = async (restaurant) => {
+    try {
+      const detail = await RestaurantsApi.getRestaurantById(
+        restaurant.restaurantId
+      )
+      setSelectedRestaurantDetail(detail)
+    } catch (err) {
+      console.error('Lỗi khi lấy chi tiết nhà hàng:', err)
+    }
+  }
+
+  if (isLocationLoading) {
+    return (
+      <div
+        style={{
+          height: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        Đang tải bản đồ và xác định vị trí của bạn...
+      </div>
+    )
+  }
+
   return (
-    // 1. APIProvider: Component bắt buộc để tải Google Maps API
     <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
       <div style={{ height: '100vh', width: '100%' }}>
-        {/* 2. Map: Component Bản đồ chính */}
+        <SearchBox onSearchResults={handleSearchResults} />
+
         <Map
-          defaultCenter={INITIAL_POSITION}
-          defaultZoom={13}
-          gestureHandling={'greedy'} // Tùy chỉnh cách xử lý tương tác chuột/cảm ứng
-          mapId={'YOUR_MAP_ID'} // Tùy chọn, dùng cho Cloud-based map styling
+          ref={mapRef}
+          defaultCenter={currentPosition}
+          defaultZoom={15}
+          gestureHandling={'greedy'}
+          mapId={'YOUR_MAP_ID'}
           style={{ width: '100%', height: '100%' }}
         >
-          {/* 3. AdvancedMarker: Điểm đánh dấu (Marker) */}
-          <AdvancedMarker position={INITIAL_POSITION}>
-            <Pin background={'#000'} borderColor={'#fff'} glyphColor={'#fff'}>
-              {/* Nội dung Pin (Tùy chọn) */}
+          {/* 📍 Marker người dùng */}
+          <AdvancedMarker position={currentPosition}>
+            <Pin
+              background={'#007bff'}
+              borderColor={'#fff'}
+              glyphColor={'#fff'}
+            >
+              📍
             </Pin>
           </AdvancedMarker>
 
-          {/* Bạn có thể thêm các Marker khác, Polyline, v.v. tại đây */}
+          {/* 🏠 Marker nhà hàng */}
+          {displayedRestaurants.map((restaurant, index) => (
+            <AdvancedMarker
+              key={index}
+              position={{
+                lat: parseFloat(restaurant.latitude),
+                lng: parseFloat(restaurant.longitude),
+              }}
+              onClick={() => handleMarkerClick(restaurant)}
+            >
+              <Pin />
+            </AdvancedMarker>
+          ))}
+
+          {/* 💬 Popup chi tiết quán */}
+          {selectedRestaurantDetail && (
+            <InfoWindow
+              position={{
+                lat: parseFloat(selectedRestaurantDetail.latitude),
+                lng: parseFloat(selectedRestaurantDetail.longitude),
+              }}
+              onCloseClick={() => setSelectedRestaurantDetail(null)}
+            >
+              <div style={{ maxWidth: '250px' }}>
+                <h4>{selectedRestaurantDetail.name}</h4>
+                <p>Địa chỉ: {selectedRestaurantDetail.address}</p>
+                <p>
+                  Giờ mở cửa:{' '}
+                  {selectedRestaurantDetail.openingHours || 'Không rõ'}
+                </p>
+              </div>
+            </InfoWindow>
+          )}
         </Map>
 
         <ChatPopup />

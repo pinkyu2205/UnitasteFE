@@ -1,11 +1,13 @@
-import axiosClient from './axios'
+import { axiosRestaurantClient } from './axios'
+
+axiosRestaurantClient
 
 const AIChatApi = {
   getAIResponse: async (prompt) => {
     const data = {
       prompt: prompt,
     }
-    return await axiosClient.post('/AI/chat', data)
+    return await axiosRestaurantClient.post('/AI/chat', data)
   },
 }
 

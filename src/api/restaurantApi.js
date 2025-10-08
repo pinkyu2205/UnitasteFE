@@ -1,22 +1,27 @@
-import axiosClient from './axios'
+import { axiosRestaurantClient } from './axios'
 
 const RestaurantsApi = {
   getAllRestaurants: async () => {
-    return await axiosClient.get('/Restaurants/get-all-restaurant')
+    return await axiosRestaurantClient.get('/Restaurants/get-all-restaurant')
   },
 
   findRestaurantsByLocation: async (data) => {
-    return await axiosClient.post('/Restaurants/find-by-location-10km', data)
+    return await axiosRestaurantClient.post(
+      '/Restaurants/find-by-location-10km',
+      data
+    )
   },
 
   getRestaurantById: async (id) => {
-    return await axiosClient.get(
+    return await axiosRestaurantClient.get(
       `/Restaurants/get-all-restaurant-by-id?id=${id}`
     )
   },
 
-  searchRestaurants: async (params) => {
-    return await axiosClient.get('/Restaurants/search', { params })
+  searchRestaurants: async (query) => {
+    return await axiosRestaurantClient.get('/Restaurants/search', {
+      params: { name: query },
+    })
   },
 }
 

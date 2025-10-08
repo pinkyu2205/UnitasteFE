@@ -9,16 +9,21 @@ function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    const data = await LoginAPI(email, password)
-    if (data) {
-      localStorage.setItem('token', data)
+    try {
+      const token = await LoginAPI(email, password)
+      if (token) {
+        localStorage.setItem('token', token)
+        navigate('/map')
+      } else {
+        setError('Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.')
+      }
+    } catch (err) {
+      setError(err.message || 'Đã xảy ra lỗi trong quá trình đăng nhập.')
     }
-    navigate('/testpage')
   }
   return (
     <div className='auth'>
