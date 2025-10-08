@@ -1,7 +1,6 @@
 import {
   AdvancedMarker,
   APIProvider,
-  InfoWindow,
   Map,
   Pin,
   useMap,
@@ -11,8 +10,9 @@ import { useEffect, useRef, useState } from 'react'
 import RestaurantsApi from '../../api/restaurantApi.js'
 
 import ChatPopup from '../../components/ChatPopup'
+import RestaurantInfoWindow from '../../components/RestaurantInfoWindow' // ✅ Import component mới
 import SearchBox from '../../components/SearchBox'
-import SearchResults from '../../components/SearchResults' // ✅ Import component mới
+import SearchResults from '../../components/SearchResults'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 const DEFAULT_CENTER = { lat: 10.8231, lng: 106.6297 }
@@ -226,39 +226,13 @@ const MapPage = () => {
             </AdvancedMarker>
           ))}
 
-          {/* 💬 Popup chi tiết quán */}
+          {/* 💬 Popup chi tiết quán với UI đẹp */}
           {selectedRestaurantDetail && (
-            <InfoWindow
-              position={{
-                lat: parseFloat(selectedRestaurantDetail.latitude),
-                lng: parseFloat(selectedRestaurantDetail.longitude),
-              }}
-              onCloseClick={() => setSelectedRestaurantDetail(null)}
-            >
-              <div style={{ maxWidth: '250px' }}>
-                <h4>{selectedRestaurantDetail.name}</h4>
-                <p>Địa chỉ: {selectedRestaurantDetail.address}</p>
-                <p>
-                  Giờ mở cửa:{' '}
-                  {selectedRestaurantDetail.openingHours || 'Không rõ'}
-                </p>
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    marginTop: '8px',
-                  }}
-                  onClick={() => handleGetDirections(selectedRestaurantDetail)}
-                >
-                  Chỉ đường
-                </button>
-              </div>
-            </InfoWindow>
+            <RestaurantInfoWindow
+              restaurant={selectedRestaurantDetail}
+              onClose={() => setSelectedRestaurantDetail(null)}
+              onGetDirections={handleGetDirections}
+            />
           )}
         </Map>
 
