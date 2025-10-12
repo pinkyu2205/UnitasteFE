@@ -7,6 +7,7 @@ import { default as RegisterVerification } from './pages/AuthPage/RegisterVerifi
 import ResetPassword from './pages/AuthPage/ResetPassword'
 import ChatPage from './pages/ChatPage/ChatPage'
 import MapPage from './pages/Map/Map'
+import PreferenceSurvey from './pages/PreferenceSurvey/PreferenceSurvey'
 import ProfilePage from './pages/Profile/ProfilePage'
 
 function App() {
@@ -24,10 +25,8 @@ function App() {
         <Route path='/reset-password' element={<ResetPassword />} />
         <Route path='/message' element={<ChatPage />} />
         <Route path='/otp-verification' element={<OtpVerification />} />
-
         {/* MapPage */}
         <Route path='/map' element={<MapPage />} />
-
         <Route
           path='*'
           element={
@@ -37,9 +36,10 @@ function App() {
             </div>
           }
         />
-
         {/* Profile */}
         <Route path='/profile' element={<ProfilePage />} />
+        {/* Survey */}
+        <Route path='/survey' element={<PreferenceSurvey />} />
       </Routes>
     </BrowserRouter>
   )
