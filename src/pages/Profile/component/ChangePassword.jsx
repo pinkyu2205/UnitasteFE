@@ -22,15 +22,18 @@ const ChangePassword = ({ onChangePassword }) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     // Clear error for this field
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: '' }))
+    if (errors[name] || errors.general) {
+      // Clear general error on input
+      setErrors((prev) => ({ ...prev, [name]: '', general: '' }))
     }
+    setSuccess(false) // Reset success message on input
   }
 
   const togglePasswordVisibility = (field) => {
     setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }))
   }
 
+  // ✅ CẬP NHẬT LOGIC KIỂM TRA MẬT KHẨU MỚI (PHÙ HỢP VỚI API)
   const validateForm = () => {
     const newErrors = {}
 
@@ -40,8 +43,15 @@ const ChangePassword = ({ onChangePassword }) => {
 
     if (!formData.newPassword) {
       newErrors.newPassword = 'Vui lòng nhập mật khẩu mới'
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = 'Mật khẩu phải có ít nhất 6 ký tự'
+    } else {
+      // Tiêu chí API: ít nhất 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+
+      if (!passwordRegex.test(formData.newPassword)) {
+        newErrors.newPassword =
+          'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số, và ký tự đặc biệt (@$!%*?&)'
+      }
     }
 
     if (!formData.confirmPassword) {
@@ -52,6 +62,7 @@ const ChangePassword = ({ onChangePassword }) => {
 
     return newErrors
   }
+  // ✅ KẾT THÚC CẬP NHẬT LOGIC
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -63,15 +74,15 @@ const ChangePassword = ({ onChangePassword }) => {
     }
 
     setLoading(true)
+    setErrors({}) // Reset lỗi
+    setSuccess(false) // Reset thông báo thành công
+
     try {
-      // Gọi API để đổi mật khẩu
-      onChangePassword({
+      // Gọi API để đổi mật khẩu (hàm này đã được liên kết với UserApi trong ProfilePage)
+      await onChangePassword({
         currentPassword: formData.currentPassword,
         newPassword: formData.newPassword,
       })
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
 
       setSuccess(true)
       setFormData({
@@ -83,11 +94,32 @@ const ChangePassword = ({ onChangePassword }) => {
       // Hide success message sau 3 giây
       setTimeout(() => setSuccess(false), 3000)
     } catch (error) {
-      setErrors({ general: 'Có lỗi xảy ra. Vui lòng thử lại.' })
+      // Bắt lỗi cụ thể từ API (ví dụ: mật khẩu cũ không đúng)
+      const errorMessage = error.message || 'Có lỗi xảy ra. Vui lòng thử lại.'
+      setErrors({ general: errorMessage })
     } finally {
       setLoading(false)
     }
   }
+
+  // --- HÀM TÍNH ĐỘ MẠNH (CẬP NHẬT LẠI TIÊU CHUẨN) ---
+  const getPasswordStrength = (password) => {
+    if (password.length < 8) return { label: '⚠️ Yếu', color: 'red' }
+
+    let strength = 0
+    if (/[a-z]/.test(password)) strength++ // Chữ thường
+    if (/[A-Z]/.test(password)) strength++ // Chữ hoa
+    if (/\d/.test(password)) strength++ // Số
+    if (/[@$!%*?&]/.test(password)) strength++ // Ký tự đặc biệt
+
+    if (strength === 4) return { label: '💪 Rất Mạnh', color: 'green' }
+    if (strength >= 3) return { label: '👍 Mạnh', color: 'blue' }
+    if (strength >= 2) return { label: '👌 Trung bình', color: 'orange' }
+    return { label: '⚠️ Yếu', color: 'red' }
+  }
+
+  const strength = getPasswordStrength(formData.newPassword)
+  // --- KẾT THÚC HÀM TÍNH ĐỘ MẠNH ---
 
   return (
     <div className='change-password-container'>
@@ -114,6 +146,7 @@ const ChangePassword = ({ onChangePassword }) => {
         {/* Mật khẩu hiện tại */}
         <div className='form-group-password'>
           <label htmlFor='currentPassword'>Mật khẩu hiện tại</label>
+          {/* ... (Giữ nguyên cấu trúc input) ... */}
           <div className='password-input-wrapper'>
             <input
               id='currentPassword'
@@ -160,16 +193,14 @@ const ChangePassword = ({ onChangePassword }) => {
               {showPasswords.new ? '👁️' : '👁️‍🗨️'}
             </button>
           </div>
+          {/* ✅ Cập nhật hiển thị lỗi chi tiết */}
           {errors.newPassword && (
             <span className='error-text'>{errors.newPassword}</span>
           )}
+          {/* ✅ Cập nhật hiển thị độ mạnh */}
           <div className='password-strength'>
-            <span className='strength-label'>
-              {formData.newPassword.length >= 8
-                ? '💪 Mạnh'
-                : formData.newPassword.length >= 6
-                ? '👍 Trung bình'
-                : '⚠️ Yếu'}
+            <span className='strength-label' style={{ color: strength.color }}>
+              {strength.label}
             </span>
           </div>
         </div>
@@ -218,7 +249,7 @@ const ChangePassword = ({ onChangePassword }) => {
         </button>
       </form>
 
-      {/* Security Tips */}
+      {/* Security Tips (Giữ nguyên) */}
       <div className='security-tips'>
         <h4>💡 Mẹo bảo mật:</h4>
         <ul>

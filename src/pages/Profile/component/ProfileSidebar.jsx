@@ -26,12 +26,6 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
         </div>
         <h3 className='sidebar-user-name'>{userData.fullName}</h3>
         <p className='sidebar-user-email'>{userData.email}</p>
-        <div className='sidebar-user-meta'>
-          <span className='meta-item'>
-            <span className='meta-icon'>📅</span>
-            Tham gia từ {new Date(userData.createdAt).getFullYear()}
-          </span>
-        </div>
       </div>
 
       {/* Menu Items */}
