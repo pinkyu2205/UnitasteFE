@@ -1,4 +1,4 @@
-import './SearchResults.css'
+import './CSS/SearchResults.css'
 
 /**
  * Component SearchResults: Hiển thị danh sách kết quả tìm kiếm

@@ -35,6 +35,21 @@ const Directions = ({ request }) => {
       directionsService.route(request, (response, status) => {
         if (status === 'OK') {
           directionsRenderer.setDirections(response)
+
+          // === PHẦN BỔ SUNG ===
+          const route = response.routes[0]
+          const leg = route.legs[0] // Chỉ lấy chặng đầu tiên
+
+          // Lấy ra mảng các bước đi
+          const steps = leg.steps.map((step) => ({
+            instructions: step.instructions, // "Đi về hướng Đông trên Đường Nguyễn Oanh"
+            distance: step.distance.text, // "30 m"
+            duration: step.duration.text, // "1 phút"
+          }))
+
+          // ✅ Gửi steps này ra ngoài MapPage (qua props hoặc callback)
+          // Ví dụ: onRouteCalculated(steps);
+          // ====================
         } else {
           console.error('Lỗi chỉ đường:', status)
         }

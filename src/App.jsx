@@ -7,6 +7,7 @@ import { default as RegisterVerification } from './pages/AuthPage/RegisterVerifi
 import ResetPassword from './pages/AuthPage/ResetPassword'
 import ChatPage from './pages/ChatPage/ChatPage'
 import MapPage from './pages/Map/Map'
+import ProfilePage from './pages/Profile/ProfilePage'
 
 function App() {
   return (
@@ -36,6 +37,9 @@ function App() {
             </div>
           }
         />
+
+        {/* Profile */}
+        <Route path='/profile' element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   )

@@ -2,7 +2,7 @@
 
 import { InfoWindow } from '@vis.gl/react-google-maps'
 import { useState } from 'react'
-import './RestaurantInfoWindow.css'
+import './CSS/RestaurantInfoWindow.css'
 
 /**
  * Component hiển thị thông tin chi tiết nhà hàng với UI đẹp mắt
@@ -24,16 +24,12 @@ const RestaurantInfoWindow = ({ restaurant, onClose, onGetDirections }) => {
     'https://via.placeholder.com/1920x1080/f093fb/ffffff?text=Image+3',
   ]
 
-  const parseOpeningHours = (hoursString) => {
-    if (!hoursString || hoursString === 'Chưa cập nhật') {
-      return null
+  function parseOpeningHours(hoursString) {
+    if (typeof hoursString !== 'string') {
+      return []
     }
 
-    const days = hoursString.split('; ')
-    return days.map((day) => {
-      const [dayName, hours] = day.split(': ')
-      return { dayName, hours }
-    })
+    return hoursString.split(';').map((item) => item.trim())
   }
 
   const openingHoursArray = parseOpeningHours(restaurant.openingHours)

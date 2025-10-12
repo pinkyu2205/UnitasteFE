@@ -3,7 +3,7 @@ import AIChatApi from '../api/AIChatApi'
 // ⚠️ Điều chỉnh đường dẫn này
 
 // 💡 IMPORT FILE CSS MỚI
-import './ChatPopup.css'
+import './CSS/ChatPopup.css'
 
 // Icon cơ bản
 const ChatIcon = () => (
