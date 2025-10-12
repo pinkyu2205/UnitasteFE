@@ -4,7 +4,7 @@ import { useState } from 'react'
 import RestaurantsApi from '../api/restaurantApi'
 
 // 💡 IMPORT FILE CSS MỚI
-import './SearchBox.css'
+import './CSS/SearchBox.css'
 
 /**
  * Component SearchBox: Cho phép tìm kiếm nhà hàng.

@@ -1,0 +1,215 @@
+/* src/pages/Profile/CSS/ProfileSidebar.css */
+
+.profile-sidebar-container {
+    background: linear-gradient(145deg, #ffffff, #fafbfc);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(255, 107, 53, 0.15);
+    border: 2px solid rgba(255, 107, 53, 0.1);
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+}
+
+/* User Card */
+.sidebar-user-card {
+    text-align: center;
+    padding-bottom: 24px;
+    border-bottom: 2px solid rgba(255, 107, 53, 0.1);
+    margin-bottom: 24px;
+}
+
+.sidebar-avatar {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(255, 107, 53, 0.1));
+    border: 3px solid rgba(255, 107, 53, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.sidebar-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-placeholder {
+    font-size: 40px;
+    font-weight: 700;
+    color: #FF6B35;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 107, 53, 0.1));
+}
+
+.sidebar-user-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar-user-email {
+    font-size: 13px;
+    color: #888;
+    margin: 0 0 12px 0;
+    word-break: break-all;
+}
+
+.sidebar-user-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.meta-icon {
+    font-size: 14px;
+}
+
+/* Menu Items */
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 0;
+    list-style: none;
+}
+
+.menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(145deg, #ffffff, #fafbfc);
+    border: 2px solid rgba(255, 107, 53, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, rgba(255, 107, 53, 0.1), transparent);
+    transition: width 0.3s ease;
+}
+
+.menu-item:hover {
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.15);
+}
+
+.menu-item:hover::before {
+    width: 100%;
+}
+
+.menu-item.active {
+    background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%);
+    border-color: #FF6B35;
+    color: white;
+    box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+}
+
+.menu-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.menu-label {
+    flex: 1;
+    text-align: left;
+}
+
+.menu-indicator {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+}
+
+.menu-item.active .menu-indicator {
+    animation: slideRight 0.3s ease-out;
+}
+
+@keyframes slideRight {
+    from {
+        transform: translateX(-10px);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* Logout Button */
+.sidebar-footer {
+    padding-top: 24px;
+    border-top: 2px solid rgba(255, 107, 53, 0.1);
+}
+
+.logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(255, 107, 53, 0.05));
+    border: 2px solid rgba(255, 107, 53, 0.2);
+    border-radius: 12px;
+    color: #FF6B35;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, #FF6B35, #FF8C42);
+    color: white;
+    border-color: #FF6B35;
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+    transform: translateY(-2px);
+}
+
+.logout-icon {
+    font-size: 16px;
+}
