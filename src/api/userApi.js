@@ -2,6 +2,7 @@ import axios from 'axios'
 import { axiosClient } from './axios'
 
 const UserApi = {
+  //USER AUTH
   // Login
   login: async (data) => {
     return await axiosClient.post('/Users/Login', data)
@@ -59,6 +60,22 @@ const UserApi = {
         },
       }
     )
+  },
+
+  //ADMIN PAGE
+  // Đếm số người dùng đang hoạt động
+  countActiveUsers: async () => {
+    return await axiosClient.get('/Users/count-active')
+  },
+
+  // Đếm số người dùng ngừng hoạt động
+  countInactiveUsers: async () => {
+    return await axiosClient.get('/Users/count-inactive')
+  },
+
+  // Đếm số người dùng đăng kí theo tháng
+  countRegisterByMonth: (year) => {
+    return axiosClient.get(`/Users/count-register-by-month/${year}`)
   },
 }
 

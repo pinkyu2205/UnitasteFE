@@ -159,6 +159,99 @@
     border-color: #FF6B35;
 }
 
+/* Year Select Styling */
+.year-select select {
+    padding: 8px 16px;
+    background: #f0f0f0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.year-select select:hover {
+    background: rgba(255, 107, 53, 0.1);
+}
+
+.year-select select:focus {
+    outline: none;
+    background: rgba(255, 107, 53, 0.1);
+    border-color: #FF6B35;
+}
+
+/* Location Performance Section */
+.location-performance {
+    animation: slideUp 0.5s ease-out 0.2s both;
+}
+
+.location-performance h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.performance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.location-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.location-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.location-header {
+    margin-bottom: 16px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
+}
+
+.location-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.location-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat .label {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+.stat .number {
+    font-size: 16px;
+    font-weight: 700;
+    color: #FF6B35;
+}
+
 /* Top Dishes Section */
 .top-dishes-section {
     background: white;
