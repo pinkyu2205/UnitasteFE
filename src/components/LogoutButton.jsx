@@ -11,7 +11,7 @@ function LogoutButton() {
     // localStorage.clear();
 
     // Điều hướng về Login
-    navigate('/login')
+    navigate('/')
   }
 
   return (

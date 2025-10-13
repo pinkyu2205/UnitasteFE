@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { axiosClient } from './axios'
 
 const UserApi = {
@@ -43,6 +44,21 @@ const UserApi = {
   // Đổi mật khẩu (POST /api/Users/change-password)
   changePassword: async (data) => {
     return await axiosClient.post('/Users/change-password', data)
+  },
+
+  //Tải ảnh đại diện lên
+  // Trả về: { avatarUrl: "..." }
+  uploadAvatar: async (formData) => {
+    return await axios.post(
+      `${import.meta.env.VITE_API_GATEWAY}/Users/upload-avatar`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      }
+    )
   },
 }
 

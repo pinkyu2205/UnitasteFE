@@ -10,6 +10,13 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
     { id: 'bookmarks', label: 'Yêu thích', icon: '❤️' },
     { id: 'history', label: 'Lịch sử', icon: '📜' },
   ]
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('token')
+    localStorage.removeItem('@secure.j.currentUser')
+    localStorage.removeItem('user')
+    navigate('/')
+  }
 
   return (
     <div className='profile-sidebar-container'>
@@ -45,7 +52,7 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
 
       {/* Logout Button */}
       <div className='sidebar-footer'>
-        <button className='logout-btn'>
+        <button className='logout-btn' onClick={handleLogout}>
           <span className='logout-icon'>🚪</span>
           Đăng xuất
         </button>
