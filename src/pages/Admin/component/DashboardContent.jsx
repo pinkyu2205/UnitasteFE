@@ -1,6 +1,6 @@
 // src/components/Admin/DashboardContent.jsx
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -13,10 +13,31 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import UserApi from '../../../api/userApi'
 import '../CSS/DashboardContent.css'
 
 const DashboardContent = () => {
   const [timeRange, setTimeRange] = useState('month')
+  const [activeCount, setActiveCount] = useState(0)
+  const [inactiveCount, setInactiveCount] = useState(0)
+
+  useEffect(() => {
+    const fetchUserCounts = async () => {
+      try {
+        const [activeRes, inactiveRes] = await Promise.all([
+          UserApi.countActiveUsers(),
+          UserApi.countInactiveUsers(),
+        ])
+
+        setActiveCount(activeRes.total)
+        setInactiveCount(inactiveRes.total)
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu user count:', error)
+      }
+    }
+
+    fetchUserCounts()
+  }, [])
 
   // Mock data cho biểu đồ truy cập người dùng theo tuần
   const userAccessData = [
@@ -46,16 +67,16 @@ const DashboardContent = () => {
       color: 'blue',
     },
     {
-      title: 'Tổng Số Người Dùng',
-      value: '12,543',
-      change: '+4.2%',
-      icon: '👥',
+      title: 'Người Dùng Đang Hoạt Động',
+      value: activeCount,
+      change: '+2.1%',
+      icon: '✅',
       color: 'green',
     },
     {
       title: 'Tài Khoản Ngừng Hoạt Động',
-      value: '245',
-      change: '+2.1%',
+      value: inactiveCount,
+      change: '-0.4%',
       icon: '⛔',
       color: 'red',
     },
