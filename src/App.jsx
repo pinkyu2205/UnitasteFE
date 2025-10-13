@@ -1,5 +1,6 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import TestPage from '../testpage'
+import AdminDashboard from './pages/Admin/AdminDashboard'
 import Login from './pages/AuthPage/Login'
 import OtpVerification from './pages/AuthPage/OtpVerification'
 import Register from './pages/AuthPage/Register'
@@ -38,8 +39,12 @@ function App() {
         />
         {/* Profile */}
         <Route path='/profile' element={<ProfilePage />} />
+
         {/* Survey */}
         <Route path='/survey' element={<PreferenceSurvey />} />
+
+        {/* Admin */}
+        <Route path='/admin' element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   )
