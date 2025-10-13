@@ -1,0 +1,248 @@
+// src/components/Admin/DashboardContent.jsx
+
+import { useState } from 'react'
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
+import '../CSS/DashboardContent.css'
+
+const DashboardContent = () => {
+  const [timeRange, setTimeRange] = useState('month')
+
+  // Mock data cho biểu đồ truy cập người dùng theo tuần
+  const userAccessData = [
+    { name: 'T2', users: 32 },
+    { name: 'T3', users: 38 },
+    { name: 'T4', users: 45 },
+    { name: 'T5', users: 42 },
+    { name: 'T6', users: 48 },
+    { name: 'T7', users: 50 },
+    { name: 'CN', users: 40 },
+  ]
+
+  // Mock data cho biểu đồ doanh thu
+  const revenueData = [
+    { name: 'Tuần 1', revenue: 2400 },
+    { name: 'Tuần 2', revenue: 2210 },
+    { name: 'Tuần 3', revenue: 2290 },
+    { name: 'Tuần 4', revenue: 2000 },
+  ]
+
+  const statsCards = [
+    {
+      title: 'Số Lượng Đăng Ký Tháng Này',
+      value: '3,456',
+      change: '+24.5%',
+      icon: '📝',
+      color: 'blue',
+    },
+    {
+      title: 'Tổng Số Người Dùng',
+      value: '12,543',
+      change: '+4.2%',
+      icon: '👥',
+      color: 'green',
+    },
+    {
+      title: 'Tài Khoản Ngừng Hoạt Động',
+      value: '245',
+      change: '+2.1%',
+      icon: '⛔',
+      color: 'red',
+    },
+    {
+      title: 'Doanh Thu Tháng Này',
+      value: '45.2M',
+      change: '+18.7%',
+      icon: '💰',
+      color: 'orange',
+    },
+  ]
+
+  return (
+    <div className='dashboard-content'>
+      {/* Stats Cards */}
+      <div className='stats-cards'>
+        {statsCards.map((card, index) => (
+          <div key={index} className={`stat-card ${card.color}`}>
+            <div className='stat-icon'>{card.icon}</div>
+            <div className='stat-info'>
+              <h4>{card.title}</h4>
+              <div className='stat-value'>{card.value}</div>
+              <p className='stat-change'>{card.change} so với kỳ trước</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Section */}
+      <div className='charts-grid'>
+        {/* User Access Chart */}
+        <div className='chart-card'>
+          <div className='chart-header'>
+            <h3>Tỷ Lệ Truy Cập Người Dùng</h3>
+            <div className='time-filter'>
+              {['day', 'week', 'month', 'year'].map((t) => (
+                <button
+                  key={t}
+                  className={`filter-btn ${timeRange === t ? 'active' : ''}`}
+                  onClick={() => setTimeRange(t)}
+                >
+                  {t === 'day'
+                    ? 'Ngày'
+                    : t === 'week'
+                    ? 'Tuần'
+                    : t === 'month'
+                    ? 'Tháng'
+                    : 'Năm'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width='100%' height={300}>
+            <LineChart data={userAccessData}>
+              <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+              <XAxis dataKey='name' />
+              <YAxis domain={[0, 50]} />
+              <Tooltip
+                contentStyle={{
+                  background: '#fff',
+                  border: '1px solid #FF6B35',
+                }}
+                cursor={{ stroke: '#FF6B35', strokeWidth: 2 }}
+              />
+              <Legend />
+              <Line
+                type='monotone'
+                dataKey='users'
+                stroke='#FF6B35'
+                strokeWidth={2}
+                dot={{ fill: '#FF6B35', r: 5 }}
+                activeDot={{ r: 7 }}
+                name='Người dùng truy cập'
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Revenue Chart */}
+        <div className='chart-card'>
+          <div className='chart-header'>
+            <h3>Doanh Thu</h3>
+            <div className='time-filter'>
+              {['day', 'month', 'year'].map((t) => (
+                <button
+                  key={t}
+                  className={`filter-btn ${t === 'month' ? 'active' : ''}`}
+                >
+                  {t === 'day' ? 'Ngày' : t === 'month' ? 'Tháng' : 'Năm'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <ResponsiveContainer width='100%' height={300}>
+            <AreaChart data={revenueData}>
+              <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+              <XAxis dataKey='name' />
+              <YAxis />
+              <Tooltip
+                contentStyle={{
+                  background: '#fff',
+                  border: '1px solid #FF6B35',
+                }}
+              />
+              <Area
+                type='monotone'
+                dataKey='revenue'
+                fill='#FF6B3520'
+                stroke='#FF6B35'
+                strokeWidth={2}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Statistics Section */}
+      <div className='location-performance'>
+        <h3>Thống Kê Cơ Bản</h3>
+        <div className='performance-grid'>
+          <div className='location-card'>
+            <div className='location-header'>
+              <h4>Tổng Đơn Hàng</h4>
+            </div>
+            <div className='location-stats'>
+              <div className='stat'>
+                <span className='label'>Hôm Nay</span>
+                <span className='number'>234</span>
+              </div>
+              <div className='stat'>
+                <span className='label'>Tuần Này</span>
+                <span className='number'>1,456</span>
+              </div>
+            </div>
+          </div>
+
+          <div className='location-card'>
+            <div className='location-header'>
+              <h4>Tỷ Lệ Chuyển Đổi</h4>
+            </div>
+            <div className='location-stats'>
+              <div className='stat'>
+                <span className='label'>Hôm Nay</span>
+                <span className='number'>68%</span>
+              </div>
+              <div className='stat'>
+                <span className='label'>Tuần Này</span>
+                <span className='number'>72%</span>
+              </div>
+            </div>
+          </div>
+
+          <div className='location-card'>
+            <div className='location-header'>
+              <h4>Tài Khoản Mới</h4>
+            </div>
+            <div className='location-stats'>
+              <div className='stat'>
+                <span className='label'>Hôm Nay</span>
+                <span className='number'>45</span>
+              </div>
+              <div className='stat'>
+                <span className='label'>Tuần Này</span>
+                <span className='number'>312</span>
+              </div>
+            </div>
+          </div>
+
+          <div className='location-card'>
+            <div className='location-header'>
+              <h4>Tài Khoản Hoạt Động</h4>
+            </div>
+            <div className='location-stats'>
+              <div className='stat'>
+                <span className='label'>Hôm Nay</span>
+                <span className='number'>2,145</span>
+              </div>
+              <div className='stat'>
+                <span className='label'>Tuần Này</span>
+                <span className='number'>8,756</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default DashboardContent

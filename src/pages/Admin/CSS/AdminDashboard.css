@@ -1,0 +1,136 @@
+/* src/pages/Admin/CSS/AdminDashboard.css */
+
+.admin-container {
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    min-height: 100vh;
+    background: #f5f7fa;
+}
+
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.admin-main.collapsed {
+    grid-template-columns: 60px 1fr;
+}
+
+.admin-header {
+    background: white;
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.toggle-sidebar-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #FF6B35;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.toggle-sidebar-btn:hover {
+    background: rgba(255, 107, 53, 0.1);
+}
+
+.header-title {
+    flex: 1;
+}
+
+.header-title h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-box input {
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #FF6B35;
+}
+
+.search-box span {
+    position: absolute;
+    right: 12px;
+    color: #999;
+    font-size: 16px;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-profile:hover {
+    background: rgba(255, 107, 53, 0.2);
+}
+
+.admin-profile img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+}
+
+.admin-profile span {
+    font-weight: 600;
+    color: #FF6B35;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-header {
+        padding: 15px 20px;
+    }
+
+    .header-right {
+        gap: 12px;
+    }
+
+    .admin-content {
+        padding: 20px;
+    }
+}
