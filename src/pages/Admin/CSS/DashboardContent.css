@@ -123,6 +123,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .chart-header h3 {
@@ -130,6 +132,8 @@
     font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
+    flex: 1;
+    min-width: 250px;
 }
 
 .time-filter {
@@ -160,6 +164,12 @@
 }
 
 /* Year Select Styling */
+.year-select {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
 .year-select select {
     padding: 8px 16px;
     background: #f0f0f0;
@@ -180,6 +190,18 @@
     outline: none;
     background: rgba(255, 107, 53, 0.1);
     border-color: #FF6B35;
+}
+
+/* Loading and Empty State */
+.chart-loading,
+.chart-empty {
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+    font-weight: 500;
 }
 
 /* Location Performance Section */
