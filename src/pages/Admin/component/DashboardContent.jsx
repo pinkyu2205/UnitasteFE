@@ -20,6 +20,11 @@ const DashboardContent = () => {
   const [timeRange, setTimeRange] = useState('month')
   const [activeCount, setActiveCount] = useState(0)
   const [inactiveCount, setInactiveCount] = useState(0)
+  const [registerData, setRegisterData] = useState([])
+  const [selectedYear, setSelectedYear] = useState(
+    String(new Date().getFullYear())
+  )
+  const [isLoadingRegister, setIsLoadingRegister] = useState(false)
 
   useEffect(() => {
     const fetchUserCounts = async () => {
@@ -38,6 +43,47 @@ const DashboardContent = () => {
 
     fetchUserCounts()
   }, [])
+
+  // Lấy dữ liệu đăng ký theo tháng
+  useEffect(() => {
+    const fetchRegisterByMonth = async () => {
+      setIsLoadingRegister(true)
+      try {
+        const res = await UserApi.countRegisterByMonth(selectedYear)
+
+        // API trả về: { year: 2025, data: { 1: 35, 2: 36, ... } }
+        let dataObj = res?.data?.data || res?.data
+
+        if (!dataObj || typeof dataObj !== 'object') {
+          console.warn('Dữ liệu không hợp lệ:', dataObj)
+          setRegisterData([])
+          return
+        }
+
+        // Chuyển object thành array [{ name: 'T1', count: 0 }, ...]
+        const chartData = Object.keys(dataObj)
+          .filter((key) => !isNaN(key)) // Chỉ lấy các key là số (tháng)
+          .map((month) => ({
+            name: `T${month}`,
+            count: dataObj[month] || 0,
+          }))
+          .sort((a, b) => {
+            const monthA = parseInt(a.name.replace('T', ''))
+            const monthB = parseInt(b.name.replace('T', ''))
+            return monthA - monthB
+          })
+
+        setRegisterData(chartData)
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu đăng ký theo tháng:', error)
+        setRegisterData([])
+      } finally {
+        setIsLoadingRegister(false)
+      }
+    }
+
+    fetchRegisterByMonth()
+  }, [selectedYear])
 
   // Mock data cho biểu đồ truy cập người dùng theo tuần
   const userAccessData = [
@@ -99,7 +145,7 @@ const DashboardContent = () => {
             <div className='stat-info'>
               <h4>{card.title}</h4>
               <div className='stat-value'>{card.value}</div>
-              <p className='stat-change'>{card.change} so với kỳ trước</p>
+              {/* <p className='stat-change'>{card.change} so với kỳ trước</p> */}
             </div>
           </div>
         ))}
@@ -155,41 +201,70 @@ const DashboardContent = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Revenue Chart */}
+        {/* Registration Chart */}
         <div className='chart-card'>
           <div className='chart-header'>
-            <h3>Doanh Thu</h3>
-            <div className='time-filter'>
-              {['day', 'month', 'year'].map((t) => (
-                <button
-                  key={t}
-                  className={`filter-btn ${t === 'month' ? 'active' : ''}`}
-                >
-                  {t === 'day' ? 'Ngày' : t === 'month' ? 'Tháng' : 'Năm'}
-                </button>
-              ))}
+            <h3>Số Người Đăng Ký Theo Tháng ({selectedYear})</h3>
+            <div className='year-select'>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+              >
+                <option value='2024'>2024</option>
+                <option value='2025'>2025</option>
+                <option value='2026'>2026</option>
+              </select>
             </div>
           </div>
-          <ResponsiveContainer width='100%' height={300}>
-            <AreaChart data={revenueData}>
-              <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-              <XAxis dataKey='name' />
-              <YAxis />
-              <Tooltip
-                contentStyle={{
-                  background: '#fff',
-                  border: '1px solid #FF6B35',
-                }}
-              />
-              <Area
-                type='monotone'
-                dataKey='revenue'
-                fill='#FF6B3520'
-                stroke='#FF6B35'
-                strokeWidth={2}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          {isLoadingRegister ? (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#999',
+              }}
+            >
+              Đang tải dữ liệu...
+            </div>
+          ) : registerData.length > 0 ? (
+            <ResponsiveContainer width='100%' height={300}>
+              <AreaChart data={registerData}>
+                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+                <XAxis dataKey='name' />
+                <YAxis />
+                <Tooltip
+                  contentStyle={{
+                    background: '#fff',
+                    border: '1px solid #4F46E5',
+                  }}
+                  cursor={{ stroke: '#4F46E5', strokeWidth: 2 }}
+                />
+                <Legend />
+                <Area
+                  type='monotone'
+                  dataKey='count'
+                  fill='#4F46E520'
+                  stroke='#4F46E5'
+                  strokeWidth={2}
+                  name='Số lượng đăng ký'
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <div
+              style={{
+                height: 300,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#999',
+              }}
+            >
+              Không có dữ liệu
+            </div>
+          )}
         </div>
       </div>
 
