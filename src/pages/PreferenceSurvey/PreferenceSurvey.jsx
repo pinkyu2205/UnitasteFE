@@ -1,14 +1,20 @@
 // src/pages/PreferenceSurvey/PreferenceSurvey.jsx
 
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import UserApi from '../../api/userApi'
 import ProgressBar from './component/ProgressBar'
 import SurveyStep from './component/SurveyStep'
 import './CSS/PreferenceSurvey.css'
 
 const PreferenceSurvey = () => {
+  const navigate = useNavigate()
+
   const [currentStep, setCurrentStep] = useState(0)
   const [surveyData, setSurveyData] = useState({
     priceRange: [],
+    preferredLocation: [],
+    customPreferredLocation: '',
     customPrice: '',
     preferredPlaces: [],
     customPlace: '',
@@ -184,17 +190,25 @@ const PreferenceSurvey = () => {
       placeholder: 'Thêm phong cách khác...',
     },
     {
-      title: 'Khoảng cách từ bạn',
-      description: 'Bạn sẵn sàng đi bao xa?',
-      type: 'single-select',
-      key: 'distance',
+      title: 'Khu vực bạn muốn đến',
+      description:
+        'Chọn các khu vực/quận bạn thường đi (có thể chọn nhiều hoặc tự nhập)',
+      type: 'multiselect-with-input',
+      key: 'preferredLocation', // đổi key để tránh lẫn với cũ
+      customKey: 'customPreferredLocation',
       options: [
-        { label: 'Dưới 1 km', value: '1km' },
-        { label: '1 - 3 km', value: '1-3km' },
-        { label: '3 - 5 km', value: '3-5km' },
-        { label: '5 - 10 km', value: '5-10km' },
-        { label: 'Trên 10 km', value: '10km+' },
+        { label: 'Quận 1', value: 'Quận 1' },
+        { label: 'Quận 3', value: 'Quận 3' },
+        { label: 'Bình Thạnh', value: 'Bình Thạnh' },
+        { label: 'Phú Nhuận', value: 'Phú Nhuận' },
+        { label: 'Gò Vấp', value: 'Gò Vấp' },
+        { label: 'Tân Bình', value: 'Tân Bình' },
+        { label: 'Quận 5', value: 'Quận 5' },
+        { label: 'Quận 7', value: 'Quận 7' },
+        { label: 'Quận 10', value: 'Quận 10' },
+        // ... mở rộng tùy ý
       ],
+      placeholder: 'Nhập tên khu vực khác...',
     },
     {
       title: 'Thời gian bạn thường đi ăn',
@@ -266,11 +280,39 @@ const PreferenceSurvey = () => {
     }
   }
 
-  const handleSubmit = () => {
-    console.log('Survey Data:', surveyData)
-    // Gọi API để lưu dữ liệu
-    // saveUserPreferences(surveyData)
-    alert('Cảm ơn bạn đã hoàn thành khảo sát! Dữ liệu của bạn đã được lưu.')
+  const handleSubmit = async () => {
+    const userId = localStorage.getItem('userId')
+    if (!userId) {
+      alert('Vui lòng đăng nhập trước khi khảo sát!')
+      return
+    }
+    // Map đúng trường cần gửi
+    const payload = {
+      UserId: Number(userId),
+      PreferredPriceRange: surveyData.priceRange.join(','),
+      PreferredPlaceTypes: surveyData.preferredPlaces.join(','),
+      PreferredLocation: surveyData.preferredLocation.join(','),
+      GoingWith: surveyData.goingWithWho.join(','),
+      Purpose: surveyData.purpose.join(','),
+      RequiredFeatures: surveyData.placeFeatures.join(','),
+      Note: surveyData.notes,
+      VenueAtmosphere: surveyData.atmosphere.join(','),
+      CuisineType: surveyData.cuisine.join(','),
+      VisitTime: surveyData.workingHours.join(','),
+    }
+
+    try {
+      const res = await UserApi.createUserPreference(payload)
+      if (res && res.userPreferenceId) {
+        alert('Cảm ơn bạn đã hoàn thành khảo sát! Dữ liệu của bạn đã được lưu.')
+        navigate('/map')
+      } else {
+        alert('Có lỗi xảy ra khi lưu khảo sát. Vui lòng thử lại.')
+      }
+    } catch (error) {
+      alert(error?.message || 'Có lỗi kết nối server hoặc token hết hạn.')
+      console.error(error)
+    }
   }
 
   const currentSurvey = surveys[currentStep]
@@ -280,7 +322,7 @@ const PreferenceSurvey = () => {
       <div className='survey-wrapper'>
         <div className='survey-header'>
           <h1>Khảo sát sở thích của bạn</h1>
-          <p>Giúp chúng tôi tìm hiểu bạn hơn để đưa ra gợi ý tốt nhất</p>
+          <p>Giúp chúng mình tìm hiểu bạn để đưa ra gợi ý tốt nhất</p>
         </div>
 
         <ProgressBar current={currentStep + 1} total={surveys.length} />

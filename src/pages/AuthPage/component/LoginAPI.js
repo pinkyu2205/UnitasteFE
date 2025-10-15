@@ -7,7 +7,8 @@ export const LoginAPI = async (email, password) => {
       email: email,
       password: password,
     })
-    return res.token
+    console.log('Login response:', res)
+    return { token: res.token, userId: res.userId }
   } catch (err) {
     throw err.response?.data || { message: 'Login failed' }
   }

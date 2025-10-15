@@ -1,8 +1,11 @@
 // src/pages/Profile/component/ProfileSidebar.jsx
-
+import React from 'react'
+import { useNavigate } from 'react-router-dom';
 import '../CSS/ProfileSidebar.css'
 
 const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
+const navigate = useNavigate();
+
   const menuItems = [
     { id: 'info', label: 'Thông tin cá nhân', icon: '👤' },
     { id: 'password', label: 'Đổi mật khẩu', icon: '🔐' },
