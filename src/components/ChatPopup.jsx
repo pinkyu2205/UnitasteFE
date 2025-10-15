@@ -1,139 +1,215 @@
+import { Loader2, MessageCircle, Send, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import AIChatApi from '../api/AIChatApi'
-// ⚠️ Điều chỉnh đường dẫn này
-
-// 💡 IMPORT FILE CSS MỚI
 import './CSS/ChatPopup.css'
-
-// Icon cơ bản
-const ChatIcon = () => (
-  <svg
-    xmlns='http://www.w3.org/2000/svg'
-    width='24'
-    height='24'
-    viewBox='0 0 24 24'
-    fill='none'
-    stroke='currentColor'
-    strokeWidth='2'
-    strokeLinecap='round'
-    strokeLinejoin='round'
-  >
-    <path d='M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z' />
-  </svg>
-)
 
 const ChatPopup = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const [messages, setMessages] = useState([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-
+  const [messages, setMessages] = useState([
+    {
+      role: 'assistant',
+      content:
+        'Xin chào! Tôi có thể giúp bạn tìm kiếm quán ăn gần đây. Bạn muốn tìm gì?',
+      timestamp: new Date(),
+    },
+  ])
+  const [inputMessage, setInputMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null)
+  const chatContainerRef = useRef(null)
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    scrollToBottom()
   }, [messages])
 
-  const handleSendPrompt = async () => {
-    if (!input.trim() || loading) return
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isLoading) return
 
-    const userMessage = { sender: 'user', text: input }
+    const userMessage = {
+      role: 'user',
+      content: inputMessage,
+      timestamp: new Date(),
+    }
+
     setMessages((prev) => [...prev, userMessage])
-    setInput('')
-    setLoading(true)
+    setInputMessage('')
+    setIsLoading(true)
 
     try {
-      const result = await AIChatApi.getAIResponse(input)
-      const aiResponseText =
-        result.data.response || 'Xin lỗi, tôi không hiểu câu hỏi của bạn.'
-      const aiMessage = { sender: 'ai', text: aiResponseText }
-      setMessages((prev) => [...prev, aiMessage])
+      const userId = localStorage.getItem('userId')
+      const token = localStorage.getItem('token')
+
+      // Giả sử bạn có lat, lng từ vị trí hiện tại
+      const lat = 10.762622 // Vị trí mặc định (TP.HCM)
+      const lng = 106.660172
+
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_GATEWAY
+        }/AI/smart-recommend?userId=${userId}&prompt=${encodeURIComponent(
+          inputMessage
+        )}&lat=${lat}&lng=${lng}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (!response.ok) throw new Error('Lỗi khi gọi API')
+
+      const data = await response.json()
+
+      const assistantMessage = {
+        role: 'assistant',
+        content:
+          data.answer ||
+          'Xin lỗi, tôi không thể xử lý yêu cầu của bạn lúc này.',
+        timestamp: new Date(),
+      }
+
+      setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
-      console.error('Lỗi khi gọi API AI:', error)
+      console.error('Error:', error)
       const errorMessage = {
-        sender: 'ai',
-        text: 'Lỗi: Không thể kết nối với dịch vụ AI.',
+        role: 'assistant',
+        content: 'Đã có lỗi xảy ra. Vui lòng thử lại sau.',
+        timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])
     } finally {
-      setLoading(false)
+      setIsLoading(false)
+    }
+  }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
     }
   }
 
   return (
-    // Sử dụng className="chat-container"
-    <div className='chat-container'>
-      {/* 1. Cửa sổ Chat */}
+    <div className='chat-popup-container'>
+      {/* Chat Button */}
+      {!isOpen && (
+        <button onClick={() => setIsOpen(true)} className='chat-popup-button'>
+          <MessageCircle className='chat-popup-icon' />
+          <span className='chat-popup-badge'>AI</span>
+          <div className='chat-popup-ping'></div>
+        </button>
+      )}
+
+      {/* Chat Window */}
       {isOpen && (
-        // Sử dụng className="chat-popup"
-        <div className='chat-popup'>
-          <div className='chat-header'>
-            <span>Trợ lý AI</span>
-            {/* Sử dụng className="chat-close-button" */}
+        <div className='chat-popup-window'>
+          {/* Header */}
+          <div className='chat-popup-header'>
+            <div className='chat-popup-header-bg'></div>
+            <div className='chat-popup-header-content'>
+              <div className='chat-popup-avatar-wrapper'>
+                <div className='chat-popup-avatar'>
+                  <MessageCircle className='chat-popup-avatar-icon' />
+                </div>
+                <span className='chat-popup-status'></span>
+              </div>
+              <div>
+                <h3 className='chat-popup-title'>AI Assistant</h3>
+                <p className='chat-popup-subtitle'>Luôn sẵn sàng hỗ trợ</p>
+              </div>
+            </div>
             <button
               onClick={() => setIsOpen(false)}
-              className='chat-close-button'
+              className='chat-popup-close'
             >
-              X
+              <X className='chat-popup-close-icon' />
             </button>
           </div>
-          {/* Sử dụng className="chat-messages-container" */}
-          <div className='chat-messages-container'>
-            {messages.length === 0 && (
-              <p className='chat-welcome-message'>
-                Chào mừng! Hãy hỏi tôi bất cứ điều gì về bản đồ, nhà hàng, hoặc
-                các chủ đề khác.
-              </p>
-            )}
+
+          {/* Messages Container */}
+          <div ref={chatContainerRef} className='chat-popup-messages'>
             {messages.map((msg, index) => (
-              // Sử dụng className động dựa trên người gửi
               <div
                 key={index}
-                className={
-                  msg.sender === 'user'
-                    ? 'chat-user-message'
-                    : 'chat-ai-message'
-                }
+                className={`chat-popup-message ${
+                  msg.role === 'user'
+                    ? 'chat-popup-message-user'
+                    : 'chat-popup-message-assistant'
+                }`}
               >
-                <strong>{msg.sender === 'user' ? 'Bạn' : 'AI'}:</strong>{' '}
-                {msg.text}
+                <div
+                  className={`chat-popup-message-bubble ${
+                    msg.role === 'user'
+                      ? 'chat-popup-bubble-user'
+                      : 'chat-popup-bubble-assistant'
+                  }`}
+                >
+                  <p className='chat-popup-message-text'>{msg.content}</p>
+                  <span
+                    className={`chat-popup-message-time ${
+                      msg.role === 'user'
+                        ? 'chat-popup-time-user'
+                        : 'chat-popup-time-assistant'
+                    }`}
+                  >
+                    {new Date(msg.timestamp).toLocaleTimeString('vi-VN', {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
               </div>
             ))}
+
+            {isLoading && (
+              <div className='chat-popup-message chat-popup-message-assistant'>
+                <div className='chat-popup-message-bubble chat-popup-bubble-assistant'>
+                  <div className='chat-popup-loading'>
+                    <Loader2 className='chat-popup-loading-icon' />
+                    <span className='chat-popup-loading-text'>
+                      Đang suy nghĩ...
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
-            {loading && <div className='chat-loading'>AI đang nhập...</div>}
           </div>
-          {/* Sử dụng className="chat-input-area" */}
-          <div className='chat-input-area'>
-            <input
-              type='text'
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') handleSendPrompt()
-              }}
-              placeholder='Nhập câu hỏi...'
-              disabled={loading}
-              className='chat-input-field'
-            />
-            <button
-              onClick={handleSendPrompt}
-              disabled={loading || !input.trim()}
-              className='chat-send-button'
-            >
-              Gửi
-            </button>
+
+          {/* Input Area */}
+          <div className='chat-popup-input-wrapper'>
+            <div className='chat-popup-input-container'>
+              <div className='chat-popup-textarea-wrapper'>
+                <textarea
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder='Nhập tin nhắn...'
+                  className='chat-popup-textarea'
+                  rows='1'
+                  disabled={isLoading}
+                />
+              </div>
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() || isLoading}
+                className='chat-popup-send-button'
+              >
+                {isLoading ? (
+                  <Loader2 className='chat-popup-send-icon chat-popup-send-loading' />
+                ) : (
+                  <Send className='chat-popup-send-icon' />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}
-
-      {/* 2. Nút Bật/Tắt */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className='chat-toggle-button'
-        aria-label={isOpen ? 'Đóng Chat' : 'Mở Chat'}
-      >
-        <ChatIcon />
-      </button>
     </div>
   )
 }
