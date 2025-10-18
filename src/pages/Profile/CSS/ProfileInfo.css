@@ -201,48 +201,82 @@
 /* Form Actions */
 .form-actions {
     display: flex;
-    gap: 16px;
-    margin-top: 30px;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 40px;
     padding-top: 30px;
     border-top: 2px solid rgba(255, 107, 53, 0.1);
 }
 
+/* luu va huy */
 .btn-save,
 .btn-cancel {
     flex: 1;
-    padding: 14px 24px;
+    padding: 14px 36px;
     border: none;
-    border-radius: 12px;
-    font-size: 15px;
+    border-radius: 16px;
+    font-size: 16px;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-family: inherit;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-save {
     background: linear-gradient(135deg, #FF6B35, #FF8C42);
     color: white;
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3);
 }
 
 .btn-save:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 10px 26px rgba(255, 107, 53, 0.4);
+}
+
+.btn-save::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60px;
+  width: 40px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+  transform: skewX(-20deg);
+  transition: left 0.6s ease;
+}
+
+.btn-save:hover::after {
+  left: 120%;
 }
 
 .btn-cancel {
     background: rgba(255, 107, 53, 0.1);
     color: #FF6B35;
-    border: 2px solid rgba(255, 107, 53, 0.2);
+    border: 2px solid rgba(255, 107, 53, 0.35);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.1);
 }
 
 .btn-cancel:hover {
     background: rgba(255, 107, 53, 0.15);
     border-color: #FF6B35;
+    transform: translateY(-2px);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-save,
+  .btn-cancel {
+    width: 100%;
+    max-width: 300px;
+  }
+}
     .profile-info-container {
         padding: 24px;
     }
@@ -265,4 +299,30 @@
     .edit-btn {
         width: 100%;
     }
+
+/* ===== Scrollable Area ===== */
+.profile-info-container {
+    max-height: 80vh; /* hiển thị tối đa 80% chiều cao màn hình */
+    overflow-y: auto; /* bật thanh cuộn dọc */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #FF6B35 #fff; /* Firefox: màu thanh cuộn & nền */
+}
+
+/* Chrome, Edge, Safari */
+.profile-info-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.profile-info-container::-webkit-scrollbar-track {
+    background: #fff;
+    border-radius: 8px;
+}
+
+.profile-info-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #FF6B35, #FF8C42);
+    border-radius: 8px;
+}
+
+.profile-info-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #FF8C42, #FF6B35);
 }
