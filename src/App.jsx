@@ -45,6 +45,9 @@ function App() {
 
         {/* Admin */}
         <Route path='/admin' element={<AdminDashboard />} />
+
+        {/* Chat */}
+        <Route path='/chat' element={<ChatPage />} />
       </Routes>
     </BrowserRouter>
   )
