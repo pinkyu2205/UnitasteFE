@@ -1,14 +1,15 @@
-// src/pages/Profile/component/ProfileInfo.jsx
-
-import { useState } from 'react'
-import UserApi from '../../../api/userApi'
+import axios from 'axios'
+import { useEffect, useState } from 'react'
 import '../CSS/ProfileInfo.css'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+const token = localStorage.getItem('token')
 
 const ProfileInfo = ({ userData, onUpdateProfile }) => {
   const [isEditing, setIsEditing] = useState(false)
-  const [isLoading, setIsLoading] = useState(false) // State loading cho nút Save
-  const [uploading, setUploading] = useState(false) // State loading cho upload ảnh
-  const [error, setError] = useState(null) // State lỗi
+  const [isLoading, setIsLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState(null)
   const [formData, setFormData] = useState({
     fullName: userData.fullName,
     email: userData.email,
@@ -16,10 +17,10 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     gender: userData.gender,
     birthDate: userData.birthDate,
   })
-  const [avatarUrl, setAvatarUrl] = useState(userData.avatarUrl) // ✅ Đổi tên thành avatarUrl cho rõ ràng
+  const [avatarUrl, setAvatarUrl] = useState(userData.avatarUrl)
 
-  // Đồng bộ State khi userData thay đổi (nếu được fetch lại)
-  useState(() => {
+  // 🔁 Đồng bộ khi userData thay đổi
+  useEffect(() => {
     setFormData({
       fullName: userData.fullName,
       email: userData.email,
@@ -35,70 +36,65 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
     setError(null)
   }
-
-  // ✅ CẬP NHẬT LOGIC: Upload ảnh lên API và lấy URL
+  // ✅ HÀM DUY NHẤT xử lý upload avatar
   const handleImageUpload = async (e) => {
     const file = e.target.files[0]
     if (!file) return
 
-    setUploading(true)
-    setError(null)
-
     try {
-      const newFormData = new FormData()
-      newFormData.append('avatarFile', file)
+      setUploading(true)
 
-      // ✅ Gọi API upload ảnh
-      const response = await UserApi.uploadAvatar(newFormData)
+      // Tạo preview tạm
+      const previewUrl = URL.createObjectURL(file)
+      setAvatarUrl(previewUrl)
 
-      // ✅ Lấy avatar URL trả về từ server (hoặc từ response.avatarUrl)
-      const newAvatarUrl = response.avatarUrl || response.data?.avatarUrl
+      // Gửi ảnh lên API
+      const formData = new FormData()
+      formData.append('avatarFile', file)
 
-      // ✅ Cập nhật ảnh hiển thị ngay
-      setAvatarUrl(newAvatarUrl)
+      const res = await axios.post(
+        `${API_URL}/api/users/upload-avatar`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
 
-      // ✅ Nếu có prop cập nhật profile ở cha thì truyền lại
-      if (onUpdateProfile) {
-        onUpdateProfile({ ...userData, avatarUrl: newAvatarUrl })
-      }
-    } catch (err) {
-      console.error('Upload avatar error:', err)
-      setError('Tải ảnh thất bại, vui lòng thử lại!')
+      // ✅ Cập nhật avatarUrl mới nhất
+      const newUrl = res.data.avatarUrl
+      setAvatarUrl(newUrl)
+
+      const updatedUser = { ...userData, avatarUrl: newUrl }
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+    } catch (error) {
+      console.error('Lỗi khi upload ảnh:', error)
+      setError('Không thể tải ảnh lên. Vui lòng thử lại.')
     } finally {
       setUploading(false)
     }
   }
 
-  // ✅ CẬP NHẬT LOGIC: Gọi onUpdateProfile với URL mới nhất
+  //luu thay doi
   const handleSave = async () => {
-    // Có thể thêm validation cơ bản ở đây (ví dụ: fullName không được rỗng)
-
     setIsLoading(true)
-    setError(null)
-
     try {
       const success = await onUpdateProfile({
         ...formData,
-        avatarUrl: avatarUrl, // ✅ Truyền URL mới nhất (đã upload)
+        avatarUrl: avatarUrl,
       })
-
-      if (success) {
-        setIsEditing(false)
-        // Note: Logic set success message sẽ nằm ở ProfilePage.jsx
-      } else {
-        // Nếu onUpdateProfile không throw mà trả về false
-        throw new Error('Lưu thông tin thất bại.')
-      }
+      if (success) setIsEditing(false)
     } catch (err) {
-      console.error('Lỗi khi lưu profile:', err)
-      setError(err.message || 'Lưu thay đổi không thành công.')
+      console.error(err)
+      setError('Lưu thông tin không thành công.')
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleCancel = () => {
-    // Reset về giá trị userData gốc
     setFormData({
       fullName: userData.fullName,
       email: userData.email,
@@ -106,11 +102,12 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
       gender: userData.gender,
       birthDate: userData.birthDate,
     })
-    setAvatarUrl(userData.avatarUrl) // Reset URL ảnh về ban đầu
+    setAvatarUrl(userData.avatarUrl)
     setIsEditing(false)
-    setError(null) // Xóa lỗi
+    setError(null)
   }
 
+  // ✅ Giao diện
   return (
     <div className='profile-info-container'>
       <div className='info-header'>
@@ -122,7 +119,6 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
         )}
       </div>
 
-      {/* Hiển thị lỗi chung */}
       {error && (
         <div className='error-message'>
           <span className='error-icon'>⚠️</span>
@@ -131,16 +127,10 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
       )}
 
       <div className='profile-info-content'>
-        {/* Avatar Section */}
         <div className='avatar-section'>
           <div className='avatar-container'>
-            {/* ✅ Sử dụng avatarUrl mới nhất */}
             {avatarUrl ? (
-              <img
-                src={avatarUrl}
-                alt={formData.fullName}
-                className='avatar-image'
-              />
+              <img src={avatarUrl} alt='avatar' className='avatar-image' />
             ) : (
               <div className='avatar-placeholder-large'>
                 {formData.fullName?.charAt(0).toUpperCase() || 'U'}
@@ -150,18 +140,14 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
 
           {isEditing && (
             <div className='avatar-upload'>
-              <label
-                htmlFor='avatar-input'
-                className='upload-label'
-                disabled={uploading}
-              >
+              <label htmlFor='avatar-input' className='upload-label'>
                 {uploading ? 'Đang tải...' : '📸 Tải ảnh lên'}
               </label>
               <input
                 id='avatar-input'
                 type='file'
                 accept='image/*'
-                onChange={handleImageUpload} // ✅ Dùng hàm upload mới
+                onChange={handleImageUpload}
                 className='upload-input'
                 disabled={uploading}
               />
@@ -169,9 +155,7 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
           )}
         </div>
 
-        {/* Form Fields (Giữ nguyên cấu trúc) */}
         <div className='form-fields'>
-          {/* Họ và Tên */}
           <div className='form-group'>
             <label>Họ và tên</label>
             {isEditing ? (
@@ -181,21 +165,17 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
                 value={formData.fullName}
                 onChange={handleInputChange}
                 className='form-input'
-                placeholder='Nhập họ và tên'
               />
             ) : (
               <div className='form-value'>{userData.fullName}</div>
             )}
           </div>
 
-          {/* Email (Không cho sửa theo API PUT) */}
           <div className='form-group'>
             <label>Email</label>
             <div className='form-value read-only'>{userData.email}</div>
-            {isEditing && <small>Email không thể thay đổi.</small>}
           </div>
 
-          {/* Bio */}
           <div className='form-group'>
             <label>Tiểu sử</label>
             {isEditing ? (
@@ -204,8 +184,6 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
                 value={formData.bio}
                 onChange={handleInputChange}
                 className='form-textarea'
-                placeholder='Viết gì đó về bản thân bạn...'
-                rows='4'
               />
             ) : (
               <div className='form-value bio-value'>
@@ -214,7 +192,6 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
             )}
           </div>
 
-          {/* Giới tính */}
           <div className='form-group'>
             <label>Giới tính</label>
             {isEditing ? (
@@ -236,14 +213,13 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
             )}
           </div>
 
-          {/* Ngày sinh */}
           <div className='form-group'>
             <label>Ngày sinh</label>
             {isEditing ? (
               <input
                 type='date'
                 name='birthDate'
-                value={formData.birthDate?.substring(0, 10) || ''} // Format date cho input
+                value={formData.birthDate?.substring(0, 10) || ''}
                 onChange={handleInputChange}
                 className='form-input'
               />
@@ -257,7 +233,6 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
           </div>
         </div>
 
-        {/* Action Buttons */}
         {isEditing && (
           <div className='form-actions'>
             <button
