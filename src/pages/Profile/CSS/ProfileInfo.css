@@ -312,22 +312,3 @@
     scrollbar-color: #FF6B35 #fff;
     /* Firefox: màu thanh cuộn & nền */
 }
-
-/* Chrome, Edge, Safari */
-.profile-info-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.profile-info-container::-webkit-scrollbar-track {
-    background: #fff;
-    border-radius: 8px;
-}
-
-.profile-info-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #FF6B35, #FF8C42);
-    border-radius: 8px;
-}
-
-.profile-info-container::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, #FF8C42, #FF6B35);
-}
