@@ -1,0 +1,152 @@
+/* src/pages/ChatPage/component/CSS/EmojiPicker.css */
+
+/* Biến màu (lấy từ ChatPage.css) */
+:root {
+    --primary-color: #f26522;
+    --surface-color: #ffffff;
+    --bg-light: #fef5f1;
+    --border-light: rgba(242, 101, 34, 0.15);
+    --shadow-main: 0 10px 40px rgba(242, 101, 34, 0.1);
+}
+
+.emoji-picker-container {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    /* Nằm ngay trên thanh input */
+    right: 0;
+    width: 350px;
+    height: 450px;
+    background: var(--surface-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-main);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 1. Header (Tab buttons) */
+.picker-header {
+    order: 3;
+    /* Đẩy xuống dưới cùng */
+    display: flex;
+    background-color: #f9f9f9;
+    border-top: 1px solid var(--border-light);
+}
+
+.picker-header button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.picker-header button:hover {
+    background-color: var(--bg-light);
+}
+
+.picker-header button.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+/* 2. Content */
+.picker-content {
+    order: 1;
+    /* Lên trên */
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Tab Emoji */
+.emoji-tab-content .EmojiPickerReact {
+    border: none !important;
+    box-shadow: none !important;
+    background: var(--surface-color) !important;
+}
+
+/* Tab Sticker */
+.sticker-tab-content {
+    padding: 10px;
+}
+
+.sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.sticker-item {
+    background: var(--bg-light);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.2s ease;
+}
+
+.sticker-item:hover {
+    transform: scale(1.1);
+    border-color: var(--primary-color);
+}
+
+.sticker-item img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+}
+
+/* 3. Footer (Sticker Packs) */
+.sticker-pack-footer {
+    order: 2;
+    /* Nằm giữa content và header */
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fdfdfd;
+    border-top: 1px solid var(--border-light);
+    overflow-x: auto;
+}
+
+.pack-icon {
+    width: 40px;
+    height: 40px;
+    padding: 4px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: #f0f0f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pack-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pack-icon.active {
+    border-color: var(--primary-color);
+    background: var(--bg-light);
+}
