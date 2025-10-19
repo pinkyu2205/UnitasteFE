@@ -10,6 +10,7 @@ import ChatPage from './pages/ChatPage/ChatPage'
 import MapPage from './pages/Map/Map'
 import PreferenceSurvey from './pages/PreferenceSurvey/PreferenceSurvey'
 import ProfilePage from './pages/Profile/ProfilePage'
+import Social from './pages/Social/Social'
 
 function App() {
   return (
@@ -48,6 +49,9 @@ function App() {
 
         {/* Chat */}
         <Route path='/chat' element={<ChatPage />} />
+
+        {/* Social */}
+        <Route path='/social' element={<Social />} />
       </Routes>
     </BrowserRouter>
   )

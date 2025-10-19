@@ -1,0 +1,22 @@
+/* src/pages/Social/component/Comment/Comment.css */
+.comment-container {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-content {
+    background-color: var(--bg-color);
+    padding: 8px 12px;
+    border-radius: 18px;
+    max-width: 80%;
+}
+
+.comment-user {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.comment-text {
+    font-size: 14px;
+    margin: 2px 0 0 0;
+}
