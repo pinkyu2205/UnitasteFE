@@ -1,0 +1,129 @@
+/* src/pages/Profile/CSS/ProfilePreferences.css */
+
+.pref-container {
+    background: var(--surface-color);
+    border-radius: 20px;
+    padding: 30px 40px;
+    box-shadow: var(--shadow-main);
+    border: 1px solid var(--border-light);
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pref-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.pref-header h2 {
+    color: var(--primary-color);
+    font-size: 26px;
+    margin-bottom: 10px;
+}
+
+.pref-header p {
+    font-size: 16px;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Các group đã được chuyển vào TagEditor.css */
+/* Chỉ giữ lại style cho mục "Ghi chú" (nếu cần) */
+.pref-group {
+    margin-bottom: 25px;
+}
+
+.pref-group label {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+.pref-textarea {
+    width: 100%;
+    padding: 14px 18px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    color: var(--text-dark);
+    font-size: 15px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+    resize: vertical;
+}
+
+.pref-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: white;
+    box-shadow: 0 0 0 4px var(--border-light);
+}
+
+/* Nút lưu */
+.pref-footer {
+    text-align: right;
+    margin-top: 30px;
+    border-top: 1px solid var(--border-light);
+    padding-top: 20px;
+}
+
+.save-btn {
+    padding: 14px 30px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(242, 101, 34, 0.4);
+    transition: all 0.3s ease;
+}
+
+.save-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
+}
+
+.save-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Thông báo lỗi/thành công */
+.pref-message {
+    text-align: left;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.pref-message.success {
+    background: #e6f7f0;
+    color: #006442;
+    border: 1px solid #b3e6d3;
+}
+
+.pref-message.error {
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--accent-color);
+    border: 1px solid rgba(230, 57, 70, 0.2);
+}

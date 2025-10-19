@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 import UserApi from '../../api/userApi'
 import ChangePassword from './component/ChangePassword'
 import ProfileInfo from './component/ProfileInfo'
+import ProfilePayment from './component/ProfilePayment'
 import ProfileSidebar from './component/ProfileSidebar'
 import './CSS/ProfilePage.css'
-import ProfilePayment from './component/ProfilePayment'
+import ProfilePreferences from './component/ProfilePreferences'
 
 const getUserIdFromToken = () => {
   // 1. Lấy token từ Local Storage
@@ -195,13 +196,14 @@ const ProfilePage = () => {
           )}
 
           {activeTab === 'history' && <ProfilePayment />}
+          {activeTab === 'bookmarks' && <ProfilePreferences />}
 
-          {activeTab === 'settings' && (
+          {/* {activeTab === 'settings' && (
             <div className='settings-placeholder'>
               <h2>Cài đặt</h2>
               <p>Sắp ra mắt...</p>
             </div>
-          )}
+          )} */}
         </main>
       </div>
     </div>

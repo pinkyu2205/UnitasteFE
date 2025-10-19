@@ -1,0 +1,101 @@
+/* src/pages/Profile/CSS/TagEditor.css */
+
+.tag-editor-group {
+    margin-bottom: 25px;
+}
+
+.tag-editor-group label {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+}
+
+/* Khu vực "Đã chọn" (các cục cam) */
+.selected-tags-area {
+    background: var(--bg-light);
+    border: 1px dashed var(--border-light);
+    border-radius: 10px;
+    padding: 10px 15px 15px 15px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.selected-tag-item {
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    animation: popIn 0.2s ease;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.selected-tag-item button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    margin-left: 8px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.selected-tag-item button:hover {
+    opacity: 1;
+}
+
+/* Khu vực nhập tùy chỉnh */
+.custom-input-group {
+    display: flex;
+    gap: 10px;
+}
+
+.custom-input-group input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.custom-input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.custom-input-group button {
+    padding: 0 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.custom-input-group button:hover {
+    background-color: var(--accent-color);
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+}
