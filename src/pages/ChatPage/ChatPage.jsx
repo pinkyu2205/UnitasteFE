@@ -2,7 +2,7 @@ import * as signalR from '@microsoft/signalr'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import ChatSidebar from './component/ChatSidebar'
-import ChatWindow from './component/ChatWindonw'
+import ChatWindow from './component/ChatWindow'
 import './CSS/ChatPage.css'
 
 export default function ChatPage() {

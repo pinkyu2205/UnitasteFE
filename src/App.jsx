@@ -7,6 +7,7 @@ import Register from './pages/AuthPage/Register'
 import { default as RegisterVerification } from './pages/AuthPage/RegisterVerification'
 import ResetPassword from './pages/AuthPage/ResetPassword'
 import ChatPage from './pages/ChatPage/ChatPage'
+import Checkout from './pages/Checkout'
 import MapPage from './pages/Map/Map'
 import PreferenceSurvey from './pages/PreferenceSurvey/PreferenceSurvey'
 import ProfilePage from './pages/Profile/ProfilePage'
@@ -52,6 +53,9 @@ function App() {
 
         {/* Social */}
         <Route path='/social' element={<Social />} />
+
+        {/* Checkout */}
+        <Route path='/checkout' element={<Checkout />} />
       </Routes>
     </BrowserRouter>
   )

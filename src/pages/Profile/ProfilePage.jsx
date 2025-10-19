@@ -7,6 +7,7 @@ import ChangePassword from './component/ChangePassword'
 import ProfileInfo from './component/ProfileInfo'
 import ProfileSidebar from './component/ProfileSidebar'
 import './CSS/ProfilePage.css'
+import ProfilePayment from './component/ProfilePayment'
 
 const getUserIdFromToken = () => {
   // 1. Lấy token từ Local Storage
@@ -192,6 +193,8 @@ const ProfilePage = () => {
           {activeTab === 'password' && (
             <ChangePassword onChangePassword={handleChangePassword} />
           )}
+
+          {activeTab === 'history' && <ProfilePayment />}
 
           {activeTab === 'settings' && (
             <div className='settings-placeholder'>

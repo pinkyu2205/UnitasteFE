@@ -11,7 +11,7 @@ const navigate = useNavigate();
     { id: 'password', label: 'Đổi mật khẩu', icon: '🔐' },
     { id: 'settings', label: 'Cài đặt', icon: '⚙️' },
     { id: 'bookmarks', label: 'Yêu thích', icon: '❤️' },
-    { id: 'history', label: 'Lịch sử', icon: '📜' },
+    { id: 'history', label: 'Nạp tiền', icon: '$' },
   ]
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
