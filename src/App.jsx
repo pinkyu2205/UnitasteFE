@@ -8,6 +8,7 @@ import { default as RegisterVerification } from './pages/AuthPage/RegisterVerifi
 import ResetPassword from './pages/AuthPage/ResetPassword'
 import ChatPage from './pages/ChatPage/ChatPage'
 import Checkout from './pages/Checkout'
+import HomePage from './pages/HomePage/HomePage'
 import MapPage from './pages/Map/Map'
 import PreferenceSurvey from './pages/PreferenceSurvey/PreferenceSurvey'
 import ProfilePage from './pages/Profile/ProfilePage'
@@ -17,8 +18,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* HomePage */}
+        <Route path='/' element={<HomePage />} />
+        <Route path='/home' element={<HomePage />} />
+        
         {/* AuthPage */}
-        <Route path='/' element={<Login />} />
+        <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
         <Route
           path='/register-verification'
