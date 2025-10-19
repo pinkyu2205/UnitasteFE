@@ -1,0 +1,90 @@
+/* src/pages/Social/component/Post/Post.css */
+.post-card {
+    background-color: var(--surface-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow-1);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.post-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.post-user {
+    font-weight: 600;
+}
+
+.post-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.post-location {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.post-menu {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+}
+
+.post-menu:hover {
+    background-color: #f0f0f0;
+}
+
+.post-content p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.post-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comment-section {
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-input {
+    flex-grow: 1;
+    background-color: var(--bg-color);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.comment-input:focus {
+    outline: 1px solid var(--primary-color);
+}
