@@ -6,9 +6,10 @@ import UserApi from '../../api/userApi'
 import ChangePassword from './component/ChangePassword'
 import ProfileInfo from './component/ProfileInfo'
 import ProfilePayment from './component/ProfilePayment'
-import ProfileSidebar from './component/ProfileSidebar'
-import './CSS/ProfilePage.css'
 import ProfilePreferences from './component/ProfilePreferences'
+import ProfileSidebar from './component/ProfileSidebar'
+import PurchaseHistory from './component/PurchaseHistory'
+import './CSS/ProfilePage.css'
 
 const getUserIdFromToken = () => {
   // 1. Lấy token từ Local Storage
@@ -197,6 +198,7 @@ const ProfilePage = () => {
 
           {activeTab === 'history' && <ProfilePayment />}
           {activeTab === 'bookmarks' && <ProfilePreferences />}
+          {activeTab === 'purchaseHistory' && <PurchaseHistory />}
 
           {/* {activeTab === 'settings' && (
             <div className='settings-placeholder'>

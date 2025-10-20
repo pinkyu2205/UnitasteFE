@@ -11,6 +11,7 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
     // { id: 'settings', label: 'Cài đặt', icon: '⚙️' },
     { id: 'bookmarks', label: 'Sở thích', icon: '❤️' },
     { id: 'history', label: 'Nạp tiền', icon: '$' },
+    { id: 'purchaseHistory', label: 'Lịch sử giao dịch', icon: '🧾' },
   ]
   const handleLogout = () => {
     localStorage.removeItem('accessToken')
