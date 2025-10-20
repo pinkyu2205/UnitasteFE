@@ -1,4 +1,3 @@
-// src/api/authApi.js
 import UserApi from '../../../api/userApi'
 
 export const LoginAPI = async (email, password) => {
@@ -8,7 +7,7 @@ export const LoginAPI = async (email, password) => {
       password: password,
     })
     console.log('Login response:', res)
-    return { token: res.token, userId: res.userId }
+    return { token: res.token, userId: res.userId, fullName: res.fullName }
   } catch (err) {
     throw err.response?.data || { message: 'Login failed' }
   }

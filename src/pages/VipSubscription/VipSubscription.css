@@ -1,0 +1,256 @@
+/* src/pages/VipSubscription/VipSubscription.css */
+:root {
+    --primary-color: #f26522;
+    /* Cam */
+    --accent-color: #e63946;
+    /* Đỏ */
+    --bg-light: #fef5f1;
+    --surface-color: #ffffff;
+    --text-dark: #333;
+    --text-light: #777;
+    --border-light: rgba(242, 101, 34, 0.15);
+    --shadow-main: 0 10px 40px rgba(242, 101, 34, 0.1);
+    --shadow-hover: 0 12px 30px rgba(242, 101, 34, 0.25);
+    --shadow-button: 0 5px 15px rgba(242, 101, 34, 0.4);
+}
+
+.subscription-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-light), #fff);
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.subscription-cards {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.sub-card {
+    background: var(--surface-color);
+    border-radius: 20px;
+    padding: 30px 40px;
+    width: 350px;
+    box-shadow: var(--shadow-main);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.sub-card.vip {
+    border: 2px solid var(--primary-color);
+}
+
+.sub-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-hover);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    padding: 5px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.4);
+}
+
+.card-title-free,
+.card-title-vip {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.card-title-free {
+    color: var(--text-dark);
+}
+
+.card-title-vip {
+    color: var(--primary-color);
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.features-list li {
+    font-size: 16px;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-yes {
+    color: #2ecc71;
+}
+
+.icon-no {
+    color: var(--accent-color);
+}
+
+.sub-button-free,
+.sub-button-vip {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sub-button-free {
+    background: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.sub-button-vip {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    box-shadow: var(--shadow-button);
+}
+
+.sub-button-vip:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
+}
+
+/* Giao diện chọn gói */
+.package-selection {
+    width: 100%;
+    max-width: 1000px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.select-title {
+    text-align: center;
+    color: var(--text-dark);
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.package-card {
+    background: var(--surface-color);
+    border: 2px solid var(--border-light);
+    border-radius: 16px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.package-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-color);
+}
+
+.package-card.popular {
+    border-color: var(--primary-color);
+}
+
+.popular-badge-pkg {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary-color);
+    color: white;
+    padding: 3px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.pkg-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 10px;
+}
+
+.pkg-price {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.pkg-duration {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.pkg-price-per-month {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 20px;
+}
+
+.pkg-select-btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0;
+}
+
+.package-card:hover .pkg-select-btn {
+    opacity: 1;
+}
