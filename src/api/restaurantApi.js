@@ -23,6 +23,16 @@ const RestaurantsApi = {
       params: { name: query },
     })
   },
+
+  // get restaurant at homepage
+  getAllSimpleRestaurants: async (currentPage = 1, pageSize = 10) => {
+    return await axiosRestaurantClient.get('/Restaurants/get-all-simple', {
+      params: {
+        currentPage,
+        pageSize,
+      },
+    })
+  },
 }
 
 export default RestaurantsApi

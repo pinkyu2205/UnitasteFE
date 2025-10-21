@@ -1,30 +1,65 @@
-/* RestaurantShowcase.css - Restaurant Showcase Component Styles */
+/* RestaurantShowcase.css */
 
-/* Restaurant Showcase */
+/* ... (Import swiper CSS nếu cần) ... */
+
+/* ... (Style cho .restaurant-showcase, .showcase-container, .section-title giữ nguyên) ... */
 .restaurant-showcase {
   padding: 5rem 2rem;
   background: white;
-  min-height: 100vh;
 }
 
 .showcase-container {
-  max-width: 1200px;
+  max-width: 1400px;
+  /* Có thể tăng max-width */
   margin: 0 auto;
 }
 
-.restaurant-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 2rem;
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  color: #333;
+}
+
+
+/* Style cho Swiper container */
+.restaurant-swiper {
+  padding-bottom: 50px !important;
   margin-top: 3rem;
 }
 
+/* Style cho slide chính (mỗi slide chứa 10 card) */
+.main-slide {
+  /* Không cần style đặc biệt ở đây nếu grid bên trong đã đúng */
+}
+
+/* 👇 THÊM MỚI: Grid 2x5 bên trong mỗi slide chính 👇 */
+.restaurant-grid-internal {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  /* 5 cột */
+  grid-template-rows: repeat(2, auto);
+  /* 2 hàng */
+  gap: 20px;
+  /* Khoảng cách giữa các card */
+  padding: 5px;
+  /* Padding nhỏ để tránh card bị cắt */
+  height: 100%;
+  /* Đảm bảo grid chiếm hết slide */
+}
+
+/* Style cho thẻ nhà hàng (Giữ và chỉnh sửa) */
 .restaurant-card {
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* Giúp các card cao bằng nhau */
 }
 
 .restaurant-card:hover {
@@ -34,20 +69,32 @@
 
 .restaurant-image {
   width: 100%;
-  height: 200px;
-  background: #FC8A06;
-  border-radius: 12px 12px 0 0;
+  padding-top: 56.25%;
+  /* Tỷ lệ 16:9 */
+  background-color: #eee;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid #eee;
 }
 
 .restaurant-info {
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .restaurant-name {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
   color: #333;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.6em;
 }
 
 .restaurant-rating {
@@ -58,39 +105,102 @@
 }
 
 .stars {
-  color: #FFD700;
+  color: #FFC107;
+  font-size: 0.9rem;
 }
 
 .rating-text {
   color: #666;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.restaurant-description {
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.view-menu-btn {
-  background: #FC8A06;
+/* 👇 SỬA MÀU NÚT 👇 */
+.directions-btn {
+  margin-top: auto;
+  /* Dùng biến màu cam */
+  background: linear-gradient(135deg, var(--primary-color, #f26522), var(--accent-color, #e63946));
   color: white;
-  padding: 0.75rem 1.5rem;
+  padding: 0.7rem 1rem;
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 8px;
+  /* Bo tròn hơn chút */
+  font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
+  /* Áp dụng transition chung */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 4px 10px rgba(242, 101, 34, 0.3);
+  /* Thêm shadow */
 }
 
-.view-menu-btn:hover {
-  background: #E67A00;
+.directions-btn:hover {
+  /* Giữ màu đỏ khi hover hoặc đổi màu khác tùy ý */
+  background: linear-gradient(135deg, var(--accent-color, #e63946), #d62828);
+  transform: translateY(-2px);
+  /* Hiệu ứng nhấc lên */
+  box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
+  /* Shadow đậm hơn */
 }
 
-/* Responsive Design for Restaurant Showcase */
+/* ... (Style cho nút Swiper và pagination giữ nguyên) ... */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #f26522 !important;
+  /* Màu cam cho nút */
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  width: 44px !important;
+  /* Tăng kích thước */
+  height: 44px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  font-size: 1.4rem !important;
+  font-weight: bold;
+}
+
+.swiper-pagination-bullet {
+  background: #ccc !important;
+  opacity: 1 !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #f26522 !important;
+  /* Màu cam cho dot active */
+}
+
+
+/* Responsive: Điều chỉnh grid bên trong */
+@media (max-width: 1200px) {
+  .restaurant-grid-internal {
+    grid-template-columns: repeat(4, 1fr);
+    /* 4 cột */
+    /* Tổng 8 card / slide */
+  }
+}
+
+@media (max-width: 992px) {
+  .restaurant-grid-internal {
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 cột */
+    /* Tổng 6 card / slide */
+  }
+}
+
 @media (max-width: 768px) {
-  .restaurant-grid {
-    grid-template-columns: 1fr;
+  .restaurant-grid-internal {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 cột */
+    /* Tổng 4 card / slide */
+    gap: 15px;
   }
 }
 
@@ -98,4 +208,15 @@
   .restaurant-showcase {
     padding: 3rem 1rem;
   }
-}
+
+  .restaurant-grid-internal {
+    grid-template-columns: 1fr;
+    /* 1 cột */
+    /* Tổng 2 card / slide */
+  }
+
+  .restaurant-name {
+    font-size: 1rem;
+    min-height: auto;
+  }
+}  

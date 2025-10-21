@@ -1,26 +1,49 @@
-import { useState } from 'react'
+// src/pages/VipSubscription/VipSubscription.jsx
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import PaymentApi from '../../api/paymentApi'
-import './VipSubscription.css' // File CSS mới
+import PaymentApi from '../../api/paymentApi' // Import API đã cập nhật
+import './VipSubscription.css'
 
-// Hàm format tiền
+// ... (formatCurrency function) ...
 const formatCurrency = (amount) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND',
-  }).format(amount)
+  /* ... */
 }
 
 const VipSubscription = () => {
-  const [view, setView] = useState('compare') // 'compare' hoặc 'select'
+  const [view, setView] = useState('compare')
   const [packages, setPackages] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [isVip, setIsVip] = useState(false) // <-- State mới để lưu trạng thái VIP
+  const [checkingStatus, setCheckingStatus] = useState(true) // <-- State để biết đang kiểm tra
   const navigate = useNavigate()
 
-  // Hàm gọi API khi người dùng bấm "Đăng ký VIP"
+  // 👇 THÊM useEffect ĐỂ KIỂM TRA TRẠNG THÁI VIP 👇
+  useEffect(() => {
+    const checkStatus = async () => {
+      setCheckingStatus(true)
+      try {
+        // Gọi API checkVipStatus
+        const response = await PaymentApi.checkVipStatus()
+        // API trả về { hasPurchased: true/false }
+        setIsVip(response.hasPurchased)
+      } catch (err) {
+        // Lỗi có thể do chưa đăng nhập (không có token/userId) hoặc lỗi mạng
+        console.error('Lỗi kiểm tra trạng thái VIP:', err)
+        // Mặc định là không phải VIP nếu có lỗi
+        setIsVip(false)
+      } finally {
+        setCheckingStatus(false)
+      }
+    }
+    checkStatus()
+  }, []) // Chạy 1 lần khi component mount
+
   const handleShowPackages = async () => {
-    setView('select') // Chuyển sang màn hình chọn gói
+    // Chỉ cho phép hiển thị gói nếu chưa phải là VIP
+    if (isVip) return
+
+    setView('select')
     setLoading(true)
     setError(null)
     try {
@@ -34,7 +57,6 @@ const VipSubscription = () => {
     }
   }
 
-  // Hàm chọn gói và chuyển sang trang xác nhận
   const handleSelectPackage = (pkg) => {
     navigate('/vip-checkout', { state: { selectedPackage: pkg } })
   }
@@ -45,6 +67,7 @@ const VipSubscription = () => {
       {/* Thẻ Gói Thường */}
       <div className='sub-card'>
         <h2 className='card-title-free'>Gói Thường</h2>
+        {/* ... (danh sách features) ... */}
         <ul className='features-list'>
           <li>
             <span className='icon-no'>❌</span> Chứa quảng cáo
@@ -59,8 +82,10 @@ const VipSubscription = () => {
             <span className='icon-no'>❌</span> Không xem được bản đồ thời tiết
           </li>
         </ul>
-        <button className='sub-button-free' disabled>
-          Bạn đang dùng gói này
+        <button className='sub-button-free' disabled={!isVip}>
+          {' '}
+          {/* Chỉ disable nếu đang là VIP */}
+          {isVip ? 'Đang dùng gói VIP' : 'Bạn đang dùng gói này'}
         </button>
       </div>
 
@@ -68,6 +93,7 @@ const VipSubscription = () => {
       <div className='sub-card vip'>
         <div className='popular-badge'>PREMIUM</div>
         <h2 className='card-title-vip'>Thành viên VIP</h2>
+        {/* ... (danh sách features) ... */}
         <ul className='features-list'>
           <li>
             <span className='icon-yes'>✅</span> Chặn toàn bộ quảng cáo
@@ -83,8 +109,19 @@ const VipSubscription = () => {
             <span className='icon-yes'>✅</span> Ưu tiên hỗ trợ 24/7
           </li>
         </ul>
-        <button className='sub-button-vip' onClick={handleShowPackages}>
-          Đăng ký ngay
+
+        {/* 👇 CẬP NHẬT NÚT BẤM DỰA TRÊN isVip và checkingStatus 👇 */}
+        <button
+          className='sub-button-vip'
+          onClick={handleShowPackages}
+          // Vô hiệu hóa nút nếu đang kiểm tra HOẶC đã là VIP
+          disabled={checkingStatus || isVip}
+        >
+          {checkingStatus
+            ? 'Đang kiểm tra...'
+            : isVip
+            ? 'Bạn đã là thành viên VIP'
+            : 'Đăng ký ngay'}
         </button>
       </div>
     </div>
