@@ -6,6 +6,7 @@ import {
   useMap,
 } from '@vis.gl/react-google-maps'
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import RestaurantsApi from '../../api/restaurantApi.js'
 
@@ -73,6 +74,7 @@ const MapPage = () => {
   const [showSearchResults, setShowSearchResults] = useState(false)
 
   const mapRef = useRef(null)
+  const location = useLocation()
 
   // Lấy vị trí người dùng
   useEffect(() => {
@@ -85,10 +87,18 @@ const MapPage = () => {
 
           setCurrentPosition(userLocation)
           setIsLocationLoading(false)
+          handleDestinationFromState(
+            userLocation,
+            location.state?.destinationRestaurant
+          )
         },
         (err) => {
           console.error('Lỗi Geolocation:', err.message)
           setIsLocationLoading(false)
+          handleDestinationFromState(
+            DEFAULT_CENTER,
+            location.state?.destinationRestaurant
+          )
         },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
       )
@@ -96,7 +106,29 @@ const MapPage = () => {
       console.error('Trình duyệt không hỗ trợ Geolocation.')
       setIsLocationLoading(false)
     }
-  }, [])
+  }, [location.state])
+
+  // Xử lý điểm đến được truyền qua state
+  const handleDestinationFromState = (origin, destination) => {
+    // Chỉ thực hiện nếu có điểm đến được truyền và chưa có request chỉ đường nào
+    if (destination && !directionsRequest) {
+      console.log('Nhận được điểm đến từ state:', destination)
+      const request = {
+        origin: origin, // Dùng vị trí hiện tại (hoặc mặc định)
+        destination: {
+          lat: parseFloat(destination.latitude),
+          lng: parseFloat(destination.longitude),
+        },
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      }
+      setDirectionsRequest(request)
+      setSelectedRestaurantDetail(null) // Đóng info window nếu đang mở
+      setShowSearchResults(false) // Đóng kết quả tìm kiếm nếu đang mở
+
+      // Có thể pan/zoom map đến khu vực giữa origin và destination nếu muốn
+      // (Phần này tùy chọn và cần tính toán bounds)
+    }
+  }
 
   // ✅ Xử lý khi tìm kiếm
   const handleSearchResults = (restaurants) => {

@@ -29,6 +29,17 @@ const PaymentApi = {
   getPurchasesByUserToken: () => {
     return axiosPaymentClient.get('/get-purchases-by-user-token')
   },
+  checkVipStatus: () => {
+    const userId = getUserIdFromToken()
+    if (!userId) {
+      // Trả về Promise reject nếu không có userId
+      return Promise.reject(new Error('User ID not found in token'))
+    }
+    // API yêu cầu userId làm query parameter
+    return axiosPaymentClient.get(
+      `/check-service-package-status?userId=${userId}`
+    )
+  },
 }
 
 export default PaymentApi
