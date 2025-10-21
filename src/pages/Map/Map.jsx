@@ -66,12 +66,20 @@ const Directions = ({ request }) => {
 const MapPage = () => {
   const [currentPosition, setCurrentPosition] = useState(DEFAULT_CENTER)
   const [isLocationLoading, setIsLocationLoading] = useState(true)
-  const [displayedRestaurants, setDisplayedRestaurants] = useState([])
+  const [displayedRestaurants, setDisplayedRestaurants] = useState([]) // Now stores only 'items'
   const [selectedRestaurantDetail, setSelectedRestaurantDetail] = useState(null)
   const [directionsRequest, setDirectionsRequest] = useState(null)
 
   // ✅ State để hiển thị/ẩn danh sách kết quả tìm kiếm
   const [showSearchResults, setShowSearchResults] = useState(false)
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  // Keep track of last search params to use for pagination
+  const [lastSearchParams, setLastSearchParams] = useState({
+    keyword: '',
+    types: [],
+  })
 
   const mapRef = useRef(null)
   const location = useLocation()
@@ -81,12 +89,13 @@ const MapPage = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          const lat = pos.coords.latitude
-          const lng = pos.coords.longitude
-          const userLocation = { lat, lng }
-
-          setCurrentPosition(userLocation)
+          const userLocation = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          }
+          setCurrentPosition(userLocation) // Update state directly
           setIsLocationLoading(false)
+          // Pass userLocation to handleDestination
           handleDestinationFromState(
             userLocation,
             location.state?.destinationRestaurant
@@ -94,7 +103,9 @@ const MapPage = () => {
         },
         (err) => {
           console.error('Lỗi Geolocation:', err.message)
+          setCurrentPosition(DEFAULT_CENTER) // Use default if error
           setIsLocationLoading(false)
+          // Pass default location to handleDestination
           handleDestinationFromState(
             DEFAULT_CENTER,
             location.state?.destinationRestaurant
@@ -131,59 +142,110 @@ const MapPage = () => {
   }
 
   // ✅ Xử lý khi tìm kiếm
-  const handleSearchResults = (restaurants) => {
-    setDisplayedRestaurants(restaurants)
+  const handleSearchResultsUpdate = (results) => {
+    setDisplayedRestaurants(results.items) // Update list
+    setCurrentPage(results.currentPage) // Update current page
+    setTotalPages(results.totalPages)
+    setLastSearchParams({ keyword: results.keyword, types: results.types })
     setDirectionsRequest(null)
     setSelectedRestaurantDetail(null)
     setShowSearchResults(true) // ✅ Hiển thị danh sách kết quả
 
-    if (restaurants.length > 0 && mapRef.current) {
-      const first = restaurants[0]
+    if (results.items.length > 0 && mapRef.current) {
+      const first = results.items[0]
       const newCenter = {
         lat: parseFloat(first.latitude),
         lng: parseFloat(first.longitude),
       }
-
       mapRef.current.panTo(newCenter)
       mapRef.current.setZoom(15)
     }
   }
 
-  // ✅ Xử lý khi click vào một quán trong danh sách kết quả
-  const handleSelectRestaurant = async (restaurant) => {
-    try {
-      setDirectionsRequest(null)
-      const detail = await RestaurantsApi.getRestaurantById(
-        restaurant.restaurantId
-      )
-      setSelectedRestaurantDetail(detail)
-      setShowSearchResults(false) // ✅ Ẩn danh sách khi đã chọn
+  const handlePageChange = async (newPage) => {
+    if (newPage < 1 || newPage > totalPages || isLocationLoading) return // Basic validation
 
-      // Di chuyển bản đồ đến vị trí quán được chọn
-      if (mapRef.current) {
-        const position = {
-          lat: parseFloat(detail.latitude),
-          lng: parseFloat(detail.longitude),
+    // Reuse the search logic from SearchBox's performSearch
+    // We need userLocation, last keyword, and last types
+    setShowSearchResults(false) // Optionally hide results while loading new page
+    setSelectedRestaurantDetail(null) // Clear detail view
+
+    // You need access to the keyword and types used for the LAST search.
+    // Easiest way: Lift keyword and selectedTypes state UP from SearchBox to MapPage
+    // OR: Modify SearchBox's onSearchResults to include the params used.
+    // Assuming you lift state up (keyword and selectedTypes are now state in MapPage):
+
+    // const typeString = selectedTypes.join(''); // Assuming selectedTypes is state here
+    // const currentKeyword = keyword; // Assuming keyword is state here
+
+    // For now, let's assume lastSearchParams holds this (requires modification in SearchBox callback)
+    const typeString = lastSearchParams.types.join('')
+    const currentKeyword = lastSearchParams.keyword
+
+    try {
+      const params = {
+        latitude: currentPosition.lat,
+        longitude: currentPosition.lng,
+        radius: 5000,
+        type: typeString,
+        keyword: currentKeyword.trim(),
+        currentPage: newPage,
+        pageSize: 5,
+      }
+      const result = await RestaurantsApi.searchNearbyWithPaging(params)
+
+      setDisplayedRestaurants(result.items || [])
+      setCurrentPage(result.currentPage || newPage)
+      setTotalPages(result.totalPages || 1)
+      setShowSearchResults(true) // Show results again
+
+      // Optionally pan to the first result of the new page
+      if (result.items.length > 0 && mapRef.current) {
+        const first = result.items[0]
+        const newCenter = {
+          lat: parseFloat(first.latitude),
+          lng: parseFloat(first.longitude),
         }
-        mapRef.current.panTo(position)
-        mapRef.current.setZoom(17)
+        mapRef.current.panTo(newCenter)
       }
     } catch (err) {
-      console.error('Lỗi khi lấy chi tiết nhà hàng:', err)
+      console.error('Error fetching page:', err)
+      // Handle error (e.g., show message)
+    }
+  }
+
+  // ✅ Xử lý khi click vào một quán trong danh sách kết quả
+  const handleSelectRestaurant = (item) => {
+    // Parameter is now 'item' from search results
+    setDirectionsRequest(null)
+    setSelectedRestaurantDetail(item) // Directly set the item from search results
+    setShowSearchResults(false)
+
+    // Pan map to the selected item's location
+    if (mapRef.current) {
+      const position = {
+        lat: parseFloat(item.latitude),
+        lng: parseFloat(item.longitude),
+      }
+      mapRef.current.panTo(position)
+      mapRef.current.setZoom(17) // Zoom in closer
     }
   }
 
   // Khi click vào marker trên bản đồ
-  const handleMarkerClick = async (restaurant) => {
-    try {
-      setDirectionsRequest(null)
-      const detail = await RestaurantsApi.getRestaurantById(
-        restaurant.restaurantId
-      )
-      setSelectedRestaurantDetail(detail)
-      setShowSearchResults(false) // ✅ Ẩn danh sách khi click marker
-    } catch (err) {
-      console.error('Lỗi khi lấy chi tiết nhà hàng:', err)
+  const handleMarkerClick = (item) => {
+    // Parameter is now 'item' from search results
+    setDirectionsRequest(null)
+    setSelectedRestaurantDetail(item) // Directly set the item from search results
+    setShowSearchResults(false) // Hide search results list if open
+    // Optionally pan map closer to the marker if needed
+    if (mapRef.current) {
+      const position = {
+        lat: parseFloat(item.latitude),
+        lng: parseFloat(item.longitude),
+      }
+      mapRef.current.panTo(position)
+      // mapRef.current.setZoom(17); // Uncomment if you want to zoom on marker click too
     }
   }
 
@@ -227,14 +289,21 @@ const MapPage = () => {
   return (
     <APIProvider apiKey={GOOGLE_MAPS_API_KEY}>
       <div style={{ height: '100vh', width: '100%' }}>
-        <SearchBox onSearchResults={handleSearchResults} />
+        <SearchBox
+          onSearchResults={handleSearchResultsUpdate}
+          userLocation={currentPosition}
+        />
 
         {/* ✅ Hiển thị danh sách kết quả tìm kiếm */}
         {showSearchResults && (
           <SearchResults
-            restaurants={displayedRestaurants}
+            items={displayedRestaurants} // Pass items
+            currentPage={currentPage}
+            totalPages={totalPages}
             onSelectRestaurant={handleSelectRestaurant}
             onClose={handleCloseSearchResults}
+            onNextPage={() => handlePageChange(currentPage + 1)} // Pass handlers
+            onPrevPage={() => handlePageChange(currentPage - 1)} // Pass handlers
           />
         )}
 
@@ -249,27 +318,30 @@ const MapPage = () => {
           <Directions request={directionsRequest} />
 
           {/* 📍 Marker người dùng */}
-          <AdvancedMarker position={currentPosition}>
-            <Pin
-              background={'#007bff'}
-              borderColor={'#fff'}
-              glyphColor={'#fff'}
-            >
-              📍
-            </Pin>
+          <AdvancedMarker
+            key='user-location-marker' // Use placeId
+            position={currentPosition}
+            // onClick={() => handleMarkerClick(item)}
+          >
+            <Pin>📍</Pin>
           </AdvancedMarker>
 
           {/* 🏠 Marker nhà hàng */}
-          {displayedRestaurants.map((restaurant, index) => (
+          {displayedRestaurants.map((item, index) => (
             <AdvancedMarker
-              key={index}
+              key={item.placeId || index} // Use placeId from search results
               position={{
-                lat: parseFloat(restaurant.latitude),
-                lng: parseFloat(restaurant.longitude),
+                lat: parseFloat(item.latitude),
+                lng: parseFloat(item.longitude),
               }}
-              onClick={() => handleMarkerClick(restaurant)}
+              onClick={() => handleMarkerClick(item)} // Pass the correct 'item'
             >
-              <Pin />
+              {/* Default Pin or custom icon for restaurants */}
+              <Pin
+                borderColor={'#FF6B35'}
+                background={'#FF8C42'}
+                glyphColor={'#FFF'}
+              />
             </AdvancedMarker>
           ))}
 

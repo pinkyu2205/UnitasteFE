@@ -1,198 +1,201 @@
+/* src/components/CSS/RestaurantInfoWindow.css */
+
+/* Use variables from your theme */
+:root {
+    --primary-color: #f26522;
+    /* Cam */
+    --accent-color: #e63946;
+    /* Đỏ */
+    --bg-light: #fef5f1;
+    --surface-color: #ffffff;
+    --text-dark: #333;
+    --text-light: #777;
+    --border-light: rgba(242, 101, 34, 0.15);
+    --shadow-main: 0 10px 40px rgba(0, 0, 0, 0.1);
+    /* Use subtle black shadow */
+    --shadow-button: 0 5px 15px rgba(242, 101, 34, 0.4);
+}
+
+/* Make InfoWindow blend better */
+.gm-style .gm-style-iw-c {
+    /* Style the default InfoWindow container */
+    padding: 0 !important;
+    border-radius: 16px !important;
+    box-shadow: var(--shadow-main) !important;
+    max-width: 420px !important;
+    /* Match container width */
+    max-height: 80vh !important;
+    /* Limit height */
+    overflow: visible !important;
+    /* Allow shadow */
+}
+
+.gm-style .gm-style-iw-d {
+    /* Style the content div */
+    overflow: auto !important;
+    /* Enable scroll if content exceeds max-height */
+    padding: 0 !important;
+    /* Remove default padding */
+    max-height: 78vh !important;
+    /* Adjust based on your content */
+}
+
+/* Style the close button if needed */
+.gm-style .gm-ui-hover-effect {
+    top: 8px !important;
+    right: 8px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 50%;
+}
+
+
 .restaurant-info-container {
     max-width: 420px;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    /* Removed background gradient, as parent InfoWindow provides it */
     border-radius: 16px;
+    /* Match parent */
     overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    /* Keep content contained */
+    background: var(--surface-color);
+    /* Add white background */
 }
 
-/* Image Gallery */
+/* Simplified Image Display */
 .image-gallery {
+    /* Keep the container for consistent height */
     position: relative;
     width: 100%;
-    height: 240px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 200px;
+    /* Adjust height as needed */
+    background-color: #eee;
+    /* Placeholder color */
     overflow: hidden;
 }
 
-.image-wrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.restaurant-image {
+.restaurant-image-single {
+    /* New style for the single image */
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+    /* Remove potential extra space */
 }
 
-.image-overlay {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    padding: 6px 12px;
-    border-radius: 20px;
-    color: white;
-    font-size: 12px;
-    font-weight: 600;
-}
+/* REMOVE Gallery specific styles */
+/* .image-wrapper, .image-overlay, .image-nav-btn, .image-dots, .dot */
 
-.image-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 24px;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
 
-.image-nav-btn:hover {
-    background: white;
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.prev-btn {
-    left: 12px;
-}
-
-.next-btn {
-    right: 12px;
-}
-
-.image-dots {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 10;
-}
-
-.dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0;
-}
-
-.dot.active {
-    background: white;
-    width: 24px;
-    border-radius: 4px;
-}
-
-.dot:hover:not(.active) {
-    background: rgba(255, 255, 255, 0.8);
-}
-
-/* Restaurant Details */
+/* Restaurant Details (Apply Orange Theme) */
 .restaurant-details {
-    padding: 20px;
+    padding: 20px 25px;
+    /* Adjust padding */
 }
 
 .restaurant-name {
-    font-size: 22px;
+    font-size: 24px;
+    /* Slightly larger */
     font-weight: 800;
-    color: #1a1a1a;
+    color: var(--text-dark);
+    /* Dark text */
     margin: 0 0 20px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Optional: Keep gradient if you like it, or remove for cleaner look */
+    /* background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
     background-clip: text;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    -webkit-text-fill-color: transparent; */
 }
 
 .info-section {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    margin-bottom: 20px;
+    gap: 12px;
+    /* Slightly smaller gap */
+    margin-bottom: 25px;
 }
 
 .info-item {
     display: flex;
     align-items: flex-start;
+    /* Align icon top */
     gap: 12px;
-    padding: 12px;
-    background: linear-gradient(145deg, #ffffff, #fafbfc);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    /* Slightly smaller padding */
+    background: #fdfdfd;
+    /* Very light background */
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border: 1px solid #eee;
 }
 
+/* Remove hover effect or make it subtle */
 .info-item:hover {
-    transform: translateX(4px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-    border-color: rgba(102, 126, 234, 0.2);
+    background-color: var(--bg-light);
+    border-color: var(--border-light);
+    /* transform: translateX(2px); */
+    /* Remove transform */
+    /* box-shadow: 0 2px 8px rgba(242, 101, 34, 0.08); */
+    /* Subtle shadow */
 }
 
 .info-icon {
-    font-size: 20px;
-    line-height: 1;
+    font-size: 18px;
+    /* Adjust icon size */
+    line-height: 1.5;
+    /* Align better with text */
     flex-shrink: 0;
+    color: var(--primary-color);
+    /* Orange icon */
+    margin-top: 2px;
+    /* Fine-tune vertical alignment */
 }
 
 .info-content {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .info-label {
     font-size: 11px;
     font-weight: 600;
-    color: #888;
+    color: var(--text-light);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .info-value {
     font-size: 14px;
-    color: #333;
+    color: var(--text-dark);
     font-weight: 500;
     line-height: 1.5;
 }
 
+.info-value.price-level {
+    /* Style for dollar signs */
+    color: #27AE60;
+    /* Green for price */
+    font-weight: 700;
+}
+
 .website-link {
-    color: #667eea;
+    color: var(--primary-color);
+    /* Orange link */
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     word-break: break-all;
 }
 
 .website-link:hover {
-    color: #764ba2;
+    color: var(--accent-color);
+    /* Red on hover */
     text-decoration: underline;
 }
 
-/* Star Rating */
+/* Star Rating (Apply Theme) */
 .star-rating {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
 }
 
 .star {
@@ -201,25 +204,12 @@
 }
 
 .star-full {
-    color: #ffd700;
-    text-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
-    animation: twinkle 2s infinite;
-}
-
-@keyframes twinkle {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.7;
-    }
+    color: #FFC107;
+    /* Gold */
 }
 
 .star-half {
-    background: linear-gradient(90deg, #ffd700 50%, #ddd 50%);
+    background: linear-gradient(90deg, #FFC107 50%, #ddd 50%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -233,8 +223,8 @@
     margin-left: 6px;
     font-size: 14px;
     font-weight: 700;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
+    color: var(--primary-color);
+    background: var(--bg-light);
     padding: 2px 8px;
     border-radius: 6px;
 }
@@ -245,9 +235,9 @@
     font-style: italic;
 }
 
-/* Opening Hours Section */
+/* Opening Hours Section (Apply Theme) */
 .hours-section {
-    flex-direction: column;
+    /* Container adjustment */
     padding: 0;
     background: transparent;
     border: none;
@@ -258,27 +248,40 @@
     box-shadow: none;
 }
 
+/* Disable hover */
+
 .hours-toggle {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(145deg, #ffffff, #fafbfc);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 12px;
-    padding: 12px;
+    background: #fdfdfd;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 10px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .hours-toggle:hover {
-    border-color: rgba(102, 126, 234, 0.2);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    border-color: var(--border-light);
+    background-color: var(--bg-light);
+}
+
+.hours-toggle[disabled] {
+    /* Style for disabled button */
+    cursor: default;
+    opacity: 0.6;
+}
+
+.hours-toggle[disabled]:hover {
+    border-color: #eee;
+    background-color: #fdfdfd;
 }
 
 .dropdown-arrow {
     font-size: 12px;
-    color: #667eea;
+    color: var(--primary-color);
     transition: transform 0.3s ease;
     margin-left: auto;
 }
@@ -289,17 +292,19 @@
 
 .hours-detail {
     margin-top: 8px;
-    background: linear-gradient(145deg, #fafbfc, #f5f6f7);
-    border-radius: 12px;
+    background: #fdfdfd;
+    border-radius: 10px;
     padding: 12px;
-    border: 1px solid rgba(102, 126, 234, 0.1);
-    animation: slideDown 0.3s ease-out;
+    border: 1px solid var(--border-light);
+    animation: slideDownHours 0.3s ease-out;
 }
 
-@keyframes slideDown {
+@keyframes slideDownHours {
+
+    /* Rename animation */
     from {
         opacity: 0;
-        transform: translateY(-10px);
+        transform: translateY(-5px);
     }
 
     to {
@@ -311,8 +316,9 @@
 .hours-day {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
 }
 
 .hours-day:last-child {
@@ -320,14 +326,12 @@
 }
 
 .day-name {
-    font-size: 13px;
     font-weight: 600;
     color: #555;
 }
 
 .day-hours {
-    font-size: 13px;
-    color: #667eea;
+    color: var(--text-dark);
     font-weight: 500;
 }
 
@@ -337,13 +341,15 @@
     font-style: italic;
     text-align: center;
     display: block;
+    padding: 10px;
 }
 
-/* Directions Button */
-.directions-btn {
+/* Directions Button (Apply Theme) */
+.directions-btn-info {
+    /* New specific class */
     width: 100%;
     padding: 14px 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--primary-color, #f26522), var(--accent-color, #e63946));
     color: white;
     border: none;
     border-radius: 12px;
@@ -354,46 +360,27 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    position: relative;
-    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-button);
+    margin-top: 10px;
+    /* Add some space above */
 }
 
-.directions-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.directions-btn:hover::before {
-    width: 400px;
-    height: 400px;
-}
-
-.directions-btn:hover {
+.directions-btn-info:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
 }
 
-.directions-btn:active {
+.directions-btn-info:active {
     transform: translateY(0);
 }
 
 .btn-icon {
     font-size: 20px;
-    z-index: 1;
 }
 
 .btn-text {
-    z-index: 1;
+    /* No specific style needed */
 }
 
 /* Responsive */
@@ -403,10 +390,14 @@
     }
 
     .image-gallery {
-        height: 200px;
+        height: 180px;
     }
 
     .restaurant-name {
-        font-size: 18px;
+        font-size: 20px;
+    }
+
+    .restaurant-details {
+        padding: 15px 20px;
     }
 }
