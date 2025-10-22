@@ -49,32 +49,51 @@
   /* Đảm bảo grid chiếm hết slide */
 }
 
-/* Style cho thẻ nhà hàng (Giữ và chỉnh sửa) */
+/* Style cho thẻ nhà hàng (Cải thiện) */
 .restaurant-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
   height: 100%;
-  /* Giúp các card cao bằng nhau */
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .restaurant-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  border-color: rgba(252, 138, 6, 0.2);
 }
 
 .restaurant-image {
   width: 100%;
   padding-top: 56.25%;
   /* Tỷ lệ 16:9 */
-  background-color: #eee;
+  background-color: #f5f5f5;
   background-size: cover;
   background-position: center;
-  border-bottom: 1px solid #eee;
+  border-radius: 16px 16px 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.restaurant-image::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(252, 138, 6, 0.1), rgba(255, 107, 53, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.restaurant-card:hover .restaurant-image::before {
+  opacity: 1;
 }
 
 .restaurant-info {
@@ -100,81 +119,98 @@
 .restaurant-rating {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
 .stars {
-  color: #FFC107;
-  font-size: 0.9rem;
+  color: #FFD700;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .rating-text {
-  color: #666;
-  font-size: 0.85rem;
+  color: #333;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* 👇 SỬA MÀU NÚT 👇 */
+/* Nút Chỉ đường cải thiện */
 .directions-btn {
   margin-top: auto;
-  /* Dùng biến màu cam */
-  background: linear-gradient(135deg, var(--primary-color, #f26522), var(--accent-color, #e63946));
+  background: linear-gradient(135deg, #FC8A06, #FF6B35);
   color: white;
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1rem;
   border: none;
-  border-radius: 8px;
-  /* Bo tròn hơn chút */
+  border-radius: 12px;
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  /* Áp dụng transition chung */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  box-shadow: 0 4px 10px rgba(242, 101, 34, 0.3);
-  /* Thêm shadow */
+  gap: 8px;
+  box-shadow: 0 4px 15px rgba(252, 138, 6, 0.3);
 }
 
 .directions-btn:hover {
-  /* Giữ màu đỏ khi hover hoặc đổi màu khác tùy ý */
-  background: linear-gradient(135deg, var(--accent-color, #e63946), #d62828);
+  background: linear-gradient(135deg, #e67e00, #e55a2b);
   transform: translateY(-2px);
-  /* Hiệu ứng nhấc lên */
-  box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
-  /* Shadow đậm hơn */
+  box-shadow: 0 6px 20px rgba(252, 138, 6, 0.4);
 }
 
-/* ... (Style cho nút Swiper và pagination giữ nguyên) ... */
+.directions-icon {
+  font-size: 1rem;
+}
+
+/* Nút điều hướng Swiper cải thiện */
 .swiper-button-next,
 .swiper-button-prev {
-  color: #f26522 !important;
-  /* Màu cam cho nút */
-  background-color: rgba(255, 255, 255, 0.8);
+  color: #FC8A06 !important;
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
-  width: 44px !important;
-  /* Tăng kích thước */
-  height: 44px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  width: 40px !important;
+  height: 40px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.restaurant-swiper:hover .swiper-button-next,
+.restaurant-swiper:hover .swiper-button-prev {
+  opacity: 1;
 }
 
 .swiper-button-next::after,
 .swiper-button-prev::after {
-  font-size: 1.4rem !important;
+  font-size: 1.2rem !important;
   font-weight: bold;
 }
 
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+  background-color: rgba(252, 138, 6, 0.1);
+  transform: scale(1.1);
+}
+
 .swiper-pagination-bullet {
-  background: #ccc !important;
+  background: rgba(204, 204, 204, 0.5) !important;
   opacity: 1 !important;
-  width: 10px !important;
-  height: 10px !important;
+  width: 12px !important;
+  height: 12px !important;
+  transition: all 0.3s ease;
 }
 
 .swiper-pagination-bullet-active {
-  background: #f26522 !important;
-  /* Màu cam cho dot active */
+  background: #FC8A06 !important;
+  transform: scale(1.2);
 }
 
 

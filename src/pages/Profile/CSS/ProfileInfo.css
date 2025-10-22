@@ -198,6 +198,34 @@
     white-space: pre-wrap;
 }
 
+/* Edit Button Section */
+.edit-button-section {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(255, 107, 53, 0.1);
+}
+
+.edit-button-section .edit-btn {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #FF6B35, #FF8C42);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.edit-button-section .edit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    background: linear-gradient(135deg, #e55a2b, #e67e00);
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;

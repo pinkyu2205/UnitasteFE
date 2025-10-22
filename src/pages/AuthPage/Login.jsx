@@ -8,6 +8,7 @@ function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -45,15 +46,23 @@ function Login() {
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div className='auth__box'>
+          <div className='auth__box auth__box--password'>
             <input
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               placeholder='Mật khẩu'
               required
               className='auth__input'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+            <button
+              type='button'
+              className='auth__password-toggle'
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu'}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
           </div>
         </div>
 

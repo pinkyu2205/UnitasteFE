@@ -112,11 +112,6 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     <div className='profile-info-container'>
       <div className='info-header'>
         <h2>Thông tin cá nhân</h2>
-        {!isEditing && (
-          <button className='edit-btn' onClick={() => setIsEditing(true)}>
-            ✏️ Chỉnh sửa
-          </button>
-        )}
       </div>
 
       {error && (
@@ -252,6 +247,15 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
           </div>
         )}
       </div>
+
+      {/* Nút chỉnh sửa ở cuối */}
+      {!isEditing && (
+        <div className='edit-button-section'>
+          <button className='edit-btn' onClick={() => setIsEditing(true)}>
+            ✏️ Chỉnh sửa thông tin
+          </button>
+        </div>
+      )}
     </div>
   )
 }

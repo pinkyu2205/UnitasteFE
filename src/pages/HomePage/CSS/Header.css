@@ -43,6 +43,16 @@
   object-fit: contain;
 }
 
+.logo-text {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #FC8A06;
+  margin-left: 0.75rem;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
 /* Center Section (Navigation) */
 .header-center {
   flex-grow: 1;
@@ -240,9 +250,7 @@
   margin: 1rem 2rem;
 }
 
-.mobile-auth-link {
-  /* Optional: Style login/register differently in mobile */
-}
+.mobile-auth-link { color: #333; }
 
 
 /* Responsive Design */
@@ -278,6 +286,11 @@
 
   .logo {
     height: 30px;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+    margin-left: 0.5rem;
   }
 
   .header-avatar {

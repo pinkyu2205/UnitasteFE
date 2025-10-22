@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../CSS/HeroSection.css';
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleExploreClick = () => {
+    navigate('/map');
+  };
+
   return (
     <section className="hero-section">
       <div className="hero-content">
@@ -11,7 +18,7 @@ const HeroSection = () => {
         <p className="hero-subtitle">
           Tìm kiếm và đánh giá các nhà hàng ngon nhất trong khu vực của bạn
         </p>
-        <button className="hero-button">
+        <button className="hero-button" onClick={handleExploreClick}>
           Bắt đầu khám phá
         </button>
       </div>

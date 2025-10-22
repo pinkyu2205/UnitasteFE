@@ -4,7 +4,7 @@ import '../CSS/FeaturesSection.css';
 const FeaturesSection = () => {
   const features = [
     {
-      icon: '🍽️',
+      icon: '🔍',
       title: 'Khám phá nhà hàng',
       description: 'Tìm kiếm các nhà hàng ngon nhất dựa trên vị trí và sở thích của bạn'
     },
@@ -14,7 +14,7 @@ const FeaturesSection = () => {
       description: 'Đọc và viết đánh giá từ cộng đồng để đưa ra quyết định tốt nhất'
     },
     {
-      icon: '🗺️',
+      icon: '📍',
       title: 'Bản đồ thông minh',
       description: 'Xem vị trí nhà hàng trên bản đồ và tìm đường đi thuận tiện nhất'
     }
