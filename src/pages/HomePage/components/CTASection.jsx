@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../CSS/CTASection.css';
 
 const CTASection = () => {
+  const navigate = useNavigate();
+
+  const handleRegisterClick = () => {
+    navigate('/register');
+  };
+
   return (
     <section className="cta-section">
       <div className="cta-container">
@@ -10,7 +17,7 @@ const CTASection = () => {
           Tham gia cộng đồng Unitaste để chia sẻ trải nghiệm ẩm thực của bạn
         </p>
         <div className="cta-buttons">
-          <button className="cta-button primary">
+          <button className="cta-button primary" onClick={handleRegisterClick}>
             Đăng ký ngay
           </button>
           <button className="cta-button secondary">

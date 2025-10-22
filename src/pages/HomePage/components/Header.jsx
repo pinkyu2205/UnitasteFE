@@ -64,6 +64,7 @@ const Header = () => {
       <div className='header-left'>
         <Link to='/' className='logo'>
           <img src='/src/assets/Unitaste-logo.png' alt='Unitaste Logo' />
+          <span className='logo-text'>UniTaste</span>
         </Link>
       </div>
 

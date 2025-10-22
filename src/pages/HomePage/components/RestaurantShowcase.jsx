@@ -15,6 +15,7 @@ import 'swiper/css/pagination'
 
 // import required modules
 import { Grid, Navigation, Pagination } from 'swiper/modules'
+import AuthPopup from '../../../components/AuthPopup'
 
 // Hàm render sao (giữ nguyên)
 const renderStars = (rating) => {
@@ -37,6 +38,10 @@ const RestaurantShowcase = () => {
   const navigate = useNavigate() // Hook để điều hướng
   const [showAuthPopup, setShowAuthPopup] = useState(false)
 
+  const isLoggedIn = () => {
+    // Kiểm tra sự tồn tại của token trong localStorage
+    return !!localStorage.getItem('token')
+  }
   useEffect(() => {
     const fetchRestaurants = async () => {
       setLoading(true)
@@ -52,11 +57,6 @@ const RestaurantShowcase = () => {
       } finally {
         setLoading(false)
       }
-    }
-
-    const isLoggedIn = () => {
-      // Kiểm tra sự tồn tại của token trong localStorage
-      return !!localStorage.getItem('token')
     }
 
     fetchRestaurants()
@@ -173,10 +173,11 @@ const RestaurantShowcase = () => {
 
                   {/* Nút Chỉ đường */}
                   <button
-                    className='directions-btn' // Đổi tên class để style riêng
+                    className='directions-btn'
                     onClick={() => handleDirections(restaurant)}
                   >
-                    Chỉ đường 🗺️
+                    <span className='directions-icon'>📍</span>
+                    Chỉ đường
                   </button>
                 </div>
               </div>
