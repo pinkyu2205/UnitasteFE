@@ -1,4 +1,5 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
 import TestPage from '../testpage'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import Login from './pages/AuthPage/Login'
@@ -62,6 +63,18 @@ function App() {
         <Route path='/vip-subscription' element={<VipSubscription />} />
         <Route path='/vip-checkout' element={<VipCheckout />} />
       </Routes>
+      <ToastContainer
+        position='bottom-right'
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme='light'
+      />
     </BrowserRouter>
   )
 }

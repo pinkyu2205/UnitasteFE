@@ -1,90 +1,194 @@
 /* src/pages/Social/component/Post/Post.css */
 .post-card {
-    background-color: var(--surface-color);
-    border-radius: 8px;
-    box-shadow: var(--shadow-1);
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-1);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .post-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .post-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .post-user {
-    font-weight: 600;
+  font-weight: 600;
 }
 
 .post-meta {
-    font-size: 13px;
-    color: var(--text-secondary);
+  font-size: 13px;
+  color: var(--text-secondary);
 }
 
 .post-location {
-    font-weight: 600;
-    color: var(--primary-color);
+  font-weight: 600;
+  color: var(--primary-color);
 }
 
 .post-menu {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 50%;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 50%;
 }
 
 .post-menu:hover {
-    background-color: #f0f0f0;
+  background-color: #f0f0f0;
 }
 
 .post-content p {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.5;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
 .post-stats {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: var(--text-secondary);
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .comment-section {
-    padding-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .comment-input-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .comment-input {
-    flex-grow: 1;
-    background-color: var(--bg-color);
-    border: none;
-    border-radius: 20px;
-    padding: 8px 12px;
-    font-size: 14px;
+  flex-grow: 1;
+  background-color: var(--bg-color);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 14px;
 }
 
 .comment-input:focus {
-    outline: 1px solid var(--primary-color);
+  outline: 1px solid var(--primary-color);
+}
+
+.post-header .avatar-placeholder-small {
+  /* Make it an img tag */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover; /* Ensure image covers the circle */
+  background-color: #eee; /* Fallback background */
+  border: 1px solid #ddd; /* Optional subtle border */
+}
+
+/* Post Media Grid */
+.post-media {
+  display: grid;
+  gap: 3px; /* Small gap between images */
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden; /* Clip images to rounded corners */
+  cursor: pointer; /* Indicate clickable for gallery view later */
+}
+
+.post-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block; /* Remove extra space below image */
+  background-color: #f0f2f5; /* Placeholder background */
+}
+
+/* Layouts for 1-4 images */
+.media-count-1 {
+  grid-template-columns: 1fr;
+  max-height: 500px;
+} /* Single image can be tall */
+.media-count-2 {
+  grid-template-columns: 1fr 1fr;
+  aspect-ratio: 16/9;
+} /* Two side-by-side */
+.media-count-3 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  aspect-ratio: 1;
+}
+.media-count-3 img:first-child {
+  grid-row: span 2;
+} /* First image takes left column */
+.media-count-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  aspect-ratio: 1;
+}
+
+/* Overlay for >4 images */
+.media-more {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  /* Position depends on the grid layout, assumes 4+ uses 4-grid layout */
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+  position: relative; /* Needed if the 4th image is also there */
+  z-index: 1;
+}
+/* Ensure the 4th image is behind the overlay if needed */
+.media-count-4 img:nth-child(4) {
+  /* No special style needed if .media-more replaces it */
+}
+
+/* Post Tags */
+.post-tags {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag {
+  color: var(--primary-color);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tag:hover {
+  text-decoration: underline;
+}
+
+/* Post Rating Display (if isReview) */
+.post-rating-display {
+  color: #ffc107; /* Gold color */
+  font-size: 16px;
+  margin-top: 5px; /* Adjust spacing */
+}
+
+/* Update comment input avatar */
+.comment-input-wrapper .avatar-placeholder-small {
+  width: 32px; /* Slightly smaller */
+  height: 32px;
+  object-fit: cover;
+  background-color: #eee;
+  border: 1px solid #ddd;
 }

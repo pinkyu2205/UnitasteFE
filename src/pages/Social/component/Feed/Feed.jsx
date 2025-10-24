@@ -1,43 +1,19 @@
 // src/pages/Social/component/Feed/Feed.jsx
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react' // Add useEffect
+import SocialApi from '../../../../api/socialApi' // Adjust path
 import CreatePost from '../CreatePost/CreatePost'
 import CreatePostModal from '../CreatePostModal/CreatePostModal'
 import Post from '../Post/Post'
 import './Feed.css'
 
-// Dữ liệu giả
-const getInitialPosts = () => [
-  {
-    id: 1,
-    user: 'User A',
-    location: 'Quán Ăn 1',
-    content: 'Review 1... Rất ngon!',
-    likes: 5,
-    comments: 2,
-  },
-  {
-    id: 2,
-    user: 'User B',
-    location: 'Quán Ăn 2',
-    content: 'Review 2... Tạm ổn.',
-    likes: 10,
-    comments: 4,
-  },
-  {
-    id: 3,
-    user: 'User C',
-    location: 'Quán Ăn 3',
-    content: 'Review 3... Sẽ quay lại!',
-    likes: 15,
-    comments: 6,
-  },
-]
-
 function Feed() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [posts, setPosts] = useState(getInitialPosts())
+  const [posts, setPosts] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [loading, setLoading] = useState(false)
+  const [initialLoad, setInitialLoad] = useState(true) // Track initial load
 
   // Infinite Scroll Logic
   const observer = useRef()
@@ -54,73 +30,90 @@ function Feed() {
 
       if (node) observer.current.observe(node)
     },
-    [loading, hasMore]
+    [loading, hasMore] // Depend on loading and hasMore
   )
 
-  const loadMorePosts = () => {
+  // Function to load posts (used initially and for infinite scroll)
+  const loadPosts = async (page) => {
     setLoading(true)
-    // Giả lập API call
-    setTimeout(() => {
-      const newPosts = [
-        {
-          id: posts.length + 1,
-          user: `User ${posts.length + 1}`,
-          location: 'Quán Mới',
-          content: 'Nội dung review mới...',
-          likes: 0,
-          comments: 0,
-        },
-        {
-          id: posts.length + 2,
-          user: `User ${posts.length + 2}`,
-          location: 'Quán Mới 2',
-          content: 'Nội dung review mới 2...',
-          likes: 1,
-          comments: 0,
-        },
-      ]
-      setPosts((prevPosts) => [...prevPosts, ...newPosts])
-
-      // Giả sử chỉ có 10 bài
-      if (posts.length >= 10) {
-        setHasMore(false)
-      }
+    try {
+      const response = await SocialApi.getAllPosts(page, 5) // Fetch 5 per page
+      setPosts((prevPosts) =>
+        page === 1 ? response.items : [...prevPosts, ...response.items]
+      )
+      setTotalPages(response.totalPages)
+      setCurrentPage(response.page)
+      setHasMore(response.page < response.totalPages)
+    } catch (error) {
+      console.error('Failed to load posts:', error)
+      // Handle error display if needed
+    } finally {
       setLoading(false)
-    }, 1500)
+      if (page === 1) setInitialLoad(false) // Mark initial load complete
+    }
+  }
+
+  // Initial load
+  useEffect(() => {
+    loadPosts(1)
+  }, []) // Empty dependency array means run once on mount
+
+  // Load more function for IntersectionObserver
+  const loadMorePosts = () => {
+    if (currentPage < totalPages) {
+      loadPosts(currentPage + 1)
+    }
+  }
+
+  // Function to add a newly created post to the top
+  const handlePostCreated = (newPost) => {
+    // Ideally, the API returns the full post object or you refetch page 1
+    // Simple approach: Add to top (may lack some initial data like counts)
+    setPosts((prevPosts) => [newPost, ...prevPosts])
+    // More robust: Refetch page 1
+    // loadPosts(1);
   }
 
   return (
     <div className='feed-container'>
-      {/* Thanh tạo bài đăng */}
       <CreatePost onOpenModal={() => setIsModalOpen(true)} />
 
-      {/* Modal tạo bài đăng */}
-      {isModalOpen && <CreatePostModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <CreatePostModal
+          onClose={() => setIsModalOpen(false)}
+          onPostCreated={handlePostCreated} // Pass callback
+        />
+      )}
 
-      {/* Danh sách bài đăng */}
       <div className='post-list'>
+        {/* Display message if initial load is done and no posts */}
+        {!initialLoad && posts.length === 0 && !loading && (
+          <div className='feed-empty'>Chưa có bài đăng nào.</div>
+        )}
+
         {posts.map((post, index) => {
+          // Attach ref to the last element
           if (posts.length === index + 1) {
-            // Gán ref cho phần tử cuối cùng
             return (
-              <div ref={lastPostElementRef} key={post.id}>
+              <div ref={lastPostElementRef} key={post.postId}>
                 <Post post={post} />
               </div>
             )
           } else {
-            return <Post key={post.id} post={post} />
+            return <Post key={post.postId} post={post} />
           }
         })}
       </div>
 
-      {/* Hiệu ứng loading "lung linh" */}
       {loading && (
         <div className='loading-spinner'>
           <div className='spinner'></div>
           <span>Đang tải thêm...</span>
         </div>
       )}
-      {!hasMore && <div className='feed-end'>Hết bài đăng rồi!</div>}
+      {!loading && !hasMore && posts.length > 0 && (
+        <div className='feed-end'>Hết bài đăng rồi!</div>
+      )}
     </div>
   )
 }
