@@ -35,25 +35,39 @@ const axiosPaymentClient = axios.create({
 })
 
 // ------------------------------------------------
-// 4. INTERCEPTOR LOGIC (Áp dụng cho cả ba)
+// 💬 4. AXIOS CLIENT MỚI CHO SOCIAL SERVICE
+// BASE_URL: https://localhost:5002
+// ------------------------------------------------
+const axiosSocialClient = axios.create({
+  // Add to .env: VITE_API_SOCIAL=https://localhost:5002/api
+  baseURL: import.meta.env.VITE_API_SOCIAL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// ------------------------------------------------
+// 5. INTERCEPTOR LOGIC (Áp dụng cho tất cả)
 // ------------------------------------------------
 const setupInterceptors = (client) => {
   // Request Interceptor: Thêm Token
   client.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem('token') // Sửa: Dùng 'token' thay vì 'accessToken'
+      const token = localStorage.getItem('token')
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
+      }
+      if (config.headers['Content-Type'] === 'multipart/form-data') {
       }
       return config
     },
     (error) => Promise.reject(error)
-  ) // Response Interceptor: Trích xuất response.data và xử lý lỗi
+  )
 
   client.interceptors.response.use(
     (response) => response.data,
     (error) => {
-      console.error(error.response?.data || error.message)
+      console.error('Axios Error:', error.response?.data || error.message) // Improved logging
       return Promise.reject(error)
     }
   )
@@ -62,7 +76,13 @@ const setupInterceptors = (client) => {
 // Áp dụng Interceptors cho cả ba client
 setupInterceptors(axiosClient)
 setupInterceptors(axiosRestaurantClient)
-setupInterceptors(axiosPaymentClient) // <-- ÁP DỤNG CHO CLIENT MỚI
+setupInterceptors(axiosPaymentClient)
+setupInterceptors(axiosSocialClient)
 
-// 🚀 Export cả ba client
-export { axiosClient, axiosPaymentClient, axiosRestaurantClient }
+// 🚀 Export tất cả client
+export {
+  axiosClient,
+  axiosPaymentClient,
+  axiosRestaurantClient,
+  axiosSocialClient,
+}
