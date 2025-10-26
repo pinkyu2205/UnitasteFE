@@ -1,34 +1,37 @@
 /* src/pages/Social/component/CreatePost/CreatePost.css */
 .create-post-bar {
-    background-color: var(--surface-color);
-    border-radius: 8px;
-    box-shadow: var(--shadow-1);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  box-shadow: var(--shadow-1);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .avatar-placeholder-small {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #ccc;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #ccc;
+  object-fit: cover; /* <-- THÊM DÒNG NÀY */
+  display: block; /* <-- Thêm để đảm bảo layout */
+  border: 1px solid #ddd;
 }
 
 .create-post-trigger {
-    flex-grow: 1;
-    border: none;
-    background-color: var(--bg-color);
-    border-radius: 20px;
-    padding: 10px 15px;
-    text-align: left;
-    color: var(--text-secondary);
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+  flex-grow: 1;
+  border: none;
+  background-color: var(--bg-color);
+  border-radius: 20px;
+  padding: 10px 15px;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .create-post-trigger:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }

@@ -1,0 +1,83 @@
+/* src/pages/Social/component/Shortcuts/Shortcuts.css */
+
+/* Widget chung cho sidebar trái (hơi khác widget phải) */
+.sidebar-widget-left {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color, #ddd);
+}
+
+.widget-title-left {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary, #65676b);
+  margin: 0 0 10px 0;
+  padding: 0 15px; /* Căn lề giống các mục menu */
+}
+
+.widget-loading-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding: 0 15px;
+}
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shortcut-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+}
+
+.shortcut-item:hover {
+  background-color: #e4e6e9; /* Giống hover của menu */
+}
+
+.shortcut-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px; /* Hơi vuông */
+  object-fit: cover;
+  background-color: #eee;
+  flex-shrink: 0;
+}
+
+.shortcut-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+
+.shortcut-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  /* Chống tràn text */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.more-btn .shortcut-name {
+  font-weight: 600;
+}

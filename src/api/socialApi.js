@@ -89,6 +89,23 @@ const SocialApi = {
       return { fullName: 'Người dùng ẩn', avatarUrl: null }
     }
   },
+
+  /** MỚI: Giả lập API lấy các tag nổi bật */
+  getTrendingTags: async () => {
+    // Giả lập độ trễ mạng
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    // Dữ liệu giả
+    return [
+      { tag: 'cafe', count: 120 },
+      { tag: 'review', count: 95 },
+      { tag: 'bunbo', count: 88 },
+      { tag: 'banhmi', count: 76 },
+      { tag: 'trasua', count: 65 },
+      { tag: 'comtam', count: 50 },
+      { tag: 'anvat', count: 43 },
+    ]
+  },
 }
 
 export default SocialApi
