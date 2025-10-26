@@ -2,10 +2,12 @@
 
 /* CTA Section */
 .cta-section {
-  padding: 5rem 2rem;
+  padding: 4rem 2rem;
   background: linear-gradient(135deg, #FC8A06 0%, #FF6B35 100%);
   text-align: center;
   color: white;
+  margin-top: -20px;
+  position: relative;
 }
 
 .cta-container {
@@ -70,8 +72,15 @@
   }
 }
 
+@media (max-width: 768px) {
+  .cta-section {
+    margin-top: -15px;
+  }
+}
+
 @media (max-width: 480px) {
   .cta-section {
     padding: 3rem 1rem;
+    margin-top: -10px;
   }
 }

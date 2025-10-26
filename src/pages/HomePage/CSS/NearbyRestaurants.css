@@ -4,9 +4,8 @@
 /* Or import it if you use CSS Modules or preprocessors */
 
 .nearby-restaurants {
-    padding: 5rem 2rem;
-    background: #fdfdfd;
-    /* Slightly different background maybe? */
+    padding: 4rem 2rem;
+    background: #ffffff;
 }
 
 .nearby-container {
@@ -29,10 +28,6 @@
 .restaurant-swiper {
     padding-bottom: 50px !important;
     margin-top: 3rem;
-}
-
-.main-slide {
-    /* No specific style needed */
 }
 
 .restaurant-grid-internal {
@@ -83,6 +78,7 @@
     color: #333;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

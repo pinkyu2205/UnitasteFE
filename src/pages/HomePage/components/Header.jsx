@@ -63,7 +63,7 @@ const Header = () => {
       {/* Logo on the Left */}
       <div className='header-left'>
         <Link to='/' className='logo'>
-          <img src='/src/assets/Unitaste-logo.png' alt='Unitaste Logo' />
+          <img src='/src/assets/Logo 1.png' alt='Unitaste Logo' />
           <span className='logo-text'>UniTaste</span>
         </Link>
       </div>
@@ -84,6 +84,11 @@ const Header = () => {
           <li>
             <Link to='/social' onClick={() => setIsMobileMenuOpen(false)}>
               Cộng đồng
+            </Link>
+          </li>
+          <li>
+            <Link to='/support' onClick={() => setIsMobileMenuOpen(false)}>
+              Hỗ trợ
             </Link>
           </li>
           {/* Only show Profile link here if logged in for consistency, or remove */}
@@ -145,6 +150,11 @@ const Header = () => {
             <li>
               <Link to='/social' onClick={() => setIsMobileMenuOpen(false)}>
                 Cộng đồng
+              </Link>
+            </li>
+            <li>
+              <Link to='/support' onClick={() => setIsMobileMenuOpen(false)}>
+                Hỗ trợ
               </Link>
             </li>
             {/* Show profile link in mobile menu only if logged in */}

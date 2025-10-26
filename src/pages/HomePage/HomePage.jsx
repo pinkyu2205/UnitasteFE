@@ -7,6 +7,7 @@ import Footer from './components/Footer'
 import Header from './components/Header'
 import HeroSection from './components/HeroSection'
 import NearbyRestaurants from './components/NearbyRestaurants' // <-- Import Nearby
+import RecentReviews from './components/RecentReviews'
 import RestaurantShowcase from './components/RestaurantShowcase'
 import './CSS/HomePage.css'
 
@@ -28,6 +29,7 @@ const HomePage = () => {
       {isLoggedIn && <NearbyRestaurants />}
       {isLoggedIn && <ChatPopup />}
       <RestaurantShowcase /> {/* Featured restaurants always show */}
+      <RecentReviews /> {/* Recent community reviews */}
       <CTASection />
       <Footer />
     </div>

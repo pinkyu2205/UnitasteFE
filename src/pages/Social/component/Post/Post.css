@@ -1,38 +1,64 @@
 /* src/pages/Social/component/Post/Post.css */
 .post-card {
   background-color: var(--surface-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-1);
-  padding: 16px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.post-card:hover {
+  box-shadow: var(--shadow-2);
+  border-color: var(--border-color);
+  transform: translateY(-2px);
 }
 
 .post-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .post-info {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  gap: 2px;
 }
 
 .post-user {
   font-weight: 600;
+  font-size: 15px;
+  color: var(--text-primary);
+  transition: color 0.2s;
+}
+
+.post-user:hover {
+  color: var(--primary-color);
+  cursor: pointer;
 }
 
 .post-meta {
   font-size: 13px;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .post-location {
   font-weight: 600;
   color: var(--primary-color);
+  transition: color 0.2s;
+}
+
+.post-location:hover {
+  color: var(--accent-color);
+  cursor: pointer;
 }
 
 .post-menu {
@@ -40,19 +66,24 @@
   border: none;
   font-size: 20px;
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 8px 12px;
   border-radius: 50%;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
 }
 
 .post-menu:hover {
-  background-color: #f0f0f0;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  transform: scale(1.1);
 }
 
 .post-content p {
   margin: 0;
-  font-size: 16px;
-  line-height: 1.5;
-  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  word-wrap: break-word;
 }
 
 .post-stats {
@@ -60,81 +91,123 @@
   justify-content: space-between;
   font-size: 14px;
   color: var(--text-secondary);
-  padding-bottom: 10px;
+  padding: 8px 0;
   border-bottom: 1px solid var(--border-color);
+  margin-top: 4px;
+}
+
+.post-stats span {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.post-stats span:hover {
+  color: var(--primary-color);
 }
 
 .comment-section {
-  padding-top: 10px;
+  padding-top: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .comment-input-wrapper {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .comment-input {
   flex-grow: 1;
   background-color: var(--bg-color);
-  border: none;
-  border-radius: 20px;
-  padding: 8px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 10px 16px;
   font-size: 14px;
+  transition: all 0.3s ease;
+  font-family: inherit;
 }
 
 .comment-input:focus {
-  outline: 1px solid var(--primary-color);
+  outline: none;
+  border-color: var(--primary-color);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.comment-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .post-header .avatar-placeholder-small {
-  /* Make it an img tag */
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  object-fit: cover; /* Ensure image covers the circle */
-  background-color: #eee; /* Fallback background */
-  border: 1px solid #ddd; /* Optional subtle border */
+  object-fit: cover;
+  background: var(--gradient-primary);
+  border: 2px solid var(--surface-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.post-header .avatar-placeholder-small:hover {
+  transform: scale(1.05);
+  cursor: pointer;
 }
 
 /* Post Media Grid */
 .post-media {
   display: grid;
-  gap: 3px; /* Small gap between images */
+  gap: 4px;
   margin-top: 12px;
-  border-radius: 8px;
-  overflow: hidden; /* Clip images to rounded corners */
-  cursor: pointer; /* Indicate clickable for gallery view later */
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.post-media:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .post-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block; /* Remove extra space below image */
-  background-color: #f0f2f5; /* Placeholder background */
+  display: block;
+  background-color: var(--bg-color);
+  transition: opacity 0.3s;
+}
+
+.post-media img:hover {
+  opacity: 0.95;
 }
 
 /* Layouts for 1-4 images */
 .media-count-1 {
   grid-template-columns: 1fr;
   max-height: 500px;
-} /* Single image can be tall */
+}
+
 .media-count-2 {
   grid-template-columns: 1fr 1fr;
   aspect-ratio: 16/9;
-} /* Two side-by-side */
+}
+
 .media-count-3 {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   aspect-ratio: 1;
 }
+
 .media-count-3 img:first-child {
   grid-row: span 2;
-} /* First image takes left column */
+}
+
 .media-count-4 {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -143,53 +216,75 @@
 
 /* Overlay for >4 images */
 .media-more {
-  background: rgba(0, 0, 0, 0.6);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 53, 0.9),
+    rgba(247, 147, 30, 0.9)
+  );
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: bold;
-  /* Position depends on the grid layout, assumes 4+ uses 4-grid layout */
+  font-size: 28px;
+  font-weight: 800;
   grid-column: 2 / 3;
   grid-row: 2 / 3;
-  position: relative; /* Needed if the 4th image is also there */
+  position: relative;
   z-index: 1;
-}
-/* Ensure the 4th image is behind the overlay if needed */
-.media-count-4 img:nth-child(4) {
-  /* No special style needed if .media-more replaces it */
+  backdrop-filter: blur(5px);
 }
 
 /* Post Tags */
 .post-tags {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
+
 .tag {
   color: var(--primary-color);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
   cursor: pointer;
+  padding: 4px 12px;
+  background: rgba(255, 107, 53, 0.08);
+  border-radius: 16px;
+  transition: all 0.2s ease;
 }
+
 .tag:hover {
-  text-decoration: underline;
+  background: rgba(255, 107, 53, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
 }
 
 /* Post Rating Display (if isReview) */
 .post-rating-display {
-  color: #ffc107; /* Gold color */
+  color: #ffc107;
   font-size: 16px;
-  margin-top: 5px; /* Adjust spacing */
+  margin-top: 4px;
+  letter-spacing: 2px;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Update comment input avatar */
 .comment-input-wrapper .avatar-placeholder-small {
-  width: 32px; /* Slightly smaller */
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   object-fit: cover;
-  background-color: #eee;
-  border: 1px solid #ddd;
+  background: var(--gradient-primary);
+  border: 2px solid var(--surface-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
 }

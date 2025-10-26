@@ -1,19 +1,9 @@
 // src/pages/Profile/component/ProfilePayment.jsx
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import logo from '../../../assets/Unitaste-logo.png' // Giả sử bạn có logo trong assets
+import PaymentApi from '../../../api/paymentApi'
+import logo from '../../../assets/Unitaste-logo.png'
 import '../CSS/ProfilePayment.css'
-
-// Dữ liệu các gói nạp
-const paymentTiers = [
-  { id: 1, vnd: 10000, coin: 52, bonus: false },
-  { id: 2, vnd: 20000, coin: 110, bonus: '5+' },
-  { id: 3, vnd: 50000, coin: 275, bonus: '10+' },
-  { id: 4, vnd: 100000, coin: 610, bonus: '60+' },
-  { id: 5, vnd: 200000, coin: 1220, bonus: '100+' },
-  { id: 6, vnd: 500000, coin: 3040, bonus: '290+' },
-  { id: 7, vnd: 1000000, coin: 6550, bonus: '1300+' },
-  { id: 8, vnd: 2000000, coin: 13250, bonus: '2750+' },
-]
 
 // Hàm format tiền VND
 const formatCurrency = (amount) => {
@@ -25,46 +15,163 @@ const formatCurrency = (amount) => {
 
 const ProfilePayment = () => {
   const navigate = useNavigate()
+  const [packages, setPackages] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const handleCheckout = (tier) => {
-    // Chuyển sang trang Checkout, mang theo thông tin gói
-    navigate('/checkout', { state: { tier } })
+  // Lấy dữ liệu gói VIP từ API
+  useEffect(() => {
+    const fetchPackages = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await PaymentApi.getAllServicePackages()
+        setPackages(data)
+      } catch (err) {
+        console.error('Lỗi khi tải gói VIP:', err)
+        setError('Không thể tải danh sách gói. Vui lòng thử lại.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPackages()
+  }, [])
+
+  const handleSelectPackage = (pkg) => {
+    navigate('/vip-checkout', { state: { selectedPackage: pkg } })
+  }
+
+  if (loading) {
+    return (
+      <div className='profile-payment-container'>
+        <div className='loading-state'>
+          <div className='loading-spinner'></div>
+          <p>Đang tải các gói dịch vụ...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className='profile-payment-container'>
+        <div className='error-state'>
+          <div className='error-icon'>⚠️</div>
+          <p>{error}</p>
+          <button className='retry-btn' onClick={() => window.location.reload()}>
+            Thử lại
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className='profile-payment-container'>
       <div className='payment-header'>
-        {/* Bạn có thể dùng logo hoặc icon đồng xu */}
-        <img src={logo} alt='Unitaste Logo' className='payment-logo-icon' />
-        <h2>Nạp Unicoin</h2>
-        <p>Chọn gói nạp để tiếp tục thanh toán</p>
+        <div className='header-icon-wrapper'>
+          <img src={logo} alt='Unitaste Logo' className='payment-logo-icon' />
+          <div className='icon-glow'></div>
+        </div>
+        <h2>Nâng cấp lên VIP</h2>
+        <p className='header-subtitle'>
+          Trải nghiệm đầy đủ tính năng với gói thành viên VIP
+        </p>
+        <div className='vip-benefits'>
+          <div className='benefit-item'>
+            <span className='benefit-icon'>✨</span>
+            <span>Không quảng cáo</span>
+          </div>
+          <div className='benefit-item'>
+            <span className='benefit-icon'>🤖</span>
+            <span>AI không giới hạn</span>
+          </div>
+          <div className='benefit-item'>
+            <span className='benefit-icon'>🗺️</span>
+            <span>Bản đồ thời tiết</span>
+          </div>
+          <div className='benefit-item'>
+            <span className='benefit-icon'>⚡</span>
+            <span>Ưu tiên hỗ trợ</span>
+          </div>
+        </div>
       </div>
 
       <div className='payment-grid'>
-        {paymentTiers.map((tier) => (
-          <div className='payment-card' key={tier.id}>
-            {/* Tag bonus "lung linh" */}
-            {tier.bonus && (
-              <div className='bonus-tag'>{`+${
-                tier.coin - (tier.vnd / 10000) * 52
-              } Unicoin`}</div>
-            )}
+        {packages.map((pkg, index) => {
+          const pricePerMonth = pkg.price / pkg.durationInMonths
+          const isPopular = index === Math.floor(packages.length / 2) // Đánh dấu gói giữa là phổ biến
+          const isBestValue = index === packages.length - 1 // Gói dài nhất là tiết kiệm nhất
 
-            <div className='coin-amount'>
-              {tier.coin.toLocaleString('en-US')}
-              <span> Unicoin</span>
-            </div>
-            <div className='vnd-amount'>{formatCurrency(tier.vnd)}</div>
-
-            <button
-              className='payment-add-btn'
-              onClick={() => handleCheckout(tier)}
-              title={`Nạp ${formatCurrency(tier.vnd)}`}
+          return (
+            <div
+              key={pkg.servicePackageId}
+              className={`payment-card ${isPopular ? 'popular' : ''} ${
+                isBestValue ? 'best-value' : ''
+              }`}
+              onClick={() => handleSelectPackage(pkg)}
             >
-              +
-            </button>
-          </div>
-        ))}
+              {isPopular && <div className='badge-tag popular-badge'>PHỔ BIẾN</div>}
+              {isBestValue && <div className='badge-tag best-value-badge'>TIẾT KIỆM NHẤT</div>}
+
+              <div className='card-header'>
+                <div className='duration-badge'>
+                  <svg className='duration-icon' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                    <circle cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='2'/>
+                    <path d='M12 6V12L16 14' stroke='currentColor' strokeWidth='2' strokeLinecap='round'/>
+                  </svg>
+                  <span>{pkg.durationInMonths} tháng</span>
+                </div>
+              </div>
+
+              <div className='card-content'>
+                <h3 className='package-name'>{pkg.description}</h3>
+                <div className='price-section'>
+                  <div className='main-price'>{formatCurrency(pkg.price)}</div>
+                  <div className='price-per-month'>
+                    {formatCurrency(pricePerMonth)}/tháng
+                  </div>
+                </div>
+                
+                <div className='package-features'>
+                  <div className='feature-item'>
+                    <svg className='check-icon' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                      <path d='M20 6L9 17L4 12' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                    </svg>
+                    <span>Tất cả tính năng VIP</span>
+                  </div>
+                  <div className='feature-item'>
+                    <svg className='check-icon' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                      <path d='M20 6L9 17L4 12' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                    </svg>
+                    <span>Hỗ trợ ưu tiên 24/7</span>
+                  </div>
+                  {isBestValue && (
+                    <div className='feature-item highlight'>
+                      <svg className='star-icon' viewBox='0 0 24 24' fill='currentColor' xmlns='http://www.w3.org/2000/svg'>
+                        <path d='M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z'/>
+                      </svg>
+                      <span>Tiết kiệm {Math.round((1 - pricePerMonth / (packages[0].price / packages[0].durationInMonths)) * 100)}%</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <button className='select-package-btn'>
+                <span>Chọn gói này</span>
+                <svg className='arrow-icon' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                  <path d='M5 12H19M19 12L12 5M19 12L12 19' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'/>
+                </svg>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+
+      <div className='payment-footer'>
+        <p className='footer-note'>
+          💡 <strong>Lưu ý:</strong> Sau khi thanh toán, gói VIP sẽ được kích hoạt ngay lập tức.
+        </p>
       </div>
     </div>
   )

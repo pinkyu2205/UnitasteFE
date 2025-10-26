@@ -1,37 +1,55 @@
 /* src/pages/Social/component/CreatePost/CreatePost.css */
 .create-post-bar {
   background-color: var(--surface-color);
-  border-radius: 8px;
-  box-shadow: var(--shadow-1);
-  padding: 12px 16px;
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.create-post-bar:hover {
+  box-shadow: var(--shadow-2);
+  border-color: var(--border-color);
 }
 
 .avatar-placeholder-small {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background-color: #ccc;
-  object-fit: cover; /* <-- THÊM DÒNG NÀY */
-  display: block; /* <-- Thêm để đảm bảo layout */
-  border: 1px solid #ddd;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.25);
 }
 
 .create-post-trigger {
   flex-grow: 1;
   border: none;
   background-color: var(--bg-color);
-  border-radius: 20px;
-  padding: 10px 15px;
+  border-radius: 24px;
+  padding: 12px 18px;
   text-align: left;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 500;
 }
 
 .create-post-trigger:hover {
-  background-color: #e0e0e0;
+  background-color: #e9ecef;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.create-post-trigger:active {
+  transform: translateY(0);
 }

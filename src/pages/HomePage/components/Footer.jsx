@@ -5,17 +5,18 @@ const Footer = () => {
     {
       title: 'Về Unitaste',
       links: [
-        { text: 'Giới thiệu', href: '#about' },
-        { text: 'Đội ngũ', href: '#team' },
-        { text: 'Tuyển dụng', href: '#careers' },
+        { 
+          text: 'Giới thiệu', 
+          href: '/about'
+        },
       ],
     },
     {
       title: 'Hỗ trợ',
       links: [
-        { text: 'Trung tâm trợ giúp', href: '#help' },
-        { text: 'Liên hệ', href: '#contact' },
-        { text: 'Câu hỏi thường gặp', href: '#faq' },
+        { text: 'Trung tâm trợ giúp', href: '/support' },
+        { text: 'Liên hệ', href: 'mailto:unitasteplatform@gmail.com' },
+        { text: 'Câu hỏi thường gặp', href: '/support' },
       ],
     },
     {
@@ -67,7 +68,7 @@ const Footer = () => {
           ))}
         </div>
         <div className='footer-bottom'>
-          <p>&copy; 2024 Unitaste. Tất cả quyền được bảo lưu.</p>
+          <p>&copy; 2025 Unitaste. Tất cả quyền được bảo lưu.</p>
         </div>
       </div>
     </footer>

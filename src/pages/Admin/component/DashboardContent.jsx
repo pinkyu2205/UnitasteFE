@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import {
-  Area,
-  AreaChart,
+  Bar,
+  BarChart,
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -13,130 +12,196 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import UserApi from '../../../api/userApi'
+import PaymentApi from '../../../api/paymentApi'
+import { StarIcon } from './AdminIcons'
 import '../CSS/DashboardContent.css'
 
-const DashboardContent = () => {
-  const [timeRange, setTimeRange] = useState('month')
-  const [activeCount, setActiveCount] = useState(0)
-  const [inactiveCount, setInactiveCount] = useState(0)
-  const [registerData, setRegisterData] = useState([])
-  const [selectedYear, setSelectedYear] = useState(
-    String(new Date().getFullYear())
-  )
-  const [isLoadingRegister, setIsLoadingRegister] = useState(false)
+// Simple SVG Icons
+const RevenueIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="10" />
+    <text x="12" y="16" textAnchor="middle" fontSize="12" fill="currentColor" stroke="none">₫</text>
+  </svg>
+)
+
+const TransactionIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <line x1="2" y1="10" x2="22" y2="10" />
+  </svg>
+)
+
+const UsersIcon = () => (
+  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+)
+
+const DashboardContent = ({ setActiveMenu }) => {
+  const [totalRevenue, setTotalRevenue] = useState(0)
+  const [totalTransactions, setTotalTransactions] = useState(0)
+  const [totalUsers, setTotalUsers] = useState(0)
+  const [revenueData, setRevenueData] = useState([])
+  const [transactionData, setTransactionData] = useState([])
+  const [recentTransactions, setRecentTransactions] = useState([])
+  const [recentReviews, setRecentReviews] = useState([])
+  const [ratingStats, setRatingStats] = useState({
+    average: 0,
+    distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 },
+  })
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const fetchUserCounts = async () => {
+    const fetchDashboardData = async () => {
+      setIsLoading(true)
       try {
-        const [activeRes, inactiveRes] = await Promise.all([
-          UserApi.countActiveUsers(),
-          UserApi.countInactiveUsers(),
-        ])
+        // Lấy tất cả giao dịch
+        const response = await PaymentApi.getPurchasesByUserToken()
+        const allTransactions = response.data || []
+        
+        // Tính tổng doanh thu từ các giao dịch thành công
+        const totalRevenue = allTransactions
+          .filter(t => t.status === 'COMPLETED' || t.status === 'SUCCESS')
+          .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
 
-        setActiveCount(activeRes.total)
-        setInactiveCount(inactiveRes.total)
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu user count:', error)
-      }
-    }
-
-    fetchUserCounts()
-  }, [])
-
-  // Lấy dữ liệu đăng ký theo tháng
-  useEffect(() => {
-    const fetchRegisterByMonth = async () => {
-      setIsLoadingRegister(true)
-      try {
-        const res = await UserApi.countRegisterByMonth(selectedYear)
-
-        // API trả về: { year: 2025, data: { 1: 35, 2: 36, ... } }
-        let dataObj = res?.data?.data || res?.data
-
-        if (!dataObj || typeof dataObj !== 'object') {
-          console.warn('Dữ liệu không hợp lệ:', dataObj)
-          setRegisterData([])
-          return
+        // Tạo dữ liệu doanh thu 7 ngày qua
+        const revenueData = []
+        const transactionData = []
+        
+        for (let i = 6; i >= 0; i--) {
+          const date = new Date()
+          date.setDate(date.getDate() - i)
+          const dateStr = date.toISOString().split('T')[0]
+          
+          const dayTransactions = allTransactions.filter(t => {
+            const tDate = new Date(t.createdAt || t.purchaseDate).toISOString().split('T')[0]
+            return tDate === dateStr
+          })
+          
+          const dayRevenue = dayTransactions
+            .filter(t => t.status === 'COMPLETED' || t.status === 'SUCCESS')
+            .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
+          
+          revenueData.push({
+            date: date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+            revenue: dayRevenue,
+          })
+          
+          transactionData.push({
+            date: date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+            transactions: dayTransactions.length,
+          })
         }
 
-        // Chuyển object thành array [{ name: 'T1', count: 0 }, ...]
-        const chartData = Object.keys(dataObj)
-          .filter((key) => !isNaN(key)) // Chỉ lấy các key là số (tháng)
-          .map((month) => ({
-            name: `T${month}`,
-            count: dataObj[month] || 0,
-          }))
-          .sort((a, b) => {
-            const monthA = parseInt(a.name.replace('T', ''))
-            const monthB = parseInt(b.name.replace('T', ''))
-            return monthA - monthB
-          })
+        // Lấy 5 giao dịch gần nhất
+        const recentTransactions = allTransactions
+          .sort((a, b) => new Date(b.createdAt || b.purchaseDate) - new Date(a.createdAt || a.purchaseDate))
+          .slice(0, 5)
 
-        setRegisterData(chartData)
+        // Mock data cho reviews và rating stats
+        const recentReviews = [
+          {
+            id: 1,
+            userName: 'Nguyễn Văn A',
+            restaurantName: 'Phở Gia Truyền',
+            rating: 5,
+            comment: 'Món ăn rất ngon!',
+            date: '2024-01-15',
+          },
+          {
+            id: 2,
+            userName: 'Trần Thị B',
+            restaurantName: 'Bánh Mì Ơi',
+            rating: 4,
+            comment: 'Phục vụ tốt',
+            date: '2024-01-14',
+          },
+          {
+            id: 3,
+            userName: 'Lê Minh C',
+            restaurantName: 'Cơm Tấm 24h',
+            rating: 3,
+            comment: 'Ổn',
+            date: '2024-01-13',
+          },
+        ]
+
+        const ratingStats = {
+          average: 4.2,
+          distribution: { 5: 120, 4: 50, 3: 10, 2: 2, 1: 5 },
+        }
+
+        setTotalRevenue(totalRevenue)
+        setTotalTransactions(allTransactions.length)
+        setTotalUsers(450) // Mock data
+        setRevenueData(revenueData)
+        setTransactionData(transactionData)
+        setRecentTransactions(recentTransactions)
+        setRecentReviews(recentReviews)
+        setRatingStats(ratingStats)
+
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu đăng ký theo tháng:', error)
-        setRegisterData([])
+        console.error('Lỗi khi tải dữ liệu dashboard:', error)
       } finally {
-        setIsLoadingRegister(false)
+        setIsLoading(false)
       }
     }
 
-    fetchRegisterByMonth()
-  }, [selectedYear])
+    fetchDashboardData()
+  }, [])
 
-  // Mock data cho biểu đồ truy cập người dùng theo tuần
-  const userAccessData = [
-    { name: 'T2', users: 32 },
-    { name: 'T3', users: 38 },
-    { name: 'T4', users: 45 },
-    { name: 'T5', users: 42 },
-    { name: 'T6', users: 48 },
-    { name: 'T7', users: 50 },
-    { name: 'CN', users: 40 },
-  ]
-
-  // Mock data cho biểu đồ doanh thu
-  const revenueData = [
-    { name: 'Tuần 1', revenue: 2400 },
-    { name: 'Tuần 2', revenue: 2210 },
-    { name: 'Tuần 3', revenue: 2290 },
-    { name: 'Tuần 4', revenue: 2000 },
-  ]
+  // Format số tiền
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(amount)
+  }
 
   const statsCards = [
     {
-      title: 'Số Lượng Đăng Ký Tháng Này',
-      value: '3,456',
-      change: '+24.5%',
-      icon: '📝',
+      title: 'Tổng Doanh Thu',
+      value: formatCurrency(totalRevenue),
+      icon: <RevenueIcon />,
       color: 'blue',
     },
     {
-      title: 'Người Dùng Đang Hoạt Động',
-      value: activeCount,
-      change: '+2.1%',
-      icon: '✅',
+      title: 'Tổng Số Giao Dịch',
+      value: totalTransactions.toLocaleString(),
+      icon: <TransactionIcon />,
       color: 'green',
     },
     {
-      title: 'Tài Khoản Ngừng Hoạt Động',
-      value: inactiveCount,
-      change: '-0.4%',
-      icon: '⛔',
-      color: 'red',
-    },
-    {
-      title: 'Doanh Thu Tháng Này',
-      value: '45.2M',
-      change: '+18.7%',
-      icon: '💰',
+      title: 'Tổng Người Dùng',
+      value: `${totalUsers.toLocaleString()} người`,
+      icon: <UsersIcon />,
       color: 'orange',
     },
   ]
 
+  // Render stars
+  const renderStars = (rating) => {
+    return (
+      <div className='star-rating'>
+        {[...Array(5)].map((_, i) => (
+          <StarIcon key={i} size={14} filled={i < rating} color='#f59e0b' />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div className='dashboard-content'>
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Đang tải dữ liệu...</p>
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className='stats-cards'>
         {statsCards.map((card, index) => (
@@ -145,7 +210,6 @@ const DashboardContent = () => {
             <div className='stat-info'>
               <h4>{card.title}</h4>
               <div className='stat-value'>{card.value}</div>
-              {/* <p className='stat-change'>{card.change} so với kỳ trước</p> */}
             </div>
           </div>
         ))}
@@ -153,190 +217,168 @@ const DashboardContent = () => {
 
       {/* Charts Section */}
       <div className='charts-grid'>
-        {/* User Access Chart */}
+        {/* Revenue Chart */}
         <div className='chart-card'>
           <div className='chart-header'>
-            <h3>Tỷ Lệ Truy Cập Người Dùng</h3>
-            <div className='time-filter'>
-              {['day', 'week', 'month', 'year'].map((t) => (
-                <button
-                  key={t}
-                  className={`filter-btn ${timeRange === t ? 'active' : ''}`}
-                  onClick={() => setTimeRange(t)}
-                >
-                  {t === 'day'
-                    ? 'Ngày'
-                    : t === 'week'
-                    ? 'Tuần'
-                    : t === 'month'
-                    ? 'Tháng'
-                    : 'Năm'}
-                </button>
-              ))}
-            </div>
+            <h3>Đồ Thị Doanh Thu (7 Ngày Qua)</h3>
           </div>
           <ResponsiveContainer width='100%' height={300}>
-            <LineChart data={userAccessData}>
+            <LineChart data={revenueData}>
               <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-              <XAxis dataKey='name' />
-              <YAxis domain={[0, 50]} />
-              <Tooltip
-                contentStyle={{
-                  background: '#fff',
-                  border: '1px solid #FF6B35',
-                }}
-                cursor={{ stroke: '#FF6B35', strokeWidth: 2 }}
+              <XAxis dataKey='date' />
+              <YAxis />
+              <Tooltip 
+                formatter={(value) => [formatCurrency(value), 'Doanh thu']}
+                labelStyle={{ color: '#333' }}
               />
-              <Legend />
               <Line
                 type='monotone'
-                dataKey='users'
-                stroke='#FF6B35'
-                strokeWidth={2}
-                dot={{ fill: '#FF6B35', r: 5 }}
+                dataKey='revenue'
+                stroke='#3b82f6'
+                strokeWidth={3}
+                dot={{ fill: '#3b82f6', r: 5 }}
                 activeDot={{ r: 7 }}
-                name='Người dùng truy cập'
               />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Registration Chart */}
+        {/* Transaction Chart */}
         <div className='chart-card'>
           <div className='chart-header'>
-            <h3>Số Người Đăng Ký Theo Tháng ({selectedYear})</h3>
-            <div className='year-select'>
-              <select
-                value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+            <h3>Giao Dịch Mới (7 Ngày Qua)</h3>
+          </div>
+          <ResponsiveContainer width='100%' height={300}>
+            <BarChart data={transactionData}>
+              <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
+              <XAxis dataKey='date' />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey='transactions' fill='#10b981' />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Reviews & Transactions Section */}
+      <div className='bottom-section'>
+        {/* Reviews Column */}
+        <div className='reviews-column'>
+          <div className='section-card'>
+            <div className='section-header'>
+              <h3>Thống Kê Đánh Giá</h3>
+            </div>
+            
+            {/* Average Rating */}
+            <div className='average-rating'>
+              <div className='rating-display'>
+                <span className='rating-number'>{ratingStats.average}</span>
+                <div className='rating-stars'>
+                  {renderStars(Math.floor(ratingStats.average))}
+                </div>
+                <span className='rating-text'>trên 5 sao</span>
+              </div>
+            </div>
+
+            {/* Rating Distribution */}
+            <div className='rating-distribution'>
+              <h4>Phân bố đánh giá:</h4>
+              {[5, 4, 3, 2, 1].map((rating) => (
+                <div key={rating} className='rating-bar'>
+                  <span className='rating-label'>
+                    {[...Array(rating)].map((_, i) => (
+                      <StarIcon key={i} size={12} filled color='#f59e0b' />
+                    ))}
+                  </span>
+                  <div className='bar-container'>
+                    <div 
+                      className='bar-fill'
+                      style={{ 
+                        width: `${(ratingStats.distribution[rating] / Math.max(...Object.values(ratingStats.distribution))) * 100}%` 
+                      }}
+                    />
+                  </div>
+                  <span className='rating-count'>{ratingStats.distribution[rating]}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Recent Reviews */}
+            <div className='recent-reviews'>
+              <h4>Đánh giá gần đây:</h4>
+              <div className='reviews-list'>
+                {recentReviews.map((review) => (
+                  <div key={review.id} className='review-item'>
+                    <div className='review-header'>
+                      <span className='user-name'>{review.userName}</span>
+                      {renderStars(review.rating)}
+                    </div>
+                    <p className='restaurant-name'>{review.restaurantName}</p>
+                    <p className='review-comment'>"{review.comment}"</p>
+                    <span className='review-date'>{review.date}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Transactions Column */}
+        <div className='transactions-column'>
+          <div className='section-card'>
+            <div className='section-header'>
+              <h3>Giao Dịch Gần Đây</h3>
+              <button 
+                className='view-all-btn'
+                onClick={() => {
+                  // Navigate to transactions page
+                  setActiveMenu('transactions')
+                }}
               >
-                <option value='2024'>2024</option>
-                <option value='2025'>2025</option>
-                <option value='2026'>2026</option>
-              </select>
+                Xem tất cả
+              </button>
             </div>
-          </div>
-          {isLoadingRegister ? (
-            <div
-              style={{
-                height: 300,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#999',
-              }}
-            >
-              Đang tải dữ liệu...
-            </div>
-          ) : registerData.length > 0 ? (
-            <ResponsiveContainer width='100%' height={300}>
-              <AreaChart data={registerData}>
-                <CartesianGrid strokeDasharray='3 3' stroke='#eee' />
-                <XAxis dataKey='name' />
-                <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    background: '#fff',
-                    border: '1px solid #4F46E5',
-                  }}
-                  cursor={{ stroke: '#4F46E5', strokeWidth: 2 }}
-                />
-                <Legend />
-                <Area
-                  type='monotone'
-                  dataKey='count'
-                  fill='#4F46E520'
-                  stroke='#4F46E5'
-                  strokeWidth={2}
-                  name='Số lượng đăng ký'
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div
-              style={{
-                height: 300,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#999',
-              }}
-            >
-              Không có dữ liệu
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Statistics Section */}
-      <div className='location-performance'>
-        <h3>Thống Kê Cơ Bản</h3>
-        <div className='performance-grid'>
-          <div className='location-card'>
-            <div className='location-header'>
-              <h4>Tổng Đơn Hàng</h4>
-            </div>
-            <div className='location-stats'>
-              <div className='stat'>
-                <span className='label'>Hôm Nay</span>
-                <span className='number'>234</span>
-              </div>
-              <div className='stat'>
-                <span className='label'>Tuần Này</span>
-                <span className='number'>1,456</span>
-              </div>
-            </div>
-          </div>
-
-          <div className='location-card'>
-            <div className='location-header'>
-              <h4>Tỷ Lệ Chuyển Đổi</h4>
-            </div>
-            <div className='location-stats'>
-              <div className='stat'>
-                <span className='label'>Hôm Nay</span>
-                <span className='number'>68%</span>
-              </div>
-              <div className='stat'>
-                <span className='label'>Tuần Này</span>
-                <span className='number'>72%</span>
-              </div>
-            </div>
-          </div>
-
-          <div className='location-card'>
-            <div className='location-header'>
-              <h4>Tài Khoản Mới</h4>
-            </div>
-            <div className='location-stats'>
-              <div className='stat'>
-                <span className='label'>Hôm Nay</span>
-                <span className='number'>45</span>
-              </div>
-              <div className='stat'>
-                <span className='label'>Tuần Này</span>
-                <span className='number'>312</span>
-              </div>
-            </div>
-          </div>
-
-          <div className='location-card'>
-            <div className='location-header'>
-              <h4>Tài Khoản Hoạt Động</h4>
-            </div>
-            <div className='location-stats'>
-              <div className='stat'>
-                <span className='label'>Hôm Nay</span>
-                <span className='number'>2,145</span>
-              </div>
-              <div className='stat'>
-                <span className='label'>Tuần Này</span>
-                <span className='number'>8,756</span>
-              </div>
+            
+            <div className='transactions-table'>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID Giao Dịch</th>
+                    <th>Tên Người Dùng</th>
+                    <th>Số Tiền</th>
+                    <th>Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentTransactions.map((transaction, index) => (
+                    <tr key={index}>
+                      <td className='transaction-id'>
+                        #{transaction.id || transaction.orderCode || 'N/A'}
+                      </td>
+                      <td>{transaction.userName || 'Người dùng'}</td>
+                      <td className='amount'>
+                        {formatCurrency(transaction.amount || transaction.totalAmount || 0)}
+                      </td>
+                      <td>
+                        <span className={`status-badge ${transaction.status?.toLowerCase()}`}>
+                          {transaction.status === 'COMPLETED' || transaction.status === 'SUCCESS'
+                            ? 'Hoàn thành'
+                            : transaction.status === 'PROCESSING'
+                            ? 'Đang xử lý'
+                            : transaction.status === 'CANCELLED'
+                            ? 'Đã hủy'
+                            : 'Chờ thanh toán'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   )
 }
