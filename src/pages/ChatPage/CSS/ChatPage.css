@@ -2,14 +2,10 @@
 
 /* Biến màu chủ đạo từ logo */
 :root {
-  --primary-color: #f26522;
-  /* Cam */
-  --accent-color: #e63946;
-  /* Đỏ */
-  --bg-light: #fef5f1;
-  /* Màu nền siêu nhạt */
-  --surface-color: #ffffff;
-  /* Màu nền thẻ (card) */
+  --primary-color: #f26522; /* Cam */
+  --accent-color: #e63946; /* Đỏ */
+  --bg-light: #fef5f1; /* Màu nền siêu nhạt */
+  --surface-color: #ffffff; /* Màu nền thẻ (card) */
   --text-dark: #333;
   --text-light: #777;
   --border-light: rgba(242, 101, 34, 0.15);
@@ -126,8 +122,7 @@
   border-radius: 20px;
   box-shadow: var(--shadow-main);
   border: 1px solid var(--border-light);
-  overflow: hidden;
-  /* Giữ bo tròn */
+  overflow: hidden; /* Giữ bo tròn */
   animation: slideInRight 0.5s ease-out;
 }
 
@@ -166,8 +161,7 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
-  background-color: #fdfdfd;
-  /* Hơi khác màu nền 1 chút */
+  background-color: #fdfdfd; /* Hơi khác màu nền 1 chút */
 }
 
 .message {
@@ -311,9 +305,7 @@
 }
 
 @keyframes float {
-
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
 
@@ -330,4 +322,165 @@
 .chat-placeholder p {
   font-size: 16px;
   color: var(--text-light);
+}
+
+/* ====== ĐÃ XEM ("✓✓") — phong cách nhẹ nhàng ====== */
+.seen-check {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffffff;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.9;
+}
+
+/* Với bubble của mình (nền cam → chữ trắng ✓✓) */
+.message.own .bubble .seen-check {
+  color: #fff;
+}
+
+/* Nếu muốn kiểu xanh Messenger: */
+/* .message.own .bubble .seen-check { color: #9ee2ff; } */
+
+.message.own .bubble:hover .seen-check {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* ====== Hiệu ứng "Đang nhập..." ====== */
+.typing-indicator {
+  margin: 0 25px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.typing-dots span {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-color);
+  border-radius: 50%;
+  margin-right: 5px;
+  animation: typingDots 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typingDots {
+  0%, 80%, 100% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.message.own .bubble .seen-check {
+  color: #9ee2ff; /* xanh Messenger */
+  font-weight: 700;
+}
+
+.seen-check {
+  opacity: 0;
+  transform: translateY(3px);
+  animation: fadeInSeen 0.3s ease forwards;
+}
+
+@keyframes fadeInSeen {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== Text “Đã xem” dưới tin nhắn cuối cùng ====== */
+.seen-text {
+  font-size: 12px;
+  color: #9ee2ff; /* Xanh nhẹ Messenger */
+  text-align: right;
+  margin-top: 4px;
+  margin-right: 8px;
+  animation: fadeInSeenText 0.4s ease-in-out;
+   margin: 4px 8px 0 0;
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+@keyframes fadeInSeenText {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Badge tin chưa đọc */
+.unread-badge {
+  background: var(--accent-color);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+  box-shadow: 0 2px 6px rgba(230, 57, 70, 0.4);
+  animation: popIn 0.3s ease;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.status-dot {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.status-dot.online {
+  background-color: #4caf50; /* xanh */
+  box-shadow: 0 0 6px #4caf50;
+}
+
+.status-dot.offline {
+  background-color: #ccc; /* xám */
 }
