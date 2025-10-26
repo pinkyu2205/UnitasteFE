@@ -1,169 +1,494 @@
 /* src/pages/Profile/CSS/ProfilePayment.css */
 
-/* Định nghĩa màu chủ đạo từ logo */
+/* Định nghĩa màu chủ đạo */
 :root {
-    --primary-color: #f26522;
-    /* Cam */
+    --primary-color: #ff6b35;
+    --primary-dark: #f7931e;
     --accent-color: #e63946;
-    /* Đỏ */
+    --success-color: #10b981;
+    --gradient-primary: linear-gradient(135deg, #ff6b35, #f7931e);
+    --gradient-accent: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
 .profile-payment-container {
     background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 40px rgba(242, 101, 34, 0.1);
-    border: 1px solid rgba(242, 101, 34, 0.1);
-    animation: fadeIn 0.5s ease-out;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(255, 107, 53, 0.1);
+    border: 1px solid rgba(255, 107, 53, 0.1);
+    animation: fadeInUp 0.6s ease-out;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-@keyframes fadeIn {
+@keyframes fadeInUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
+/* Loading & Error States */
+.loading-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 107, 53, 0.2);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-state p,
+.error-state p {
+    font-size: 16px;
+    color: #666;
+    margin-top: 10px;
+}
+
+.error-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+}
+
+.retry-btn {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3);
+}
+
+/* Header Section */
 .payment-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 50px;
+}
+
+.header-icon-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
 }
 
 .payment-logo-icon {
-    width: 80px;
+    width: 100px;
     height: auto;
-    margin-bottom: 10px;
-    /* Hiệu ứng "lung linh" - pulse */
-    animation: pulse-orange 2.5s infinite;
+    position: relative;
+    z-index: 2;
+    animation: float 3s ease-in-out infinite;
 }
 
-@keyframes pulse-orange {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
 
+.icon-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(255, 107, 53, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.5;
+    }
     50% {
-        transform: scale(1.1);
+        transform: translate(-50%, -50%) scale(1.2);
         opacity: 0.8;
-    }
-
-    100% {
-        transform: scale(1);
-        opacity: 1;
     }
 }
 
 .payment-header h2 {
-    font-size: 28px;
+    font-size: 36px;
     font-weight: 800;
-    color: var(--primary-color);
-    margin: 0;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 10px 0;
 }
 
-.payment-header p {
-    font-size: 16px;
-    color: #777;
-}
-
-.payment-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 25px;
-}
-
-.payment-card {
-    position: relative;
-    background: linear-gradient(145deg, #ffffff, #fafbfc);
-    border-radius: 16px;
-    padding: 25px;
-    text-align: center;
-    border: 2px solid transparent;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    overflow: hidden;
-    /* Để chứa bonus tag */
-}
-
-/* Hiệu ứng "lung linh" khi hover card */
-.payment-card:hover {
-    transform: translateY(-8px);
-    border-color: var(--primary-color);
-    box-shadow: 0 12px 30px rgba(242, 101, 34, 0.25);
-}
-
-.bonus-tag {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-    color: white;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    border-bottom-left-radius: 16px;
-    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.4);
-    /* Hiệu ứng "shine" */
-    animation: shine 3s infinite linear;
-}
-
-/* Animation cho bonus tag */
-@keyframes shine {
-    0% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 1;
-    }
-
-    100% {
-        opacity: 0.8;
-    }
-}
-
-.coin-amount {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--primary-color);
-    margin-bottom: 5px;
-}
-
-.coin-amount span {
+.header-subtitle {
     font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+/* VIP Benefits */
+.vip-benefits {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(247, 147, 30, 0.05));
+    border-radius: 50px;
+    font-size: 14px;
     font-weight: 600;
-    color: #555;
-}
-
-.vnd-amount {
-    font-size: 18px;
-    font-weight: 700;
     color: #333;
-    margin-bottom: 20px;
-}
-
-.payment-add-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: none;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    color: white;
-    font-size: 30px;
-    font-weight: 300;
-    line-height: 50px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(242, 101, 34, 0.4);
+    border: 1px solid rgba(255, 107, 53, 0.2);
     transition: all 0.3s ease;
 }
 
-/* Hiệu ứng "lung linh" khi hover nút + */
-.payment-card:hover .payment-add-btn {
-    transform: scale(1.15) rotate(90deg);
-    box-shadow: 0 6px 20px rgba(230, 57, 70, 0.5);
+.benefit-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+    border-color: var(--primary-color);
+}
+
+.benefit-icon {
+    font-size: 18px;
+}
+
+/* Payment Grid */
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+    margin-top: 15px;
+}
+
+/* Payment Card */
+.payment-card {
+    position: relative;
+    background: linear-gradient(145deg, #ffffff, #fafbfc);
+    border-radius: 20px;
+    padding: 0;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+    border-radius: 0 0 18px 18px;
+}
+
+.payment-card:hover::after {
+    transform: scaleX(1);
+}
+
+.payment-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-color);
+    box-shadow: 0 12px 40px rgba(255, 107, 53, 0.2);
+}
+
+/* Popular & Best Value Cards */
+.payment-card.popular {
+    border-color: #3b82f6;
+    background: linear-gradient(145deg, #eff6ff, #dbeafe);
+}
+
+.payment-card.best-value {
+    border-color: #10b981;
+    background: linear-gradient(145deg, #f0fdf4, #dcfce7);
+    transform: scale(1.05);
+}
+
+.payment-card.best-value:hover {
+    transform: translateY(-8px) scale(1.05);
+}
+
+/* Badge Tags */
+.badge-tag {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 24px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: white;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.badge-tag::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+    animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+.popular-badge {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.best-value-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+    animation: badgeShimmer 2s ease-in-out infinite;
+}
+
+@keyframes badgeShimmer {
+    0%, 100% { 
+        opacity: 1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    50% { 
+        opacity: 0.95;
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+    }
+}
+
+@keyframes dotPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+/* Card Header */
+.card-header {
+    padding: 30px 20px 10px;
+    position: relative;
+}
+
+.duration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(255, 107, 53, 0.1);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.duration-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--primary-color);
+}
+
+/* Card Content */
+.card-content {
+    padding: 10px 20px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.package-name {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1f2937;
+    margin: 0 0 20px 0;
+}
+
+.price-section {
+    margin-bottom: 25px;
+}
+
+.main-price {
+    font-size: 32px;
+    font-weight: 900;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+}
+
+.price-per-month {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 5px;
+}
+
+/* Package Features */
+.package-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #4b5563;
+}
+
+.feature-item.highlight {
+    color: var(--success-color);
+    font-weight: 700;
+}
+
+.check-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--success-color);
+    flex-shrink: 0;
+}
+
+.star-icon {
+    width: 20px;
+    height: 20px;
+    color: #fbbf24;
+    flex-shrink: 0;
+    animation: starRotate 3s ease-in-out infinite;
+}
+
+@keyframes starRotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(15deg); }
+}
+
+/* Select Button */
+.select-package-btn {
+    width: 100%;
+    padding: 14px 24px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.select-package-btn:hover {
+    transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.arrow-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.select-package-btn:hover .arrow-icon {
+    transform: translateX(4px);
+}
+
+/* Footer */
+.payment-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px dashed rgba(255, 107, 53, 0.2);
+}
+
+.footer-note {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.footer-note strong {
+    color: var(--primary-color);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-payment-container {
+        padding: 25px;
+    }
+
+    .payment-header h2 {
+        font-size: 28px;
+    }
+
+    .vip-benefits {
+        gap: 15px;
+    }
+
+    .benefit-item {
+        padding: 8px 15px;
+        font-size: 13px;
+    }
+
+    .payment-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .payment-card.best-value {
+        transform: scale(1);
+    }
+
+    .payment-card.best-value:hover {
+        transform: translateY(-8px) scale(1);
+    }
 }

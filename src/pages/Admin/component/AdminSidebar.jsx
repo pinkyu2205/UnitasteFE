@@ -1,6 +1,7 @@
 // src/pages/Admin/component/AdminSidebar.jsx
 
 import '../CSS/AdminSidebar.css'
+import { ChefHatIcon, LogoutIcon } from './AdminIcons'
 
 const AdminSidebar = ({
   menuItems,
@@ -12,7 +13,9 @@ const AdminSidebar = ({
     <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
       <div className='sidebar-header'>
         <div className='logo'>
-          <span className='logo-icon'>🍽️</span>
+          <span className='logo-icon'>
+            <ChefHatIcon size={28} />
+          </span>
           {sidebarOpen && <span className='logo-text'>UniTaste Admin</span>}
         </div>
       </div>
@@ -36,7 +39,9 @@ const AdminSidebar = ({
 
       <div className='sidebar-footer'>
         <button className='logout-btn' title='Đăng xuất'>
-          <span>🚪</span>
+          <span>
+            <LogoutIcon size={20} />
+          </span>
           {sidebarOpen && <span>Đăng xuất</span>}
         </button>
       </div>

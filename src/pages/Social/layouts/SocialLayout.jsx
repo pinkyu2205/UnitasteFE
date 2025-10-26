@@ -1,10 +1,9 @@
 import { jwtDecode } from 'jwt-decode' // Import jwt-decode
 import { useEffect, useState } from 'react' // Import hooks
 import SocialApi from '../../../api/socialApi' // Import API của bạn
-import ChatPopup from '../../../components/ChatPopup'
 import Feed from '../component/Feed/Feed'
 import LeftSidebar from '../component/LeftSidebar/LeftSidebar'
-import RightSidebar from '../RightSidebar/RightSidebar'
+import RightSidebar from '../component/RightSidebar/RightSidebar'
 import './SocialLayout.css'
 
 // Helper function để lấy userId từ token
@@ -62,11 +61,10 @@ function SocialLayout() {
       </div>
       <div className='social-layout-sidebar-right'>
         <RightSidebar />
-      </div>{' '}
-      <ChatPopup />
-      {/* Chat components
+      </div>
+      {/* Chat components */}
       <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} />
-      {isChatOpen && <ChatList onClose={() => setIsChatOpen(false)} />} */}
+      {isChatOpen && <ChatList onClose={() => setIsChatOpen(false)} />} */
     </div>
   )
 }

@@ -4,8 +4,8 @@
 
 /* ... (Style cho .restaurant-showcase, .showcase-container, .section-title giữ nguyên) ... */
 .restaurant-showcase {
-  padding: 5rem 2rem;
-  background: white;
+  padding: 4rem 2rem;
+  background: #f5f7fa;
 }
 
 .showcase-container {

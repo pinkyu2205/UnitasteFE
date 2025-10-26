@@ -1,25 +1,16 @@
 // src/api/paymentApi.js
-import { jwtDecode } from 'jwt-decode'
 import { axiosPaymentClient } from './axios' // Make sure you are using the correct client (port 5005)
 
+// Helper function to get UserID from token
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('token')
-  if (!token) {
-    return null
-  }
+  if (!token) return null
+
   try {
-    const decoded = jwtDecode(token) // Lấy claim chứa User ID
-    const nameIdentifierClaim =
-      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
-    const id =
-      decoded[nameIdentifierClaim] ||
-      decoded.sub ||
-      decoded.id ||
-      decoded.userId
-    const userIdInt = id ? parseInt(id, 10) : null
-    return isNaN(userIdInt) ? null : userIdInt
-  } catch (e) {
-    console.error('Lỗi giải mã token trong paymentApi:', e)
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload.userId || payload.sub || payload.id
+  } catch (error) {
+    console.error('Error parsing token:', error)
     return null
   }
 }
@@ -36,12 +27,16 @@ const PaymentApi = {
   /**
    * Tạo một yêu cầu thanh toán cho gói dịch vụ
    * POST: /create-service-package-payment
-   * Body: { servicePackageId }
+   * Body: { servicePackageId, returnUrl, cancelUrl }
    */
   createServicePackagePayment: (servicePackageId) => {
-    // Chỉ cần gửi servicePackageId trong body
+    // Lấy base URL từ window.location
+    const baseUrl = window.location.origin
+
     return axiosPaymentClient.post('/create-service-package-payment', {
       servicePackageId,
+      returnUrl: `${baseUrl}/payment/success`, // URL khi thanh toán thành công
+      cancelUrl: `${baseUrl}/vip-checkout`, // URL khi hủy thanh toán
     })
   },
 
@@ -61,6 +56,17 @@ const PaymentApi = {
     // API yêu cầu userId làm query parameter
     return axiosPaymentClient.get(
       `/check-service-package-status?userId=${userId}`
+    )
+  },
+
+  /**
+   * Callback xác nhận thanh toán thành công
+   * GET: /payment-success-callback?orderCode={orderCode}
+   * (hoặc /api/payments/payment-success-callback nếu backend dùng /api prefix)
+   */
+  paymentSuccessCallback: (orderCode) => {
+    return axiosPaymentClient.get(
+      `/payment-success-callback?orderCode=${orderCode}`
     )
   },
 }

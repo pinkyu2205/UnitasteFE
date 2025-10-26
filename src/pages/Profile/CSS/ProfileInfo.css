@@ -329,14 +329,3 @@
     width: 100%;
 }
 
-/* ===== Scrollable Area ===== */
-.profile-info-container {
-    max-height: 80vh;
-    /* hiển thị tối đa 80% chiều cao màn hình */
-    overflow-y: auto;
-    /* bật thanh cuộn dọc */
-    scrollbar-width: thin;
-    /* Firefox */
-    scrollbar-color: #FF6B35 #fff;
-    /* Firefox: màu thanh cuộn & nền */
-}

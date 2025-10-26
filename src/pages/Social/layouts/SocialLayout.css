@@ -1,48 +1,90 @@
 /* src/pages/Social/layouts/SocialLayout.css */
 .social-layout {
     display: grid;
-    /* Cột trái 300px, cột giữa (feed) 1fr (tự co dãn), cột phải 300px */
-    grid-template-columns: 300px 1fr 300px;
+    grid-template-columns: minmax(260px, 300px) minmax(580px, 680px) minmax(260px, 320px);
     gap: 20px;
-    max-width: 1600px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding-top: 20px;
+    padding: 24px 16px;
+    animation: fadeIn 0.5s ease-out;
+    justify-content: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .social-layout-sidebar-left,
 .social-layout-sidebar-right {
-    /* Giữ cố định khi cuộn */
     position: sticky;
-    top: 20px;
-    /* Cách lề trên 20px */
-    height: calc(100vh - 40px);
+    top: 90px;
+    height: fit-content;
+    max-height: calc(100vh - 110px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.social-layout-sidebar-left::-webkit-scrollbar,
+.social-layout-sidebar-right::-webkit-scrollbar {
+    width: 6px;
+}
+
+.social-layout-sidebar-left::-webkit-scrollbar-track,
+.social-layout-sidebar-right::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.social-layout-sidebar-left::-webkit-scrollbar-thumb,
+.social-layout-sidebar-right::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
 }
 
 .social-layout-main-content {
-    /* Cột giữa sẽ tự động cuộn */
     min-height: 100vh;
+    padding-bottom: 40px;
 }
 
 /* Responsive cho màn hình nhỏ */
+@media (max-width: 1400px) {
+    .social-layout {
+        grid-template-columns: 260px minmax(500px, 680px) 280px;
+        gap: 16px;
+    }
+}
+
 @media (max-width: 1200px) {
     .social-layout {
-        grid-template-columns: 300px 1fr;
+        grid-template-columns: 260px 1fr;
+        gap: 20px;
     }
 
     .social-layout-sidebar-right {
         display: none;
-        /* Ẩn cột phải */
+    }
+}
+
+@media (max-width: 900px) {
+    .social-layout {
+        grid-template-columns: 240px 1fr;
+        gap: 16px;
     }
 }
 
 @media (max-width: 768px) {
     .social-layout {
         grid-template-columns: 1fr;
-        /* Chỉ 1 cột */
+        gap: 16px;
+        padding: 16px 12px;
     }
 
     .social-layout-sidebar-left {
         display: none;
-        /* Ẩn luôn cột trái */
     }
 }

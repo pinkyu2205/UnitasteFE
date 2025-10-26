@@ -2,7 +2,9 @@
 .reaction-bar-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
   border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
   position: relative;
 }
 
@@ -12,86 +14,203 @@
   color: var(--text-secondary);
   font-weight: 600;
   font-size: 15px;
-  padding: 10px;
+  padding: 10px 12px;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background-color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.action-button .icon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
 }
 
 .action-button:hover {
-  background-color: #f0f0f0;
+  background-color: rgba(255, 107, 53, 0.08);
+  color: var(--text-primary);
+  transform: translateY(-2px);
 }
 
-/* Ẩn reaction popup ban đầu */
-.reaction-popup {
-  position: absolute;
-  bottom: 100%;
-  left: 0;
-  background-color: var(--surface-color);
-  border-radius: 20px;
-  box-shadow: var(--shadow-2);
-  padding: 5px 10px;
-  display: flex;
-  gap: 5px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(10px);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 10;
+.action-button:hover .icon {
+  transform: scale(1.2);
 }
 
-/* Hiệu ứng "lung linh" khi hover nút "Thích" */
-.action-button:first-child:hover + .reaction-popup,
-.reaction-popup:hover {
-  opacity: 1;
-  visibility: visible;
+.action-button:active {
   transform: translateY(0);
 }
 
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Reaction popup */
+.reaction-popup {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 12px;
+  background-color: var(--surface-color);
+  border-radius: 32px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: 8px 12px;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+  border: 1px solid var(--border-color);
+}
+
+/* Hiển thị popup khi hover nút reaction */
+.reaction-bar-container:hover .reaction-popup,
+.reaction-popup:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
 .reaction-icon {
-  font-size: 24px;
+  font-size: 32px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: grayscale(0.3);
+  position: relative;
+}
+
+.reaction-icon::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: 6px;
+  height: 6px;
+  background: var(--gradient-primary);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
 }
 
 .reaction-icon:hover {
-  transform: scale(1.3);
+  transform: scale(1.4) rotate(10deg);
+  filter: grayscale(0) drop-shadow(0 4px 12px rgba(255, 107, 53, 0.4));
 }
 
+.reaction-icon:hover::after {
+  transform: translateX(-50%) scale(1);
+}
+
+.reaction-icon.active {
+  transform: scale(1.2);
+  filter: grayscale(0);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.reaction-icon.active::after {
+  transform: translateX(-50%) scale(1);
+}
+
+/* Styled reaction button when user has reacted */
 .action-button.reaction-trigger.reacted {
-  font-weight: bold;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Specific colors for different reactions (optional, but nice) */
-.action-button.reaction-trigger.reacted.like {
-  color: #007bff;
-} /* Blue */
-.action-button.reaction-trigger.reacted.love {
-  color: #e84393;
-} /* Pink/Red */
-.action-button.reaction-trigger.reacted.haha {
-  color: #fbc531;
-} /* Yellow */
-.action-button.reaction-trigger.reacted.wow {
-  color: #fbc531;
-} /* Yellow */
-.action-button.reaction-trigger.reacted.sad {
-  color: #fbc531;
-} /* Yellow */
-.action-button.reaction-trigger.reacted.angry {
-  color: #e63946;
-} /* Red */
+.action-button.reaction-trigger.reacted::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-primary);
+  opacity: 0.1;
+  border-radius: 10px;
+  animation: pulseReaction 2s ease-in-out infinite;
+}
 
-/* Style for active reaction icon in the popup */
-.reaction-popup .reaction-icon.active {
-  transform: scale(1.1); /* Make it slightly bigger */
-  /* Optional: Add border */
-  /* border: 2px solid var(--primary-color);
-  border-radius: 50%;
-  padding: 2px;
-  margin: -2px; */ /* Adjust margin to compensate for padding */
+@keyframes pulseReaction {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* Specific colors for different reactions */
+.action-button.reaction-trigger.reacted.like {
+  color: #1877f2;
+}
+
+.action-button.reaction-trigger.reacted.love {
+  color: #f33e58;
+}
+
+.action-button.reaction-trigger.reacted.haha {
+  color: #f7b125;
+}
+
+.action-button.reaction-trigger.reacted.wow {
+  color: #f7b125;
+}
+
+.action-button.reaction-trigger.reacted.sad {
+  color: #f7b125;
+}
+
+.action-button.reaction-trigger.reacted.angry {
+  color: #e9710f;
+}
+
+/* Add sparkle effect on hover for reacted button */
+.action-button.reaction-trigger.reacted:hover .icon {
+  animation: sparkle 0.6s ease-in-out;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    transform: scale(1.2) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.3) rotate(-10deg);
+  }
+  50% {
+    transform: scale(1.4) rotate(10deg);
+  }
+  75% {
+    transform: scale(1.3) rotate(-10deg);
+  }
+}
+
+/* Tooltip arrow for reaction popup */
+.reaction-popup::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 24px;
+  width: 12px;
+  height: 12px;
+  background: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  transform: rotate(45deg);
 }

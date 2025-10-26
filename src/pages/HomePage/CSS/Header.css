@@ -7,34 +7,33 @@
   left: 0;
   right: 0;
   width: 100%;
-  height: 80px;
-  /* Or your preferred height */
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(229, 229, 229, 0.8);
+  height: 70px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
-  /* Use flexbox for layout */
   align-items: center;
   justify-content: space-between;
-  /* Space out left, center, right */
-  padding: 0 2rem;
+  padding: 0 4rem;
   z-index: 1000;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-  /* Soften shadow */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* Left Section (Logo) */
 .header-left {
   flex-shrink: 0;
-  /* Prevent logo from shrinking */
 }
 
 .logo {
-  height: 40px;
+  height: 45px;
   display: flex;
   align-items: center;
   text-decoration: none;
-  /* Ensure Link doesn't have underline */
+  gap: 8px;
+  transition: opacity 0.3s ease;
+}
+
+.logo:hover {
+  opacity: 0.8;
 }
 
 .logo img {
@@ -44,28 +43,23 @@
 }
 
 .logo-text {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #FC8A06;
-  margin-left: 0.75rem;
-  font-family: 'Arial', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #ff6b35;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Center Section (Navigation) */
 .header-center {
   flex-grow: 1;
-  /* Allow center section to take available space */
   display: flex;
   justify-content: center;
-  /* Center the nav menu */
 }
 
 .nav-menu {
   display: flex;
-  gap: 2rem;
-  /* Adjust gap as needed */
+  gap: 2.5rem;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -74,73 +68,82 @@
 
 .nav-menu li a {
   text-decoration: none;
-  color: #333;
-  font-weight: 600;
-  /* Slightly bolder */
+  color: #374151;
+  font-weight: 500;
   font-size: 1rem;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+  padding: 0.5rem 0.25rem;
+  transition: color 0.2s ease;
   display: block;
   white-space: nowrap;
-  /* Prevent wrapping */
+  position: relative;
 }
 
 .nav-menu li a:hover,
 .nav-menu li a.active {
-  /* Add active class styling if using react-router NavLink */
-  color: var(--primary-color, #f26522);
-  background: rgba(242, 101, 34, 0.08);
-  /* Lighter background */
+  color: #ff6b35;
+}
+
+.nav-menu li a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #ff6b35;
+  transform: scaleX(0);
+  transition: transform 0.2s ease;
+}
+
+.nav-menu li a:hover::after,
+.nav-menu li a.active::after {
+  transform: scaleX(1);
 }
 
 /* Right Section (Auth/User) */
 .header-right {
   flex-shrink: 0;
-  /* Prevent shrinking */
   display: flex;
   align-items: center;
   gap: 1rem;
-  /* Space between avatar/buttons and mobile btn */
 }
 
 .auth-buttons {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .header-button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9375rem;
   text-decoration: none;
   transition: all 0.2s ease;
   white-space: nowrap;
-  border: 1px solid transparent;
-  /* Base border */
+  border: none;
+  cursor: pointer;
 }
 
 .header-button.login {
-  background-color: var(--bg-light, #fef5f1);
-  color: var(--primary-color, #f26522);
-  border-color: var(--border-light, rgba(242, 101, 34, 0.15));
+  background: transparent;
+  color: #374151;
 }
 
 .header-button.login:hover {
-  background-color: rgba(242, 101, 34, 0.15);
+  color: #ff6b35;
 }
 
 .header-button.register {
-  background: linear-gradient(135deg, var(--primary-color, #f26522), var(--accent-color, #e63946));
+  background: #3b82f6;
   color: white;
-  box-shadow: 0 4px 10px rgba(242, 101, 34, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .header-button.register:hover {
-  box-shadow: 0 6px 15px rgba(230, 57, 70, 0.3);
-  transform: translateY(-1px);
+  background: #2563eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .avatar-button {
@@ -150,21 +153,19 @@
   cursor: pointer;
   border-radius: 50%;
   line-height: 0;
-  /* Prevent extra space */
   transition: transform 0.2s ease;
 }
 
 .avatar-button:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .header-avatar {
-  width: 40px;
-  height: 40px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--primary-color, #f26522);
-  /* Add border */
+  border: 2px solid #e5e7eb;
 }
 
 
@@ -254,43 +255,55 @@
 
 
 /* Responsive Design */
-@media (max-width: 992px) {
+@media (max-width: 1024px) {
+  .homepage-header {
+    padding: 0 2rem;
+  }
+  
+  .nav-menu {
+    gap: 1.5rem;
+  }
+}
 
-  /* Adjust breakpoint if needed */
+@media (max-width: 992px) {
   .header-center {
-    /* Hide desktop nav earlier */
     display: none;
   }
 
   .header-right {
     margin-left: auto;
-    /* Push auth/avatar and mobile button to the far right */
   }
 
   .mobile-menu-btn {
     display: block;
-    /* Show mobile button */
   }
 
   .homepage-header {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-header {
     padding: 0 1rem;
-    /* Reduce padding */
+  }
+
+  .auth-buttons .header-button.login {
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
   .homepage-header {
     height: 60px;
-    /* Smaller header on small screens */
   }
 
   .logo {
-    height: 30px;
+    height: 35px;
   }
 
   .logo-text {
-    font-size: 1.5rem;
-    margin-left: 0.5rem;
+    font-size: 1.4rem;
   }
 
   .header-avatar {
@@ -298,13 +311,9 @@
     height: 32px;
   }
 
-  .header-button {
+  .header-button.register {
     padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .auth-buttons {
-    gap: 0.5rem;
+    font-size: 0.875rem;
   }
 
   .mobile-menu-overlay {
