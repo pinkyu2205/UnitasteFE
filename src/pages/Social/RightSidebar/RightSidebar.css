@@ -1,0 +1,193 @@
+/* src/pages/Social/component/RightSidebar/RightSidebar.css */
+
+.right-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  /* height: calc(100vh - 40px); */ /* Đã có ở SocialLayout.css */
+  /* overflow-y: auto; */ /* Cho phép cuộn nếu nội dung quá dài */
+}
+
+/* Kiểu chung cho mỗi widget */
+.sidebar-widget {
+  background: var(--surface-color, #fff);
+  border-radius: 8px;
+  box-shadow: var(--shadow-1);
+  padding: 16px;
+  border: 1px solid #eee;
+}
+
+.widget-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #050505);
+  margin: 0 0 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+/* Widget Gợi ý Bạn bè */
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.suggestion-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #eee;
+}
+
+.suggestion-info {
+  flex-grow: 1;
+  overflow: hidden; /* Chống tràn text */
+}
+
+.suggestion-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-subtext {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.add-friend-btn {
+  background: var(--bg-light, #fef5f1);
+  color: var(--primary-color, #f26522);
+  border: 1px solid var(--border-light, #f26522);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.add-friend-btn:hover {
+  background: var(--primary-color, #f26522);
+  color: white;
+  box-shadow: var(--shadow-hover);
+}
+
+/* Widget Quán ăn nổi bật (Grid) */
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 cột */
+  gap: 10px;
+}
+
+.restaurant-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 1 / 1; /* Giữ card vuông */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.restaurant-item:hover {
+  transform: scale(1.05);
+}
+
+.suggestion-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: #eee;
+}
+
+.restaurant-item .suggestion-name.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 8px 8px 8px; /* Padding cho text */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Footer nhỏ */
+.sidebar-footer-links {
+  padding: 10px 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.sidebar-footer-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.sidebar-footer-links a:hover {
+  text-decoration: underline;
+}
+.sidebar-footer-links p {
+  margin: 10px 0 0 0;
+  color: #aaa;
+}
+
+.widget-loading-text,
+.widget-error-message {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 20px 0;
+}
+
+.widget-error-message {
+  color: var(--accent-color);
+  font-weight: 500;
+}
+
+/* Kiểu cho thông báo yêu cầu quyền */
+.permission-prompt-widget {
+  text-align: center;
+  padding: 10px;
+}
+.permission-prompt-widget p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 15px;
+}
+
+.request-location-btn-small {
+  background: linear-gradient(
+    135deg,
+    var(--primary-color, #f26522),
+    var(--accent-color, #e63946)
+  );
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(242, 101, 34, 0.3);
+}
+
+.request-location-btn-small:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
+}

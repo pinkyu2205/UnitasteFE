@@ -20,7 +20,7 @@ function Login() {
         localStorage.setItem('token', token)
         localStorage.setItem('userId', userId)
         localStorage.setItem('fullName', fullName)
-        navigate('/map')
+        navigate('/')
       } else {
         setError('Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.')
       }

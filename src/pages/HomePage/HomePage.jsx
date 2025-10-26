@@ -1,5 +1,6 @@
 // src/pages/HomePage/HomePage.jsx
 import { useEffect, useState } from 'react' // Add useState, useEffect
+import ChatPopup from '../../components/ChatPopup'
 import CTASection from './components/CTASection'
 import FeaturesSection from './components/FeaturesSection'
 import Footer from './components/Footer'
@@ -25,6 +26,7 @@ const HomePage = () => {
       <FeaturesSection />
       {/* 👇 Conditionally render NearbyRestaurants 👇 */}
       {isLoggedIn && <NearbyRestaurants />}
+      {isLoggedIn && <ChatPopup />}
       <RestaurantShowcase /> {/* Featured restaurants always show */}
       <CTASection />
       <Footer />

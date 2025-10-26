@@ -1,5 +1,28 @@
 // src/api/paymentApi.js
+import { jwtDecode } from 'jwt-decode'
 import { axiosPaymentClient } from './axios' // Make sure you are using the correct client (port 5005)
+
+const getUserIdFromToken = () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return null
+  }
+  try {
+    const decoded = jwtDecode(token) // Lấy claim chứa User ID
+    const nameIdentifierClaim =
+      'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+    const id =
+      decoded[nameIdentifierClaim] ||
+      decoded.sub ||
+      decoded.id ||
+      decoded.userId
+    const userIdInt = id ? parseInt(id, 10) : null
+    return isNaN(userIdInt) ? null : userIdInt
+  } catch (e) {
+    console.error('Lỗi giải mã token trong paymentApi:', e)
+    return null
+  }
+}
 
 const PaymentApi = {
   /**
