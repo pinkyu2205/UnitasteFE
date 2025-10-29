@@ -4,9 +4,17 @@ import { useNavigate } from 'react-router-dom'
 import PaymentApi from '../../api/paymentApi' // Import API đã cập nhật
 import './VipSubscription.css'
 
-// ... (formatCurrency function) ...
+// Định dạng tiền tệ VND
 const formatCurrency = (amount) => {
-  /* ... */
+  try {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      maximumFractionDigits: 0,
+    }).format(Number(amount) || 0)
+  } catch {
+    return `${amount}`
+  }
 }
 
 const VipSubscription = () => {
@@ -16,6 +24,7 @@ const VipSubscription = () => {
   const [error, setError] = useState(null)
   const [isVip, setIsVip] = useState(false) // <-- State mới để lưu trạng thái VIP
   const [checkingStatus, setCheckingStatus] = useState(true) // <-- State để biết đang kiểm tra
+  const [currentDurationMonths, setCurrentDurationMonths] = useState(0) // Gói hiện tại
   const navigate = useNavigate()
 
   // 👇 THÊM useEffect ĐỂ KIỂM TRA TRẠNG THÁI VIP 👇
@@ -25,8 +34,35 @@ const VipSubscription = () => {
       try {
         // Gọi API checkVipStatus
         const response = await PaymentApi.checkVipStatus()
-        // API trả về { hasPurchased: true/false }
-        setIsVip(response.hasPurchased)
+        const purchased =
+          response?.hasPurchased ?? response?.data?.hasPurchased ?? false
+        setIsVip(!!purchased)
+
+        // Nếu đã có VIP, thử lấy lịch sử để biết thời hạn gói hiện tại
+        try {
+          const history = await PaymentApi.getPurchasesByUserToken()
+          const items = Array.isArray(history)
+            ? history
+            : Array.isArray(history?.data)
+            ? history.data
+            : []
+          // Tìm gói còn hiệu lực gần nhất
+          const now = new Date()
+          const active =
+            items.find(
+              (p) =>
+                p?.isActive === true ||
+                (p?.endDate && new Date(p.endDate) > now) ||
+                (p?.status && String(p.status).toUpperCase() === 'ACTIVE')
+            ) || items[0]
+          const duration =
+            active?.durationInMonths ||
+            active?.servicePackage?.durationInMonths ||
+            0
+          setCurrentDurationMonths(Number(duration) || 0)
+        } catch (_) {
+          setCurrentDurationMonths(0)
+        }
       } catch (err) {
         // Lỗi có thể do chưa đăng nhập (không có token/userId) hoặc lỗi mạng
         console.error('Lỗi kiểm tra trạng thái VIP:', err)
@@ -47,8 +83,15 @@ const VipSubscription = () => {
     setLoading(true)
     setError(null)
     try {
-      const data = await PaymentApi.getAllServicePackages()
-      setPackages(data)
+      const result = await PaymentApi.getAllServicePackages()
+      const list = Array.isArray(result)
+        ? result
+        : Array.isArray(result?.data)
+        ? result.data
+        : Array.isArray(result?.items)
+        ? result.items
+        : []
+      setPackages(list)
     } catch (err) {
       console.error('Lỗi khi tải gói VIP:', err)
       setError('Không thể tải danh sách gói. Vui lòng thử lại.')
@@ -58,6 +101,10 @@ const VipSubscription = () => {
   }
 
   const handleSelectPackage = (pkg) => {
+    const locked =
+      Number(currentDurationMonths) > 0 &&
+      Number(pkg?.durationInMonths) <= Number(currentDurationMonths)
+    if (locked) return
     navigate('/vip-checkout', { state: { selectedPackage: pkg } })
   }
 
@@ -142,12 +189,17 @@ const VipSubscription = () => {
           // Tính toán giá mỗi tháng để hiển thị (nếu muốn)
           const pricePerMonth = pkg.price / pkg.durationInMonths
           const isPopular = index === packages.length - 1 // Đánh dấu gói dài nhất là "Phổ biến"
+          const locked =
+            Number(currentDurationMonths) > 0 &&
+            Number(pkg.durationInMonths) <= Number(currentDurationMonths)
 
           return (
             <div
               key={pkg.servicePackageId}
-              className={`package-card ${isPopular ? 'popular' : ''}`}
-              onClick={() => handleSelectPackage(pkg)}
+              className={`package-card ${isPopular ? 'popular' : ''} ${
+                locked ? 'disabled' : ''
+              }`}
+              onClick={() => !locked && handleSelectPackage(pkg)}
             >
               {isPopular && (
                 <div className='popular-badge-pkg'>Tiết kiệm nhất</div>
@@ -158,7 +210,11 @@ const VipSubscription = () => {
               <div className='pkg-price-per-month'>
                 (Chỉ {formatCurrency(pricePerMonth)}/tháng)
               </div>
-              <button className='pkg-select-btn'>Chọn gói này</button>
+              <button className='pkg-select-btn' disabled={locked}>
+                {locked
+                  ? 'Bạn đã sở hữu gói này - Hãy nâng cấp'
+                  : 'Chọn gói này'}
+              </button>
             </div>
           )
         })}

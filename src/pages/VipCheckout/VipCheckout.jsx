@@ -37,16 +37,27 @@ const VipCheckout = () => {
     // No need to create uniqueOrderCode or description here anymore
 
     try {
-      // Call the new API function, passing only the ID
-      const response = await PaymentApi.createServicePackagePayment(
-        selectedPackage.servicePackageId
-      )
+      // Validate đầu vào
+      const packageId = selectedPackage?.servicePackageId
+      if (!packageId) {
+        setError('Thiếu mã gói dịch vụ. Vui lòng chọn lại gói.')
+        return
+      }
 
-      // API now returns checkoutUrl directly in the main response object
-      if (response.checkoutUrl) {
-        window.location.href = response.checkoutUrl // Redirect to payment page
+      // Gọi API tạo thanh toán, axios interceptor trả về response.data
+      const response = await PaymentApi.createServicePackagePayment(packageId)
+
+      // Đồng bộ với paymentApi: backend trả về URL thanh toán trong trường phổ biến
+      const checkoutUrl =
+        response?.checkoutUrl ||
+        response?.paymentUrl ||
+        response?.redirectUrl ||
+        response?.url ||
+        response?.data?.checkoutUrl
+
+      if (checkoutUrl) {
+        window.location.href = checkoutUrl
       } else {
-        // Log the response to see what's actually returned if checkoutUrl is missing
         console.error('API response missing checkoutUrl:', response)
         setError('Không nhận được liên kết thanh toán. Vui lòng thử lại.')
       }

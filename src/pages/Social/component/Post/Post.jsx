@@ -14,6 +14,12 @@ function Post({ post }) {
   const [isCommenting, setIsCommenting] = useState(false)
   // You'll need a way to fetch and display actual comments later
   const [comments, setComments] = useState([])
+  const [showComments, setShowComments] = useState(false)
+  const [loadingComments, setLoadingComments] = useState(false)
+  const [commentsError, setCommentsError] = useState(null)
+  const [reactionsCount, setReactionsCount] = useState(post.reactionsCount || 0)
+
+  // API đã trả đúng mảng comment đã bóc vỏ -> không cần normalize phức tạp
 
   // Fetch author details when post data is available
   useEffect(() => {
@@ -32,6 +38,11 @@ function Post({ post }) {
     }
   }, [post.authorUserId, post.postId])
 
+  // Sync reactions count when post changes
+  useEffect(() => {
+    setReactionsCount(post.reactionsCount || 0)
+  }, [post.postId, post.reactionsCount])
+
   // Format date (can be moved to utils)
   const formatDate = (dateString) => {
     const date = new Date(dateString)
@@ -41,25 +52,70 @@ function Post({ post }) {
     })
   }
 
+  // Toggle and load comments on demand
+  const handleToggleComments = async () => {
+    const willShow = !showComments
+    setShowComments(willShow)
+    if (!willShow) return
+    // Load comments when opening
+    setLoadingComments(true)
+    setCommentsError(null)
+    try {
+      const result = await SocialApi.getCommentsForPost(post.postId)
+      setComments(Array.isArray(result) ? result : [])
+    } catch (e) {
+      console.error('Failed to load comments:', e)
+      setCommentsError('Không thể tải bình luận. Vui lòng thử lại.')
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
   // Handle comment submission
   const handleCommentSubmit = async (e) => {
-    if (e.key === 'Enter' && commentText.trim()) {
-      setIsCommenting(true)
-      try {
-        const response = await SocialApi.createComment(
-          post.postId,
-          commentText.trim()
-        )
-        toast.success(response.message || 'Bình luận thành công!')
-        setCommentText('') // Clear input
-        // TODO: Ideally, refetch comments for this post or add the new comment locally
-        // For now, maybe just increment the count visually (though API already does)
-      } catch (error) {
-        console.error('Failed to post comment:', error)
-        toast.error(error.response?.data?.message || 'Không thể gửi bình luận.')
-      } finally {
-        setIsCommenting(false)
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    const text = commentText.trim()
+    if (!text) return
+
+    setIsCommenting(true)
+    try {
+      const response = await SocialApi.createComment(post.postId, text)
+      toast.success(response?.message || 'Bình luận thành công!')
+
+      // mở khung bình luận nếu đang đóng để user thấy bình luận
+      if (!showComments) setShowComments(true)
+
+      // Thêm ngay bình luận mới vào UI (optimistic)
+      const me = {
+        commentId:
+          response?.data?.commentId ||
+          (window.crypto && window.crypto.randomUUID
+            ? window.crypto.randomUUID()
+            : `temp-${Date.now()}`),
+        userId: localStorage.getItem('userId'),
+        fullName: localStorage.getItem('fullName') || 'Tôi',
+        avatarUrl: localStorage.getItem('avatarUrl'),
+        content: text,
+        createdAt: new Date().toISOString(),
       }
+      setComments((prev) => [me, ...(prev || [])])
+
+      setCommentText('') // xóa input
+
+      // Refetch để đồng bộ với server (an toàn nhưng không bắt buộc)
+      try {
+        const result = await SocialApi.getCommentsForPost(post.postId)
+        setComments(Array.isArray(result) ? result : [])
+      } catch (err) {
+        // nếu refetch lỗi, vẫn giữ optimistic UI
+        console.warn('Refetch comments failed:', err)
+      }
+    } catch (error) {
+      console.error('Failed to post comment:', error)
+      toast.error(error?.response?.data?.message || 'Không thể gửi bình luận.')
+    } finally {
+      setIsCommenting(false)
     }
   }
 
@@ -143,42 +199,103 @@ function Post({ post }) {
       {/* Post Stats */}
       <div className='post-stats'>
         {/* TODO: Integrate reaction summary API here */}
-        <span>{post.reactionsCount} Thích</span>
+        <span>{reactionsCount} Thích</span>
         <span>{post.commentsCount} Bình luận</span>
         <span>{post.sharesCount} Chia sẻ</span>
       </div>
 
       {/* Pass postId to ReactionBar */}
-      <ReactionBar postId={post.postId} />
+      <ReactionBar
+        postId={post.postId}
+        onCommentClick={handleToggleComments}
+        onReactionChange={(oldType, newType) => {
+          // Optimistic adjust total likes: count all reactions as "likes" total
+          if (!oldType && newType) {
+            setReactionsCount((c) => c + 1)
+          } else if (oldType && !newType) {
+            setReactionsCount((c) => (c > 0 ? c - 1 : 0))
+          }
+          // Changing type keeps same count
+        }}
+      />
 
       {/* Comment Section */}
-      <div className='comment-section'>
-        {/* TODO: Fetch and display actual comments */}
-        {/* <Comment user='User 1' text='Đồng ý, quán này ngon!' /> */}
+      {showComments && (
+        <div className='comment-section'>
+          {loadingComments && (
+            <div className='comments-loading'>Đang tải bình luận...</div>
+          )}
+          {commentsError && (
+            <div className='comments-error'>
+              {commentsError}{' '}
+              <button className='comments-retry' onClick={handleToggleComments}>
+                Thử lại
+              </button>
+            </div>
+          )}
+          {comments?.length > 0 ? (
+            <div className='comments-list'>
+              {comments.map((c) => (
+                <div
+                  key={c.commentId || `${c.userId}-${c.createdAt}`}
+                  className='comment-item'
+                >
+                  <img
+                    src={
+                      c.avatarUrl ||
+                      `https://ui-avatars.com/api/?name=${(c.fullName || 'U').charAt(0)}&background=random`
+                    }
+                    alt={c.fullName || 'user'}
+                    className='avatar-placeholder-small'
+                  />
+                  <div className='comment-bubble'>
+                    <div className='comment-meta'>
+                      <span className='comment-user'>
+                        {c.fullName || 'Người dùng'}
+                      </span>
+                      <span className='comment-time'>
+                        {new Date(c.createdAt || Date.now()).toLocaleString(
+                          'vi-VN',
+                          {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                          }
+                        )}
+                      </span>
+                    </div>
+                    <div className='comment-text'>{c.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className='comments-empty'>Chưa có bình luận</div>
+          )}
 
-        <div className='comment-input-wrapper'>
-          {/* Add current user avatar */}
-          <img
-            src={
-              localStorage.getItem('avatarUrl') ||
-              `https://ui-avatars.com/api/?name=${localStorage
-                .getItem('fullName')
-                ?.charAt(0)}&background=random`
-            }
-            alt='My avatar'
-            className='avatar-placeholder-small'
-          />
-          <input
-            type='text'
-            className='comment-input'
-            placeholder='Viết bình luận...'
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            onKeyDown={handleCommentSubmit} // Use onKeyDown for Enter
-            disabled={isCommenting}
-          />
+          <div className='comment-input-wrapper'>
+            {/* Add current user avatar */}
+            <img
+              src={
+                localStorage.getItem('avatarUrl') ||
+                `https://ui-avatars.com/api/?name=${localStorage
+                  .getItem('fullName')
+                  ?.charAt(0)}&background=random`
+              }
+              alt='My avatar'
+              className='avatar-placeholder-small'
+            />
+            <input
+              type='text'
+              className='comment-input'
+              placeholder='Viết bình luận...'
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={handleCommentSubmit} // Use onKeyDown for Enter
+              disabled={isCommenting}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

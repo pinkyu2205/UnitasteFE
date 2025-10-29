@@ -30,12 +30,15 @@ export default function useRegister() {
     }
 
     try {
-      const res = await axios.post('https://localhost:5001/api/Users/Register', {
-        fullName,
-        email,
-        passwordHash: password,
-        birthDate,
-      })
+      const res = await axios.post(
+        'https://userservice-5qvn.onrender.com/api/Users/Register',
+        {
+          fullName,
+          email,
+          passwordHash: password,
+          birthDate,
+        }
+      )
 
       if (res.data.status) {
         setSuccess(true)

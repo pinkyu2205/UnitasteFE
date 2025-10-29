@@ -189,6 +189,24 @@
     position: relative;
 }
 
+.package-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.package-card.disabled::after {
+    content: 'Bạn đã sở hữu gói này';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .package-card:hover {
     transform: translateY(-8px);
     box-shadow: var(--shadow-hover);

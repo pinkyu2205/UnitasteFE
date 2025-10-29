@@ -1,8 +1,10 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import PaymentApi from '../../../api/paymentApi'
 import '../CSS/ProfileInfo.css'
+import VipBadge from './VipBadge'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
+const API_GATEWAY = import.meta.env.VITE_API_GATEWAY
 const token = localStorage.getItem('token')
 
 const ProfileInfo = ({ userData, onUpdateProfile }) => {
@@ -18,6 +20,7 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     birthDate: userData.birthDate,
   })
   const [avatarUrl, setAvatarUrl] = useState(userData.avatarUrl)
+  const [isVip, setIsVip] = useState(false)
 
   // 🔁 Đồng bộ khi userData thay đổi
   useEffect(() => {
@@ -30,6 +33,54 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     })
     setAvatarUrl(userData.avatarUrl)
   }, [userData])
+
+  // Kiểm tra trạng thái VIP để hiển thị dưới tên
+  useEffect(() => {
+    let mounted = true
+    const check = async () => {
+      try {
+        // 1) Thử endpoint checkVipStatus
+        const res = await PaymentApi.checkVipStatus()
+        const purchased = res?.hasPurchased ?? res?.data?.hasPurchased
+        if (purchased !== undefined) {
+          if (mounted) {
+            setIsVip(!!purchased)
+            localStorage.setItem('isVip', String(!!purchased))
+          }
+          return
+        }
+      } catch (_) {
+        // ignore and fallback below
+      }
+
+      // 2) Fallback: xem lịch sử mua để xác định còn hiệu lực
+      try {
+        const history = await PaymentApi.getPurchasesByUserToken()
+        const items = Array.isArray(history)
+          ? history
+          : Array.isArray(history?.data)
+          ? history.data
+          : []
+        const now = new Date()
+        const active = items.some(
+          (p) =>
+            p?.isActive === true ||
+            (p?.endDate && new Date(p.endDate) > now) ||
+            (p?.status && String(p.status).toUpperCase() === 'ACTIVE')
+        ) || items.length > 0
+        if (mounted) {
+          setIsVip(active)
+          localStorage.setItem('isVip', String(!!active))
+        }
+      } catch (_) {
+        if (mounted) setIsVip(false)
+      }
+    }
+    check()
+    return () => {
+      mounted = false
+    }
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -53,7 +104,7 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
       formData.append('avatarFile', file)
 
       const res = await axios.post(
-        `${API_URL}/api/users/upload-avatar`,
+        `${API_GATEWAY}/Users/upload-avatar`,
         formData,
         {
           headers: {
@@ -112,6 +163,7 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
     <div className='profile-info-container'>
       <div className='info-header'>
         <h2>Thông tin cá nhân</h2>
+        {/* Badge VIP hiển thị riêng ở Sidebar theo yêu cầu */}
       </div>
 
       {error && (
@@ -162,7 +214,9 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
                 className='form-input'
               />
             ) : (
-              <div className='form-value'>{userData.fullName}</div>
+              <div className='form-value'>
+                {userData.fullName}
+              </div>
             )}
           </div>
 

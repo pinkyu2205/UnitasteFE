@@ -1,5 +1,7 @@
 // src/pages/Checkout/Checkout.jsx
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { toast } from 'react-toastify'
 import logo from '../assets/Unitaste-logo.png' // Dùng lại logo
 import './Checkout.css'
 
@@ -17,6 +19,25 @@ const Checkout = () => {
 
   // Nhận dữ liệu 'tier' được gửi từ trang ProfilePayment
   const { tier } = location.state || {}
+
+  // Lắng nghe kết quả thanh toán trả về qua query params
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const cancel = params.get('cancel')
+    const status = params.get('status')
+
+    if (cancel === 'true') {
+      toast.info('Bạn đã hủy thanh toán.')
+      navigate('/', { replace: true })
+      return
+    }
+
+    if (status && status.toUpperCase() === 'PAID') {
+      toast.success('Thanh toán thành công! Cảm ơn bạn.')
+      const timer = setTimeout(() => navigate('/', { replace: true }), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [location.search, navigate])
 
   if (!tier) {
     return (

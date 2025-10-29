@@ -1,6 +1,7 @@
 // src/pages/Profile/component/ProfileSidebar.jsx
 import { useNavigate } from 'react-router-dom'
 import '../CSS/ProfileSidebar.css'
+import VipBadge from './VipBadge'
 
 const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
   const navigate = useNavigate()
@@ -59,6 +60,7 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
     localStorage.removeItem('token')
     localStorage.removeItem('@secure.j.currentUser')
     localStorage.removeItem('user')
+    localStorage.removeItem('isVip')
     navigate('/')
   }
 
@@ -85,6 +87,7 @@ const ProfileSidebar = ({ userData, activeTab, setActiveTab }) => {
         </div>
         <h3 className='sidebar-user-name'>{userData.fullName}</h3>
         <p className='sidebar-user-email'>{userData.email}</p>
+        {localStorage.getItem('isVip') === 'true' && <VipBadge inline />}
       </div>
 
       {/* Menu Items */}

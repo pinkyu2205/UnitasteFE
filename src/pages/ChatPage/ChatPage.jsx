@@ -1,5 +1,5 @@
 import * as signalR from '@microsoft/signalr'
-import axios from 'axios'
+import { axiosClient, axiosSocialClient } from '../../api/axios'
 import { useEffect, useMemo, useState } from 'react'
 import ChatSidebar from './component/ChatSidebar'
 import ChatWindow from './component/ChatWindow'
@@ -29,7 +29,7 @@ export default function ChatPage() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get('http://localhost:8001/api/users/get-all', {
+        const res = await axiosClient.get('/Users/get-all', {
           headers: authHeader,
         })
         const filtered = res.data.filter((u) => u.fullName !== currentUser)
@@ -46,7 +46,7 @@ export default function ChatPage() {
     if (!token || connection) return
     const newConnection = new signalR.HubConnectionBuilder()
       .withUrl(
-        `http://localhost:8001/api/social/chathub?username=${encodeURIComponent(
+        `${import.meta.env.VITE_API_SOCIAL}/social/chathub?username=${encodeURIComponent(
           currentUser
         )}&access_token=${token}`,
         {
@@ -162,8 +162,13 @@ export default function ChatPage() {
         const partner = userList.find((u) => u.fullName === selectedUser)
         if (!partner) return
 
-        const url = `http://localhost:8001/api/message/history?senderId=${currentUserId}&receiverId=${partner.userId}`
-        const res = await axios.get(url, { headers: authHeader })
+        const res = await axiosSocialClient.get('/message/history', {
+          headers: authHeader,
+          params: {
+            senderId: currentUserId,
+            receiverId: partner.userId,
+          },
+        })
         const mapped = (res.data || []).map((m) => ({
           user: m.senderId == currentUserId ? 'Bạn' : selectedUser,
           message: m.content,
@@ -184,10 +189,16 @@ export default function ChatPage() {
         // ❌ KHÔNG cập nhật lastMessageTimeMap ở đây nữa
 
         // mark as seen
-        await axios.put(
-          `http://localhost:8001/api/message/user-seen-message?senderId=${partner.userId}&receiverId=${currentUserId}`,
+        await axiosSocialClient.put(
+          '/message/user-seen-message',
           {},
-          { headers: authHeader }
+          {
+            headers: authHeader,
+            params: {
+              senderId: partner.userId,
+              receiverId: currentUserId,
+            },
+          }
         )
         if (connection)
           await connection.invoke('MarkAsSeen', selectedUser, currentUser)

@@ -176,8 +176,8 @@ const RestaurantShowcase = () => {
                     className='directions-btn'
                     onClick={() => handleDirections(restaurant)}
                   >
-                    <span className='directions-icon'>📍</span>
-                    Chỉ đường
+                    <span className='directions-icon'></span>
+                    Chỉ đường 🗺️
                   </button>
                 </div>
               </div>

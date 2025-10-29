@@ -9,6 +9,10 @@ const CTASection = () => {
     navigate('/register');
   };
 
+  const handleLearnMoreClick = () => {
+    navigate('/about');
+  };
+
   return (
     <section className="cta-section">
       <div className="cta-container">
@@ -20,7 +24,7 @@ const CTASection = () => {
           <button className="cta-button primary" onClick={handleRegisterClick}>
             Đăng ký ngay
           </button>
-          <button className="cta-button secondary">
+          <button className="cta-button secondary" onClick={handleLearnMoreClick}>
             Tìm hiểu thêm
           </button>
         </div>

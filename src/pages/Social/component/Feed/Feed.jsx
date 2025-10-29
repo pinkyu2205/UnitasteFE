@@ -67,11 +67,13 @@ function Feed() {
 
   // Function to add a newly created post to the top
   const handlePostCreated = (newPost) => {
-    // Ideally, the API returns the full post object or you refetch page 1
-    // Simple approach: Add to top (may lack some initial data like counts)
-    setPosts((prevPosts) => [newPost, ...prevPosts])
-    // More robust: Refetch page 1
-    // loadPosts(1);
+    // Thêm bài mới lên đầu và loại bỏ trùng theo postId để tránh hiển thị 2 lần
+    setPosts((prevPosts) => [
+      newPost,
+      ...prevPosts.filter((p) => p.postId !== newPost.postId),
+    ])
+    // Nếu muốn chắc chắn đồng bộ, có thể gọi loadPosts(1) ở đây
+    // loadPosts(1)
   }
 
   return (

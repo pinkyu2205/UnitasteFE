@@ -5,7 +5,7 @@ import RestaurantsApi from '../../../../api/restaurantApi' // Adjust path
 import SocialApi from '../../../../api/socialApi' // Adjust path
 import './CreatePostModal.css'
 
-const VISIBILITY_OPTIONS = ['Công khai', 'Bạn bè', 'Chỉ mình tôi']
+const VISIBILITY_OPTIONS = ['Public', 'Private']
 const TAG_OPTIONS = ['cafe', 'restaurant'] // Predefined tags
 
 const getUserIdFromToken = () => {

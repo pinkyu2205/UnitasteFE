@@ -16,7 +16,6 @@ import ProfilePage from './pages/Profile/ProfilePage'
 import Social from './pages/Social/Social'
 import VipCheckout from './pages/VipCheckout/VipCheckout'
 import VipSubscription from './pages/VipSubscription/VipSubscription'
-import PaymentSuccess from './pages/PaymentSuccess/PaymentSuccess'
 import Support from './pages/Support/Support'
 import About from './pages/About/About'
 
@@ -66,8 +65,8 @@ function App() {
         <Route path='/vip-subscription' element={<VipSubscription />} />
         <Route path='/vip-checkout' element={<VipCheckout />} />
         
-        {/* Payment Success */}
-        <Route path='/payment/success' element={<PaymentSuccess />} />
+        {/* Payment Success: điều hướng về HomePage */}
+        <Route path='/payment/success' element={<HomePage />} />
         
         {/* Support */}
         <Route path='/support' element={<Support />} />

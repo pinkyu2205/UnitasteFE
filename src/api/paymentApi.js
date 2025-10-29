@@ -21,7 +21,7 @@ const PaymentApi = {
    * GET: /get-all-service-package
    */
   getAllServicePackages: () => {
-    return axiosPaymentClient.get('/get-all-service-package')
+    return axiosPaymentClient.get('/ServicePackages/get-all-service-package')
   },
 
   /**
@@ -30,11 +30,15 @@ const PaymentApi = {
    * Body: { servicePackageId, returnUrl, cancelUrl }
    */
   createServicePackagePayment: (servicePackageId) => {
-    // Lấy base URL từ window.location
-    const baseUrl = window.location.origin
+    // Ưu tiên base URL từ env khi deploy; fallback window.location.origin khi dev
+    const rawBase =
+      (import.meta.env.VITE_PUBLIC_BASE_URL || window.location.origin) + ''
+    // Chuẩn hóa: bỏ dấu '/' cuối nếu có
+    const baseUrl = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase
 
-    return axiosPaymentClient.post('/create-service-package-payment', {
+    return axiosPaymentClient.post('/ServicePackages/create-service-package-payment', {
       servicePackageId,
+      // Trả về trang FE để hiển thị thông báo và redirect về homepage
       returnUrl: `${baseUrl}/payment/success`, // URL khi thanh toán thành công
       cancelUrl: `${baseUrl}/vip-checkout`, // URL khi hủy thanh toán
     })
@@ -45,7 +49,7 @@ const PaymentApi = {
    * GET: /get-purchases-by-user-token
    */
   getPurchasesByUserToken: () => {
-    return axiosPaymentClient.get('/get-purchases-by-user-token')
+    return axiosPaymentClient.get('/ServicePackages/get-purchases-by-user-token')
   },
   checkVipStatus: () => {
     const userId = getUserIdFromToken()
@@ -55,7 +59,7 @@ const PaymentApi = {
     }
     // API yêu cầu userId làm query parameter
     return axiosPaymentClient.get(
-      `/check-service-package-status?userId=${userId}`
+      `/ServicePackages/check-service-package-status?userId=${userId}`
     )
   },
 
@@ -66,7 +70,7 @@ const PaymentApi = {
    */
   paymentSuccessCallback: (orderCode) => {
     return axiosPaymentClient.get(
-      `/payment-success-callback?orderCode=${orderCode}`
+      `/Payments/payment-success-callback?orderCode=${orderCode}`
     )
   },
 }
