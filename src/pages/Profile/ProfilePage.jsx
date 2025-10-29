@@ -4,6 +4,7 @@ import { jwtDecode } from 'jwt-decode'
 import { useEffect, useState } from 'react'
 import UserApi from '../../api/userApi'
 import ChangePassword from './component/ChangePassword'
+import MyPosts from './component/MyPosts'
 import ProfileInfo from './component/ProfileInfo'
 import ProfilePayment from './component/ProfilePayment'
 import ProfilePreferences from './component/ProfilePreferences'
@@ -197,6 +198,8 @@ const ProfilePage = () => {
           )}
 
           {activeTab === 'history' && <ProfilePayment />}
+          {activeTab === 'myposts' && <MyPosts />}
+
           {activeTab === 'bookmarks' && <ProfilePreferences />}
           {activeTab === 'purchaseHistory' && <PurchaseHistory />}
 

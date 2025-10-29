@@ -136,6 +136,12 @@ const SocialApi = {
   },
   
 
+  getPostsByUserId: (userId) => {
+    // API này lấy userId từ token (Authorization header)
+    // Hoặc nếu nó cần userId làm param, dùng: params: { userId }
+    return axiosSocialClient.get('/Posts/get-all-post-of-userId')
+  },
+
   /** MỚI: Giả lập API lấy các tag nổi bật */
   getTrendingTags: async () => {
     // Giả lập độ trễ mạng
@@ -155,14 +161,3 @@ const SocialApi = {
 }
 
 export default SocialApi
-
-// Remember to update your axios.js to include axiosSocialClient
-// Example addition to axios.js:
-/*
-const axiosSocialClient = axios.create({
-  baseURL: 'https://localhost:5002', // Your Social Service URL
-  headers: { 'Content-Type': 'application/json' },
-});
-setupInterceptors(axiosSocialClient); // Apply interceptors
-export { axiosClient, axiosRestaurantClient, axiosPaymentClient, axiosSocialClient };
-*/

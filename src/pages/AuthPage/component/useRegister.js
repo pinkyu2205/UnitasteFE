@@ -53,7 +53,6 @@ export default function useRegister() {
         setError(err.response?.data?.message || 'Đăng ký thất bại, thử lại.')
       }
     }
-
   }
 
   return { registerUser, error, success }

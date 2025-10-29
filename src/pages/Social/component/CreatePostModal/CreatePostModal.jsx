@@ -4,9 +4,10 @@ import { toast } from 'react-toastify'
 import RestaurantsApi from '../../../../api/restaurantApi' // Adjust path
 import SocialApi from '../../../../api/socialApi' // Adjust path
 import './CreatePostModal.css'
+import TagEditor from '../../../Profile/component/TagEditor'
 
-const VISIBILITY_OPTIONS = ['Public', 'Private']
-const TAG_OPTIONS = ['cafe', 'restaurant'] // Predefined tags
+const VISIBILITY_OPTIONS = ['Công khai', 'Bạn bè', 'Chỉ mình tôi']
+// const TAG_OPTIONS = ['cafe', 'restaurant'] // Predefined tags
 
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('token')
@@ -28,12 +29,13 @@ const getUserIdFromToken = () => {
 
 function CreatePostModal({ onClose, onPostCreated }) {
   const [content, setContent] = useState('')
+  const [title, setTitle] = useState('')
   const [rating, setRating] = useState(0) // 0 means no rating
   const [isReview, setIsReview] = useState(false)
   const [visibility, setVisibility] = useState(VISIBILITY_OPTIONS[0])
   const [mediaFiles, setMediaFiles] = useState([]) // Store File objects
   const [mediaPreviews, setMediaPreviews] = useState([]) // Store preview URLs
-  const [tags, setTags] = useState([])
+  const [tags, setTags] = useState('')
   const [restaurantId, setRestaurantId] = useState(null) // Selected restaurant ID
   const [restaurantsList, setRestaurantsList] = useState([]) // List for dropdown
   const [loading, setLoading] = useState(false)
@@ -78,10 +80,14 @@ function CreatePostModal({ onClose, onPostCreated }) {
   }
 
   // Handle tag selection/deselection
-  const handleTagToggle = (tag) => {
-    setTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    )
+  // const handleTagToggle = (tag) => {
+  //   setTags((prev) =>
+  //     prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+  //   )
+  // }
+
+  const handleTagsChange = (newTagsString) => {
+    setTags(newTagsString)
   }
 
   // Handle form submission
@@ -95,13 +101,15 @@ function CreatePostModal({ onClose, onPostCreated }) {
 
     const formData = new FormData()
     formData.append('content', content)
+      formData.append('title', title)
     // Append optional fields only if they have a value or are required
     // formData.append('title', ''); // Title is optional, send empty if needed by API
     if (restaurantId) formData.append('restaurantId', restaurantId)
     if (rating > 0) formData.append('rating', rating) // Send rating only if selected
     formData.append('isReview', isReview)
     formData.append('visibility', visibility) // Send selected visibility
-    tags.forEach((tag) => formData.append('tags', tag))
+    const tagsArray = tags.split(',').filter(Boolean) // Chuyển chuỗi thành mảng
+    tagsArray.forEach((tag) => formData.append('tags', tag.trim()))
     mediaFiles.forEach((file) => formData.append('mediaFiles', file))
 
     try {
@@ -114,10 +122,13 @@ function CreatePostModal({ onClose, onPostCreated }) {
           const basicNewPost = {
             postId: response.postId,
             authorUserId: currentUserId, // Use the fetched ID
+            title: title,
             content: content,
             createdAt: new Date().toISOString(),
             mediaUrls: mediaPreviews,
-            tags: tags,
+            tags: tagsArray,
+            isReview: isReview,
+            googlePlaceId: response.googlePlaceId,
             reactionsCount: 0,
             commentsCount: 0,
             sharesCount: 0,
@@ -157,6 +168,14 @@ function CreatePostModal({ onClose, onPostCreated }) {
           </div>
 
           <div className='modal-body'>
+            <input
+              type='text'
+              className='post-title-input' // <-- Thêm class CSS mới
+              placeholder='Tiêu đề (không bắt buộc)...'
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={loading}
+            />
             <textarea
               className='post-textarea'
               placeholder='Bạn muốn review quán nào hôm nay?'
@@ -263,24 +282,13 @@ function CreatePostModal({ onClose, onPostCreated }) {
                   ))}
                 </select>
               </div>
-              <div className='option-group'>
-                <label>Tags:</label>
-                <div className='tag-selection'>
-                  {TAG_OPTIONS.map((tag) => (
-                    <button
-                      type='button'
-                      key={tag}
-                      className={`tag-btn ${
-                        tags.includes(tag) ? 'active' : ''
-                      }`}
-                      onClick={() => handleTagToggle(tag)}
-                      disabled={loading}
-                    >
-                      {tag === 'cafe' ? 'Cà phê ☕' : 'Nhà hàng 🍽️'}
-                    </button>
-                  ))}
-                  {/* Add input for custom tags if needed */}
-                </div>
+              <div className='option-group tag-editor-wrapper'>
+                <TagEditor
+                  label='Tags'
+                  value={tags} // Truyền chuỗi tags
+                  onChange={handleTagsChange} // Nhận lại chuỗi tags
+                  placeholder='Thêm tag (nhấn Enter)...'
+                />
               </div>
             </div>
           </div>

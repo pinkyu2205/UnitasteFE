@@ -1,4 +1,4 @@
-  import axios from 'axios'
+import axios from 'axios'
 import { axiosClient } from './axios'
 
 const UserApi = {
@@ -61,20 +61,25 @@ const UserApi = {
       }
     )
   },
-// Tạo user preference (POST /Users/create-user-preference)
-createUserPreference: async (payload) => {
-  return await axiosClient.post('/Users/create-user-preference', payload)
-},
+  // Tạo user preference (POST /Users/create-user-preference)
+  createUserPreference: async (payload) => {
+    return await axiosClient.post('/Users/create-user-preference', payload)
+  },
 
-// Lấy user preference theo userId (GET /Users/get-user-preference-by-userid/{userId})
-getUserPreferenceByUserId: async (userId) => {
-  return await axiosClient.get(`/Users/get-user-preference-by-userid/${userId}`)
-},
+  // Lấy user preference theo userId (GET /Users/get-user-preference-by-userid/{userId})
+  getUserPreferenceByUserId: async (userId) => {
+    return await axiosClient.get(
+      `/Users/get-user-preference-by-userid/${userId}`
+    )
+  },
 
-// Update user preference (PUT /Users/update-user-preference/{userId})
-updateUserPreference: async (userId, data) => {
-  return await axiosClient.put(`/Users/update-user-preference/${userId}`, data)
-},
+  // Update user preference (PUT /Users/update-user-preference/{userId})
+  updateUserPreference: async (userId, data) => {
+    return await axiosClient.put(
+      `/Users/update-user-preference/${userId}`,
+      data
+    )
+  },
 
   //ADMIN PAGE
   // Đếm số người dùng đang hoạt động
