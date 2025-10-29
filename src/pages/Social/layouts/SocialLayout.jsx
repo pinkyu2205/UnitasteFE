@@ -63,7 +63,7 @@ function SocialLayout() {
         <RightSidebar />
       </div>
       {/* Chat components */}
-      <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} />
+      {/* <ChatIcon onClick={() => setIsChatOpen(!isChatOpen)} /> */}
       {isChatOpen && <ChatList onClose={() => setIsChatOpen(false)} />} */
     </div>
   )

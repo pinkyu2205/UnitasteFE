@@ -327,3 +327,55 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.post-title-input {
+  width: 100%;
+  padding: 10px 8px;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 10px;
+  background: transparent;
+  color: var(--text-primary);
+}
+.post-title-input:focus {
+  outline: none;
+  border-bottom-color: var(--primary-color);
+}
+.post-textarea {
+  height: 120px; /* Giảm chiều cao textarea một chút */
+}
+
+.option-group.tag-editor-wrapper {
+  /* Ghi đè style của .option-group */
+  flex-direction: column; /* Cho label và editor nằm trên/dưới */
+  align-items: stretch; /* Kéo dãn 100% chiều rộng */
+}
+.option-group.tag-editor-wrapper label {
+  /* Ghi đè style của label trong .option-group */
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+  margin-bottom: 10px; /* Thêm khoảng cách dưới label */
+}
+/* Style lại TagEditor cho vừa vặn trong modal */
+.tag-editor-wrapper .tag-editor-group {
+  margin-bottom: 0; /* Bỏ margin mặc định của TagEditor */
+}
+.tag-editor-wrapper .tag-editor-group label {
+  display: none; /* Ẩn label bên trong của TagEditor (vì đã có label bên ngoài) */
+}
+.tag-editor-wrapper .selected-tags-area {
+  padding: 10px;
+  max-height: 80px; /* Giới hạn chiều cao */
+  overflow-y: auto; /* Cho phép cuộn nếu nhiều tag */
+}
+.tag-editor-wrapper .custom-input-group input {
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.tag-editor-wrapper .custom-input-group button {
+  padding: 0 15px;
+  font-size: 13px;
+}
