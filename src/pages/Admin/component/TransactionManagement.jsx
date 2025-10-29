@@ -2,8 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import PaymentApi from '../../../api/paymentApi'
-import { CheckCircleIcon, ClockIcon, SearchIcon, XCircleIcon } from './AdminIcons'
 import '../CSS/TransactionManagement.css'
+import {
+  CheckCircleIcon,
+  ClockIcon,
+  SearchIcon,
+  XCircleIcon,
+} from './AdminIcons'
 
 const TransactionManagement = () => {
   const [transactions, setTransactions] = useState([])
@@ -14,22 +19,54 @@ const TransactionManagement = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
 
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    processing: 0, // Vẫn giữ lại nếu bạn muốn đếm từ danh sách
+    cancelled: 0,
+    totalRevenue: 0,
+  })
+
   useEffect(() => {
-    const fetchTransactions = async () => {
+    const fetchAllData = async () => {
       setIsLoading(true)
       try {
-        const response = await PaymentApi.getPurchasesByUserToken()
-        const allTransactions = response.data || []
-        
-        // Sắp xếp theo ngày mới nhất
+        // Gọi song song các API để tải nhanh hơn
+        const [
+          historyResponse,
+          successCountResponse,
+          cancelCountResponse,
+          revenueResponse,
+          totalCountResponse,
+          pendingCountResponse,
+        ] = await Promise.all([
+          PaymentApi.getPurchasesByUserToken(), // Giữ lại để lấy danh sách
+          PaymentApi.countSuccessTransactions(),
+          PaymentApi.countCancelTransactions(),
+          PaymentApi.getSumAmountSuccessTransactions(),
+          PaymentApi.countTotalTransactions(),
+          PaymentApi.countPendingTransactions(),
+        ])
+
+        // 1. Xử lý danh sách giao dịch (như cũ)
+        const allTransactions = historyResponse || [] // Giả sử API trả về mảng
         const sortedTransactions = allTransactions.sort((a, b) => {
           const dateA = new Date(a.createdAt || a.purchaseDate)
           const dateB = new Date(b.createdAt || b.purchaseDate)
           return dateB - dateA
         })
-        
         setTransactions(sortedTransactions)
         setFilteredTransactions(sortedTransactions)
+
+        // 2. Cập nhật các thẻ thống kê từ API
+        setStats({
+          total: totalCountResponse || 0,
+          completed: successCountResponse.successTransactionCount || 0,
+          cancelled: cancelCountResponse.cancelTransactionCount || 0,
+          totalRevenue: revenueResponse || 0, // API trả về số trực tiếp
+          // Tính toán các trạng thái còn lại nếu cần
+          processing: pendingCountResponse.pendingTransactionCount || 0,
+        })
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu giao dịch:', error)
       } finally {
@@ -37,8 +74,8 @@ const TransactionManagement = () => {
       }
     }
 
-    fetchTransactions()
-  }, [])
+    fetchAllData()
+  }, []) // Chỉ chạy 1 lần lúc mount
 
   // Filter transactions
   useEffect(() => {
@@ -46,14 +83,14 @@ const TransactionManagement = () => {
 
     // Filter by status
     if (filterStatus !== 'all') {
-      filtered = filtered.filter(transaction => {
-        const status = transaction.status?.toUpperCase()
+      filtered = filtered.filter((transaction) => {
+        const status = transaction.status?.toUpperCase() // 'PENDING', 'SUCCESS', 'CANCEL', 'ACTIVE'
         if (filterStatus === 'completed') {
-          return status === 'COMPLETED' || status === 'SUCCESS'
+          return status === 'SUCCESS' || status === 'ACTIVE' // Coi 'Active' và 'Success' là hoàn thành
         } else if (filterStatus === 'processing') {
-          return status === 'PROCESSING' || status === 'PENDING'
+          return status === 'PENDING'
         } else if (filterStatus === 'cancelled') {
-          return status === 'CANCELLED' || status === 'FAILED'
+          return status === 'CANCEL' // Sửa từ 'CANCELLED' thành 'CANCEL'
         }
         return true
       })
@@ -61,10 +98,14 @@ const TransactionManagement = () => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(transaction => {
-        const id = (transaction.id || transaction.orderCode || '').toString().toLowerCase()
-        const packageName = (transaction.servicePackageName || transaction.packageName || '').toLowerCase()
-        return id.includes(searchTerm.toLowerCase()) || packageName.includes(searchTerm.toLowerCase())
+      filtered = filtered.filter((transaction) => {
+        // Tìm theo orderCode hoặc description
+        const code = (transaction.orderCode || '').toString().toLowerCase()
+        const desc = (transaction.description || '').toLowerCase()
+        return (
+          code.includes(searchTerm.toLowerCase()) ||
+          desc.includes(searchTerm.toLowerCase())
+        )
       })
     }
 
@@ -75,7 +116,10 @@ const TransactionManagement = () => {
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentTransactions = filteredTransactions.slice(indexOfFirstItem, indexOfLastItem)
+  const currentTransactions = filteredTransactions.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  )
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
 
   // Format số tiền
@@ -101,54 +145,31 @@ const TransactionManagement = () => {
   // Get status info
   const getStatusInfo = (status) => {
     const upperStatus = status?.toUpperCase()
-    if (upperStatus === 'COMPLETED' || upperStatus === 'SUCCESS') {
+    if (upperStatus === 'SUCCESS' || upperStatus === 'ACTIVE') {
       return {
         label: 'Hoàn thành',
         class: 'completed',
         icon: <CheckCircleIcon size={16} />,
       }
-    } else if (upperStatus === 'PROCESSING' || upperStatus === 'PENDING') {
+    } else if (upperStatus === 'PENDING') {
       return {
-        label: 'Đang xử lý',
-        class: 'processing',
+        label: 'Chờ thanh toán',
+        class: 'pending', // Dùng class 'pending' (màu xanh dương)
         icon: <ClockIcon size={16} />,
       }
-    } else if (upperStatus === 'CANCELLED' || upperStatus === 'FAILED') {
+    } else if (upperStatus === 'CANCEL') {
+      // Sửa 'CANCELLED' thành 'CANCEL'
       return {
         label: 'Đã hủy',
-        class: 'cancelled',
+        class: 'cancelled', // Dùng class 'cancelled' (màu đỏ)
         icon: <XCircleIcon size={16} />,
       }
-    }
+    } // Fallback cho các trường hợp khác
     return {
-      label: 'Chờ thanh toán',
-      class: 'pending',
+      label: status || 'Đang xử lý',
+      class: 'processing', // Dùng class 'processing' (màu cam)
       icon: <ClockIcon size={16} />,
     }
-  }
-
-  // Statistics
-  const stats = {
-    total: transactions.length,
-    completed: transactions.filter(t => {
-      const status = t.status?.toUpperCase()
-      return status === 'COMPLETED' || status === 'SUCCESS'
-    }).length,
-    processing: transactions.filter(t => {
-      const status = t.status?.toUpperCase()
-      return status === 'PROCESSING' || status === 'PENDING'
-    }).length,
-    cancelled: transactions.filter(t => {
-      const status = t.status?.toUpperCase()
-      return status === 'CANCELLED' || status === 'FAILED'
-    }).length,
-    totalRevenue: transactions.reduce((sum, t) => {
-      const status = t.status?.toUpperCase()
-      if (status === 'COMPLETED' || status === 'SUCCESS') {
-        return sum + (t.amount || t.totalAmount || 0)
-      }
-      return sum
-    }, 0),
   }
 
   return (
@@ -212,28 +233,28 @@ const TransactionManagement = () => {
         <table className='transaction-table'>
           <thead>
             <tr>
-              <th>Mã Giao Dịch</th>
+              <th>Mã Đơn Hàng</th>
+              <th>UserID</th>
               <th>Ngày & Giờ</th>
-              <th>Gói Dịch Vụ</th>
+              <th>Mô Tả (Gói)</th>
               <th>Số Tiền</th>
               <th>Trạng Thái</th>
             </tr>
           </thead>
           <tbody>
             {currentTransactions.length > 0 ? (
-              currentTransactions.map((transaction, index) => {
+              currentTransactions.map((transaction) => {
                 const statusInfo = getStatusInfo(transaction.status)
                 return (
-                  <tr key={index}>
+                  <tr key={transaction.paymentTransactionId}>
                     <td className='transaction-id'>
-                      #{transaction.id || transaction.orderCode || 'N/A'}
+                      #{transaction.paymentTransactionId}
                     </td>
-                    <td>{formatDate(transaction.createdAt || transaction.purchaseDate)}</td>
-                    <td>
-                      {transaction.servicePackageName || transaction.packageName || 'VIP Package'}
-                    </td>
+                    <td>{transaction.userId}</td>
+                    <td>{formatDate(transaction.createdAt)}</td>
+                    <td>{transaction.description}</td>
                     <td className='amount'>
-                      {formatCurrency(transaction.amount || transaction.totalAmount || 0)}
+                      {formatCurrency(transaction.amount)}
                     </td>
                     <td>
                       <span className={`status-badge ${statusInfo.class}`}>
@@ -246,7 +267,7 @@ const TransactionManagement = () => {
               })
             ) : (
               <tr>
-                <td colSpan='5' className='no-data'>
+                <td colSpan='6' className='no-data'>
                   {searchTerm || filterStatus !== 'all'
                     ? 'Không tìm thấy giao dịch nào'
                     : 'Chưa có giao dịch nào'}
@@ -262,7 +283,7 @@ const TransactionManagement = () => {
         <div className='pagination'>
           <button
             className='page-btn'
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
           >
             Trước
@@ -272,7 +293,9 @@ const TransactionManagement = () => {
           </div>
           <button
             className='page-btn'
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
           >
             Sau
@@ -284,4 +307,3 @@ const TransactionManagement = () => {
 }
 
 export default TransactionManagement
-

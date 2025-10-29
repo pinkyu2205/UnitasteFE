@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import './LeftSidebar.css'
 
-function LeftSidebar() {
+function LeftSidebar({ userInfo, isLoading }) {
   // const navigate = useNavigate();
   const [unreadCount] = useState(5) // TODO: Lấy từ API
 

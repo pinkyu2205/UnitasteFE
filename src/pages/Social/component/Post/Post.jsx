@@ -15,6 +15,8 @@ function Post({ post }) {
   // You'll need a way to fetch and display actual comments later
   const [comments, setComments] = useState([])
 
+  // Lấy tên nhà hàng
+  const [restaurantName, setRestaurantName] = useState(null)
   // Fetch author details when post data is available
   useEffect(() => {
     if (post.authorUserId) {
@@ -63,6 +65,17 @@ function Post({ post }) {
     }
   }
 
+  // Xử lý nút chỉ đường
+  const handleGoogleMapsRedirect = (googlePlaceId) => {
+    if (!googlePlaceId) return
+
+    // Cấu trúc link bạn cung cấp
+    const mapUrl = `https://www.google.com/maps/place/?q=place_id:${googlePlaceId}`
+
+    // Mở tab mới
+    window.open(mapUrl, '_blank', 'noopener,noreferrer')
+  }
+
   return (
     <div className='post-card'>
       {/* Post Header */}
@@ -82,12 +95,12 @@ function Post({ post }) {
           <span className='post-meta'>
             {formatDate(post.createdAt)}
             {/* Display location/restaurant if it's a review */}
-            {post.isReview && post.restaurantId && (
+            {post.isReview && post.title && (
               <>
                 {' '}
                 • Review tại{' '}
                 <span className='post-location'>
-                  Nhà hàng ID {post.restaurantId}
+                  {post.title} {}
                 </span>{' '}
               </>
             )}
@@ -106,6 +119,9 @@ function Post({ post }) {
 
       {/* Post Content */}
       <div className='post-content'>
+        {post.title && !post.isReview && (
+          <h3 className='post-title-display'>{post.title}</h3>
+        )}
         <p>{post.content}</p>
         {/* Display Media */}
         {post.mediaUrls && post.mediaUrls.length > 0 && (
@@ -140,6 +156,17 @@ function Post({ post }) {
         )}
       </div>
 
+      {post.isReview && post.googlePlaceId && (
+        <div className='post-directions-bar'>
+          <button
+            className='directions-btn-google'
+            onClick={() => handleGoogleMapsRedirect(post.googlePlaceId)}
+          >
+            <span className='directions-icon'>📍</span>
+            Chỉ đường đến địa điểm này
+          </button>
+        </div>
+      )}
       {/* Post Stats */}
       <div className='post-stats'>
         {/* TODO: Integrate reaction summary API here */}

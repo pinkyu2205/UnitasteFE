@@ -9,7 +9,7 @@ const SocialApi = {
   /** GET /api/Post/get-all-paged */
   getAllPosts: (page = 1, pageSize = 5) => {
     // Default pageSize to 5 or more
-    return axiosSocialClient.get('/Post/get-all-paged', {
+    return axiosSocialClient.get('/Posts/get-all-paged', {
       params: { page, pageSize },
     })
   },
@@ -17,7 +17,7 @@ const SocialApi = {
   /** POST /api/Post/create (multipart/form-data) */
   createPost: (formData) => {
     // Expects FormData object
-    return axiosSocialClient.post('/Post/create', formData, {
+    return axiosSocialClient.post('/Posts/create', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -90,6 +90,12 @@ const SocialApi = {
     }
   },
 
+  getPostsByUserId: (userId) => {
+    // API này lấy userId từ token (Authorization header)
+    // Hoặc nếu nó cần userId làm param, dùng: params: { userId }
+    return axiosSocialClient.get('/Posts/get-all-post-of-userId')
+  },
+
   /** MỚI: Giả lập API lấy các tag nổi bật */
   getTrendingTags: async () => {
     // Giả lập độ trễ mạng
@@ -109,14 +115,3 @@ const SocialApi = {
 }
 
 export default SocialApi
-
-// Remember to update your axios.js to include axiosSocialClient
-// Example addition to axios.js:
-/*
-const axiosSocialClient = axios.create({
-  baseURL: 'https://localhost:5002', // Your Social Service URL
-  headers: { 'Content-Type': 'application/json' },
-});
-setupInterceptors(axiosSocialClient); // Apply interceptors
-export { axiosClient, axiosRestaurantClient, axiosPaymentClient, axiosSocialClient };
-*/

@@ -21,7 +21,7 @@ const PaymentApi = {
    * GET: /get-all-service-package
    */
   getAllServicePackages: () => {
-    return axiosPaymentClient.get('/get-all-service-package')
+    return axiosPaymentClient.get('/ServicePackages/get-all-service-package')
   },
 
   /**
@@ -33,11 +33,14 @@ const PaymentApi = {
     // Lấy base URL từ window.location
     const baseUrl = window.location.origin
 
-    return axiosPaymentClient.post('/create-service-package-payment', {
-      servicePackageId,
-      returnUrl: `${baseUrl}/payment/success`, // URL khi thanh toán thành công
-      cancelUrl: `${baseUrl}/vip-checkout`, // URL khi hủy thanh toán
-    })
+    return axiosPaymentClient.post(
+      '/ServicePackages/create-service-package-payment',
+      {
+        servicePackageId,
+        returnUrl: `${baseUrl}/payment/success`, // URL khi thanh toán thành công
+        cancelUrl: `${baseUrl}/vip-checkout`, // URL khi hủy thanh toán
+      }
+    )
   },
 
   /**
@@ -45,7 +48,9 @@ const PaymentApi = {
    * GET: /get-purchases-by-user-token
    */
   getPurchasesByUserToken: () => {
-    return axiosPaymentClient.get('/get-purchases-by-user-token')
+    return axiosPaymentClient.get(
+      '/ServicePackages/get-purchases-by-user-token'
+    )
   },
   checkVipStatus: () => {
     const userId = getUserIdFromToken()
@@ -66,8 +71,48 @@ const PaymentApi = {
    */
   paymentSuccessCallback: (orderCode) => {
     return axiosPaymentClient.get(
-      `/payment-success-callback?orderCode=${orderCode}`
+      `/ServicePackages/payment-success-callback?orderCode=${orderCode}`
     )
+  },
+
+  /**
+   * [ADMIN] Đếm tổng số giao dịch THÀNH CÔNG
+   * GET: /api/Payments/count-success-transactions
+   */
+  countSuccessTransactions: () => {
+    // API này nằm trên port 5005 nhưng có prefix /api/Payments/
+    return axiosPaymentClient.get('/Payments/count-success-transactions')
+  },
+
+  /**
+   * [ADMIN] Đếm tổng số giao dịch BỊ HỦY
+   * GET: /api/Payments/count-cancel-transactions
+   */
+  countCancelTransactions: () => {
+    return axiosPaymentClient.get('/Payments/count-cancel-transactions')
+  },
+
+  /**
+   * [ADMIN] Lấy tổng doanh thu từ các giao dịch thành công
+   * GET: /api/Payments/sum-amount-success-transactions
+   */
+  getSumAmountSuccessTransactions: () => {
+    // API này trả về text/plain (là một con số)
+    return axiosPaymentClient.get('/Payments/sum-amount-success-transactions')
+  },
+  countTotalTransactions: () => {
+    // API MỚI
+    return axiosPaymentClient.get(
+      '/Payments/count-amount-of-paymentTransaction'
+    )
+  },
+
+  countPendingTransactions: () => {
+    return axiosPaymentClient.get('/Payments/count-pending-transactions')
+  },
+
+  getAllPaymentTransactions: () => {
+    return axiosPaymentClient.get('/api/Payments/get-all-payment-transaction')
   },
 }
 
