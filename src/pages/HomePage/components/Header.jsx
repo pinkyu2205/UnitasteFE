@@ -63,7 +63,7 @@ const Header = () => {
       {/* Logo on the Left */}
       <div className='header-left'>
         <Link to='/' className='logo'>
-          <img src='/src/assets/Logo 1.png' alt='Unitaste Logo' />
+          <img src='/src/assets/logo-1.png' alt='Unitaste Logo' />
           <span className='logo-text'>UniTaste</span>
         </Link>
       </div>

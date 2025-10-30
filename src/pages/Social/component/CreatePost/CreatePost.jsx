@@ -6,7 +6,7 @@ function CreatePost({ onOpenModal, userInfo, isLoadingUser }) {
   const avatarUrl =
     userInfo?.avatarUrl ||
     `https://ui-avatars.com/api/?name=${
-      userInfo?.fullName?.charAt(0) || 'U'
+      userInfo?.fullName?.charAt(0) || ''
     }&background=random`
 
   return (

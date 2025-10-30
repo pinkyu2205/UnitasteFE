@@ -1,11 +1,13 @@
 // src/api/paymentApi.js
-import { axiosPaymentClient } from './axios' // Make sure you are using the correct client (port 5005)
+import { axiosPaymentClient } from './axios' // baseURL = import.meta.env.VITE_API_PAYMENT (ví dụ https://paymentservice-.../api)
 
-// Helper function to get UserID from token
+// Lưu ý: KHÔNG để dấu cách sau dấu "=" trong .env
+// VITE_API_PAYMENT=https://paymentservice-5ccj.onrender.com/api
+
+// Helper: lấy userId từ JWT (nếu cần)
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('token')
   if (!token) return null
-
   try {
     const payload = JSON.parse(atob(token.split('.')[1]))
     return payload.userId || payload.sub || payload.id
@@ -17,106 +19,88 @@ const getUserIdFromToken = () => {
 
 const PaymentApi = {
   /**
-   * Lấy tất cả các gói dịch vụ VIP
-   * GET: /get-all-service-package
+   * Gói dịch vụ (ServicePackagesController)
    */
   getAllServicePackages: () => {
+    // baseURL đã có /api → KHÔNG thêm /api lần nữa
     return axiosPaymentClient.get('/ServicePackages/get-all-service-package')
   },
 
   /**
-   * Tạo một yêu cầu thanh toán cho gói dịch vụ
-   * POST: /create-service-package-payment
-   * Body: { servicePackageId, returnUrl, cancelUrl }
+   * Tạo thanh toán gói dịch vụ
+   * BE (PayOSService) sẽ tự dùng ReturnUrl/CancelUrl từ appsettings → KHÔNG gửi từ FE
+   * POST: /ServicePackages/create-service-package-payment
+   * Body: { servicePackageId }
    */
   createServicePackagePayment: (servicePackageId) => {
-    // Ưu tiên base URL từ env khi deploy; fallback window.location.origin khi dev
-    const rawBase =
-      (import.meta.env.VITE_PUBLIC_BASE_URL || window.location.origin) + ''
-    // Chuẩn hóa: bỏ dấu '/' cuối nếu có
-    const baseUrl = rawBase.endsWith('/') ? rawBase.slice(0, -1) : rawBase
-
     return axiosPaymentClient.post(
       '/ServicePackages/create-service-package-payment',
-      {
-        servicePackageId,
-        returnUrl: `${baseUrl}/payment/success`, // URL khi thanh toán thành công
-        cancelUrl: `${baseUrl}/vip-checkout`, // URL khi hủy thanh toán
-      }
+      { servicePackageId }
     )
   },
 
   /**
-   * Lấy lịch sử mua hàng của người dùng (dựa trên token)
-   * GET: /get-purchases-by-user-token
+   * Lịch sử mua hàng theo token
+   * GET: /ServicePackages/get-purchases-by-user-token
    */
   getPurchasesByUserToken: () => {
-    return axiosPaymentClient.get(
-      '/ServicePackages/get-purchases-by-user-token'
-    )
+    return axiosPaymentClient.get('/ServicePackages/get-purchases-by-user-token')
   },
+
+  /**
+   * Kiểm tra trạng thái VIP (cần userId)
+   * GET: /ServicePackages/check-service-package-status?userId={id}
+   */
   checkVipStatus: () => {
     const userId = getUserIdFromToken()
-    if (!userId) {
-      // Trả về Promise reject nếu không có userId
-      return Promise.reject(new Error('User ID not found in token'))
-    }
-    // API yêu cầu userId làm query parameter
-    return axiosPaymentClient.get(
-      `/ServicePackages/check-service-package-status?userId=${userId}`
-    )
+    if (!userId) return Promise.reject(new Error('User ID not found in token'))
+    return axiosPaymentClient.get(`/ServicePackages/check-service-package-status`, {
+      params: { userId }
+    })
   },
 
   /**
-   * Callback xác nhận thanh toán thành công
-   * GET: /payment-success-callback?orderCode={orderCode}
-   * (hoặc /api/payments/payment-success-callback nếu backend dùng /api prefix)
+   * CALLBACK thanh toán (PaymentsController)
+   * GET: /payments/payment-success-callback?orderCode={orderCode}
+   * GET: /payments/payment-cancel-callback?orderCode={orderCode}
    */
   paymentSuccessCallback: (orderCode) => {
-    return axiosPaymentClient.get(
-      `/ServicePackages/payment-success-callback?orderCode=${orderCode}`
-    )
+    return axiosPaymentClient.get('/payments/payment-success-callback', {
+      params: { orderCode }
+    })
+  },
+
+  paymentCancelCallback: (orderCode) => {
+    return axiosPaymentClient.get('/payments/payment-cancel-callback', {
+      params: { orderCode }
+    })
   },
 
   /**
-   * [ADMIN] Đếm tổng số giao dịch THÀNH CÔNG
-   * GET: /api/Payments/count-success-transactions
+   * ADMIN dashboards (PaymentsController)
+   * Lưu ý: KHÔNG thêm "/api" ở path vì baseURL đã có /api
    */
   countSuccessTransactions: () => {
-    // API này nằm trên port 5005 nhưng có prefix /api/Payments/
-    return axiosPaymentClient.get('/Payments/count-success-transactions')
+    return axiosPaymentClient.get('/payments/count-success-transactions')
   },
 
-  /**
-   * [ADMIN] Đếm tổng số giao dịch BỊ HỦY
-   * GET: /api/Payments/count-cancel-transactions
-   */
   countCancelTransactions: () => {
-    return axiosPaymentClient.get('/Payments/count-cancel-transactions')
+    return axiosPaymentClient.get('/payments/count-cancel-transactions')
   },
 
-  /**
-   * [ADMIN] Lấy tổng doanh thu từ các giao dịch thành công
-   * GET: /api/Payments/sum-amount-success-transactions
-   */
   getSumAmountSuccessTransactions: () => {
-    // API này trả về text/plain (là một con số)
-    return axiosPaymentClient.get('/Payments/sum-amount-success-transactions')
-  },
-  countTotalTransactions: () => {
-    // API MỚI
-    return axiosPaymentClient.get(
-      '/Payments/count-amount-of-paymentTransaction'
-    )
+    // BE trả số; axios tự parse theo headers
+    return axiosPaymentClient.get('/payments/sum-amount-success-transactions')
   },
 
-  countPendingTransactions: () => {
-    return axiosPaymentClient.get('/Payments/count-pending-transactions')
+  countTotalTransactions: () => {
+    return axiosPaymentClient.get('/payments/count-amount-of-paymentTransaction')
   },
 
   getAllPaymentTransactions: () => {
-    return axiosPaymentClient.get('/api/Payments/get-all-payment-transaction')
-  },
+    // Sửa lỗi cũ: trước đây viết "/api/Payments/..." → trùng /api
+    return axiosPaymentClient.get('/payments/get-all-payment-transaction')
+  }
 }
 
 export default PaymentApi
