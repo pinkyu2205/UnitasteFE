@@ -54,6 +54,25 @@ function Post({ post }) {
     })
   }
 
+  // Lấy avatar thật của user đang đăng nhập để hiển thị cho comment của chính họ
+  const getCurrentUserId = () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (!token) return null
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.userId || payload.sub || payload.id || null
+    } catch {
+      return null
+    }
+  }
+  const currentUserId = getCurrentUserId()
+  const myAvatarUrl = (() => {
+    const stored = localStorage.getItem('avatarUrl')
+    if (stored && stored !== 'null' && stored !== 'undefined') return stored
+    const name = localStorage.getItem('fullName') || 'U'
+    return `https://ui-avatars.com/api/?name=${name.charAt(0)}&background=random`
+  })()
+
   // Toggle and load comments on demand
   const handleToggleComments = async () => {
     const willShow = !showComments
@@ -269,8 +288,11 @@ function Post({ post }) {
                 >
                   <img
                     src={
-                      c.avatarUrl ||
-                      `https://ui-avatars.com/api/?name=${(c.fullName || 'U').charAt(0)}&background=random`
+                      Number(c.userId) === Number(currentUserId)
+                        ? myAvatarUrl
+                        : (c.avatarUrl && c.avatarUrl !== 'null' && c.avatarUrl !== 'undefined')
+                        ? c.avatarUrl
+                        : `https://ui-avatars.com/api/?name=${(c.fullName || 'U').charAt(0)}&background=random`
                     }
                     alt={c.fullName || 'user'}
                     className='avatar-placeholder-small'

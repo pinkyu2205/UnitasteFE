@@ -22,7 +22,6 @@ const TransactionManagement = () => {
   const [stats, setStats] = useState({
     total: 0,
     completed: 0,
-    processing: 0, // Vẫn giữ lại nếu bạn muốn đếm từ danh sách
     cancelled: 0,
     totalRevenue: 0,
   })
@@ -32,15 +31,8 @@ const TransactionManagement = () => {
       setIsLoading(true)
       try {
         // Gọi song song các API để tải nhanh hơn
-        const [
-          historyResponse,
-          successCountResponse,
-          cancelCountResponse,
-          revenueResponse,
-          totalCountResponse,
-          pendingCountResponse,
-        ] = await Promise.all([
-          PaymentApi.getPurchasesByUserToken(), // Giữ lại để lấy danh sách
+        const [allTxSet, successSet, cancelSet, revenueSet, totalSet, pendingSet] = await Promise.allSettled([
+          PaymentApi.getAllPaymentTransactions().catch(() => PaymentApi.getPurchasesByUserToken()),
           PaymentApi.countSuccessTransactions(),
           PaymentApi.countCancelTransactions(),
           PaymentApi.getSumAmountSuccessTransactions(),
@@ -48,8 +40,17 @@ const TransactionManagement = () => {
           PaymentApi.countPendingTransactions(),
         ])
 
-        // 1. Xử lý danh sách giao dịch (như cũ)
-        const allTransactions = historyResponse || [] // Giả sử API trả về mảng
+        const allTransactionsResponse = allTxSet.status === 'fulfilled' ? allTxSet.value : []
+        const successCountResponse = successSet.status === 'fulfilled' ? successSet.value : null
+        const cancelCountResponse = cancelSet.status === 'fulfilled' ? cancelSet.value : null
+        const revenueResponse = revenueSet.status === 'fulfilled' ? revenueSet.value : null
+        const totalCountResponse = totalSet.status === 'fulfilled' ? totalSet.value : null
+        const pendingCountResponse = pendingSet.status === 'fulfilled' ? pendingSet.value : null
+
+        // 1. Xử lý danh sách giao dịch (Admin)
+        const allTransactions = Array.isArray(allTransactionsResponse)
+          ? allTransactionsResponse
+          : (allTransactionsResponse?.data ?? allTransactionsResponse?.items ?? [])
         const sortedTransactions = allTransactions.sort((a, b) => {
           const dateA = new Date(a.createdAt || a.purchaseDate)
           const dateB = new Date(b.createdAt || b.purchaseDate)
@@ -59,13 +60,26 @@ const TransactionManagement = () => {
         setFilteredTransactions(sortedTransactions)
 
         // 2. Cập nhật các thẻ thống kê từ API
+        const toNum = (v) => (typeof v === 'number' ? v : Number(v))
+        // Tính từ danh sách nếu API count không khả dụng
+        const successFromList = allTransactions.filter(t => {
+          const s = (t.status || '').toString().toUpperCase()
+          return s === 'SUCCESS' || s === 'ACTIVE'
+        }).length
+        const cancelFromList = allTransactions.filter(t => (t.status || '').toString().toUpperCase() === 'CANCEL').length
+        const pendingFromList = allTransactions.filter(t => (t.status || '').toString().toUpperCase() === 'PENDING').length
+        const revenueFromList = allTransactions
+          .filter(t => {
+            const s = (t.status || '').toString().toUpperCase()
+            return s === 'SUCCESS' || s === 'ACTIVE'
+          })
+          .reduce((sum, t) => sum + Number(t.amount || t.totalAmount || 0), 0)
+
         setStats({
-          total: totalCountResponse || 0,
-          completed: successCountResponse.successTransactionCount || 0,
-          cancelled: cancelCountResponse.cancelTransactionCount || 0,
-          totalRevenue: revenueResponse || 0, // API trả về số trực tiếp
-          // Tính toán các trạng thái còn lại nếu cần
-          processing: pendingCountResponse.pendingTransactionCount || 0,
+          total: toNum(totalCountResponse) || allTransactions.length || 0,
+          completed: successCountResponse?.successTransactionCount || toNum(successCountResponse) || successFromList,
+          cancelled: cancelCountResponse?.cancelTransactionCount || toNum(cancelCountResponse) || cancelFromList,
+          totalRevenue: toNum(revenueResponse) || revenueFromList,
         })
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu giao dịch:', error)
@@ -87,8 +101,6 @@ const TransactionManagement = () => {
         const status = transaction.status?.toUpperCase() // 'PENDING', 'SUCCESS', 'CANCEL', 'ACTIVE'
         if (filterStatus === 'completed') {
           return status === 'SUCCESS' || status === 'ACTIVE' // Coi 'Active' và 'Success' là hoàn thành
-        } else if (filterStatus === 'processing') {
-          return status === 'PENDING'
         } else if (filterStatus === 'cancelled') {
           return status === 'CANCEL' // Sửa từ 'CANCELLED' thành 'CANCEL'
         }
@@ -191,10 +203,6 @@ const TransactionManagement = () => {
           <div className='stat-label'>Hoàn Thành</div>
           <div className='stat-value'>{stats.completed}</div>
         </div>
-        <div className='stat-card orange'>
-          <div className='stat-label'>Đang Xử Lý</div>
-          <div className='stat-value'>{stats.processing}</div>
-        </div>
         <div className='stat-card red'>
           <div className='stat-label'>Đã Hủy</div>
           <div className='stat-value'>{stats.cancelled}</div>
@@ -223,7 +231,6 @@ const TransactionManagement = () => {
         >
           <option value='all'>Tất cả trạng thái</option>
           <option value='completed'>Hoàn thành</option>
-          <option value='processing'>Đang xử lý</option>
           <option value='cancelled'>Đã hủy</option>
         </select>
       </div>

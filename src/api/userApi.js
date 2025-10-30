@@ -82,6 +82,15 @@ const UserApi = {
   },
 
   //ADMIN PAGE
+  // Lấy tất cả người dùng (dành cho admin)
+  getAllUsers: async () => {
+    try {
+      return await axiosClient.get('/Users/get-all')
+    } catch (e) {
+      // Fallback nếu BE dùng route khác
+      return await axiosClient.get('/Users/get-all')
+    }
+  },
   // Đếm số người dùng đang hoạt động
   countActiveUsers: async () => {
     return await axiosClient.get('/Users/count-active')

@@ -76,7 +76,7 @@ function ReactionBar({ postId, onCommentClick, onReactionChange }) {
   // Determine current button text/icon
   const currentReactionIcon =
     REACTION_ICONS[currentUserReaction] || REACTION_ICONS.Default
-  const currentReactionText = currentUserReaction || 'Thích' // Text for the main button
+  const currentReactionText = currentUserReaction || 'Like' // Text for the main button
 
   return (
     <>

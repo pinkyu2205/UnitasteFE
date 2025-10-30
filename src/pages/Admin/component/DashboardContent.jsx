@@ -13,6 +13,7 @@ import {
   YAxis,
 } from 'recharts'
 import PaymentApi from '../../../api/paymentApi'
+import UserApi from '../../../api/userApi'
 import { StarIcon } from './AdminIcons'
 import '../CSS/DashboardContent.css'
 
@@ -58,14 +59,37 @@ const DashboardContent = ({ setActiveMenu }) => {
     const fetchDashboardData = async () => {
       setIsLoading(true)
       try {
-        // Lấy tất cả giao dịch
-        const response = await PaymentApi.getPurchasesByUserToken()
-        const allTransactions = response.data || []
+        // Gọi song song: dùng admin API, có fallback nếu không có quyền
+        const [sumRevenueSet, totalTxSet, allTxSet, allUsersSet] = await Promise.allSettled([
+          PaymentApi.getSumAmountSuccessTransactions(),
+          PaymentApi.countTotalTransactions(),
+          // Fallback admin -> user token
+          PaymentApi.getAllPaymentTransactions().catch(() => PaymentApi.getPurchasesByUserToken()),
+          UserApi.getAllUsers(),
+        ])
+
+        const sumRevenueResp = sumRevenueSet.status === 'fulfilled' ? sumRevenueSet.value : null
+        const totalTransactionsResp = totalTxSet.status === 'fulfilled' ? totalTxSet.value : null
+        const allTransactionsResp = allTxSet.status === 'fulfilled' ? allTxSet.value : []
+        const allUsersResp = allUsersSet.status === 'fulfilled' ? allUsersSet.value : []
+
+        // Lưu ý: axios interceptor đã trả về response.data; đề phòng BE bọc dữ liệu trong thuộc tính khác
+        const allTransactions = Array.isArray(allTransactionsResp)
+          ? allTransactionsResp
+          : (allTransactionsResp?.data ?? allTransactionsResp?.items ?? [])
         
         // Tính tổng doanh thu từ các giao dịch thành công
-        const totalRevenue = allTransactions
-          .filter(t => t.status === 'COMPLETED' || t.status === 'SUCCESS')
+        // Ưu tiên lấy từ BE; fallback tự tính nếu BE trả sai định dạng
+        const computedRevenue = allTransactions
+          .filter(t => t.status === 'SUCCESS' || t.status === 'ACTIVE')
           .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
+        const totalRevenueFromBE =
+          typeof sumRevenueResp === 'number'
+            ? sumRevenueResp
+            : Number(sumRevenueResp) || 0
+        const totalRevenue = Number.isFinite(totalRevenueFromBE)
+          ? totalRevenueFromBE
+          : computedRevenue
 
         // Tạo dữ liệu doanh thu 7 ngày qua
         const revenueData = []
@@ -82,7 +106,7 @@ const DashboardContent = ({ setActiveMenu }) => {
           })
           
           const dayRevenue = dayTransactions
-            .filter(t => t.status === 'COMPLETED' || t.status === 'SUCCESS')
+            .filter(t => t.status === 'SUCCESS' || t.status === 'ACTIVE')
             .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
           
           revenueData.push({
@@ -134,9 +158,22 @@ const DashboardContent = ({ setActiveMenu }) => {
           distribution: { 5: 120, 4: 50, 3: 10, 2: 2, 1: 5 },
         }
 
+        // Tổng số giao dịch: ưu tiên từ BE, fallback = allTransactions.length
+        const totalTxFromBE =
+          typeof totalTransactionsResp === 'number'
+            ? totalTransactionsResp
+            : (totalTransactionsResp?.count ?? totalTransactionsResp?.total ?? Number(totalTransactionsResp))
         setTotalRevenue(totalRevenue)
-        setTotalTransactions(allTransactions.length)
-        setTotalUsers(450) // Mock data
+        setTotalTransactions(
+          Number.isFinite(totalTxFromBE) && totalTxFromBE >= 0
+            ? totalTxFromBE
+            : allTransactions.length
+        )
+        // Tổng người dùng từ API get-all
+        const usersCount = Array.isArray(allUsersResp)
+          ? allUsersResp.length
+          : (allUsersResp?.total ?? allUsersResp?.count ?? Number(allUsersResp))
+        setTotalUsers(Number.isFinite(usersCount) ? usersCount : 0)
         setRevenueData(revenueData)
         setTransactionData(transactionData)
         setRecentTransactions(recentTransactions)

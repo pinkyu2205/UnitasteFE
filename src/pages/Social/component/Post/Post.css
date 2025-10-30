@@ -106,39 +106,101 @@
 }
 
 .comment-section {
-  padding-top: 8px;
+  padding-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 8px;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.comments-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comments-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.comments-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.comment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 0;
+}
+
+.comments-empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 12px;
+  font-style: italic;
 }
 
 .comment-input-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.comment-input-wrapper:focus-within {
+  background-color: rgba(255, 107, 53, 0.02);
 }
 
 .comment-input {
   flex-grow: 1;
   background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 20px;
   padding: 10px 16px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
+  color: var(--text-primary);
+}
+
+.comment-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.comment-input:hover {
+  border-color: rgba(255, 107, 53, 0.3);
 }
 
 .comment-input:focus {
   outline: none;
   border-color: var(--primary-color);
   background-color: white;
-  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.08), 0 2px 8px rgba(255, 107, 53, 0.1);
+  transform: translateY(-1px);
 }
 
 .comment-input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background-color: var(--bg-color);
 }
 
 .post-header .avatar-placeholder-small {
