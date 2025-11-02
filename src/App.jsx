@@ -19,8 +19,6 @@ import VipSubscription from './pages/VipSubscription/VipSubscription'
 import Support from './pages/Support/Support'
 import About from './pages/About/About'
 import PaymentStatus from './pages/PaymentStatus/PaymentStatus'
-import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy'
-import TermsOfService from './pages/TermsOfService/TermsOfService'
 
 function App() {
   return (
