@@ -54,179 +54,43 @@
   cursor: not-allowed;
 }
 
-/* Reaction popup */
-.reaction-popup {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 12px;
-  background-color: var(--surface-color);
-  border-radius: 32px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-  padding: 8px 12px;
-  display: flex;
-  gap: 8px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px) scale(0.95);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  z-index: 10;
-  border: 1px solid var(--border-color);
-}
-
-/* Chỉ hiển thị popup khi hover nút Like (reaction-trigger) hoặc khi hover trực tiếp popup */
-.action-button.reaction-trigger:hover + .reaction-popup,
-.reaction-popup:hover {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
-}
-
-.reaction-icon {
-  font-size: 32px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  filter: grayscale(0.3);
+/* Like button styles */
+.action-button.like-button {
   position: relative;
 }
 
-.reaction-icon.badge {
-  width: 42px;
-  height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+.action-button.like-button.liked {
+  color: #f33e58;
+  font-weight: 600;
 }
 
-.reaction-icon::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%) scale(0);
-  width: 6px;
-  height: 6px;
-  background: var(--gradient-primary);
-  border-radius: 50%;
-  transition: transform 0.3s ease;
+.action-button.like-button.liked .heart-icon {
+  color: #f33e58;
+  animation: heartBeat 0.4s ease-in-out;
 }
 
-.reaction-icon:hover {
-  transform: scale(1.4) rotate(10deg);
-  filter: grayscale(0) drop-shadow(0 4px 12px rgba(255, 107, 53, 0.4));
-}
-
-.reaction-icon:hover::after {
-  transform: translateX(-50%) scale(1);
-}
-
-.reaction-icon.active {
-  transform: scale(1.2);
-  filter: grayscale(0);
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popIn {
+@keyframes heartBeat {
   0% {
-    transform: scale(0);
-    opacity: 0;
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.15);
   }
   50% {
-    transform: scale(1.3);
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
   }
   100% {
-    transform: scale(1.2);
-    opacity: 1;
+    transform: scale(1);
   }
 }
 
-.reaction-icon.active::after {
-  transform: translateX(-50%) scale(1);
-}
-
-/* Styled reaction button when user has reacted */
-.action-button.reaction-trigger.reacted {
-  font-weight: 700;
-  position: relative;
-  overflow: hidden;
-}
-
-.action-button.reaction-trigger.reacted::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-primary);
-  opacity: 0.1;
-  border-radius: 10px;
-  animation: pulseReaction 2s ease-in-out infinite;
-}
-
-@keyframes pulseReaction {
-  0%, 100% {
-    opacity: 0.1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-/* Specific colors for different reactions */
-.action-button.reaction-trigger.reacted.like {
-  color: #1877f2;
-}
-
-.action-button.reaction-trigger.reacted.love {
+.action-button.like-button:hover {
   color: #f33e58;
 }
 
-.action-button.reaction-trigger.reacted.haha {
-  color: #f7b125;
-}
-
-.action-button.reaction-trigger.reacted.wow {
-  color: #f7b125;
-}
-
-.action-button.reaction-trigger.reacted.sad {
-  color: #f7b125;
-}
-
-.action-button.reaction-trigger.reacted.angry {
-  color: #e9710f;
-}
-
-/* Add sparkle effect on hover for reacted button */
-.action-button.reaction-trigger.reacted:hover .icon {
-  animation: sparkle 0.6s ease-in-out;
-}
-
-@keyframes sparkle {
-  0%, 100% {
-    transform: scale(1.2) rotate(0deg);
-  }
-  25% {
-    transform: scale(1.3) rotate(-10deg);
-  }
-  50% {
-    transform: scale(1.4) rotate(10deg);
-  }
-  75% {
-    transform: scale(1.3) rotate(-10deg);
-  }
-}
-
-/* Tooltip arrow for reaction popup */
-.reaction-popup::after {
-  content: '';
-  position: absolute;
-  bottom: -6px;
-  left: 24px;
-  width: 12px;
-  height: 12px;
-  background: var(--surface-color);
-  border-right: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
-  transform: rotate(45deg);
+.action-button.like-button:hover .heart-icon {
+  transform: scale(1.1);
 }

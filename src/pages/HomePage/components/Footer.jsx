@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import '../CSS/Footer.css'
 
 const Footer = () => {
@@ -22,9 +23,8 @@ const Footer = () => {
     {
       title: 'Pháp lý',
       links: [
-        { text: 'Chính sách bảo mật', href: '#privacy' },
-        { text: 'Điều khoản sử dụng', href: '#terms' },
-        { text: 'Cookie', href: '#cookies' },
+        { text: 'Chính sách bảo mật', href: '/privacy' },
+        { text: 'Điều khoản sử dụng', href: '/terms' },
       ],
     },
     {
@@ -50,17 +50,21 @@ const Footer = () => {
               <ul>
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <a
-                      href={link.href}
-                      target={link.target || '_self'}
-                      rel={
-                        link.target === '_blank'
-                          ? 'noopener noreferrer'
-                          : undefined
-                      }
-                    >
-                      {link.text}
-                    </a>
+                    {link.href.startsWith('/') && !link.target ? (
+                      <Link to={link.href}>{link.text}</Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        target={link.target || '_self'}
+                        rel={
+                          link.target === '_blank'
+                            ? 'noopener noreferrer'
+                            : undefined
+                        }
+                      >
+                        {link.text}
+                      </a>
+                    )}
                   </li>
                 ))}
               </ul>
