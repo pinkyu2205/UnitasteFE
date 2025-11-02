@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import UserApi from '../../../api/userApi'
 import '../CSS/Header.css'
+import logo1Image from '../../../assets/logo1.png'
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -63,7 +64,7 @@ const Header = () => {
       {/* Logo on the Left */}
       <div className='header-left'>
         <Link to='/' className='logo'>
-          <img src='/src/assets/logo-1.png' alt='Unitaste Logo' />
+          <img src={logo1Image} alt='Unitaste Logo' />
           <span className='logo-text'>UniTaste</span>
         </Link>
       </div>
