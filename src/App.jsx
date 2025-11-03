@@ -80,7 +80,8 @@ function App() {
         {/* <Route path='/privacy' element={<PrivacyPolicy />} /> */}
         
         {/* Terms of Service */}
-        <Route path='/terms' element={<TermsOfService />} />
+        {/* <Route path='/terms' element={<TermsOfService />} /> */}
+        
       </Routes>
       <ToastContainer
         position='bottom-right'
