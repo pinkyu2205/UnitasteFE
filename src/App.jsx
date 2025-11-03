@@ -19,6 +19,8 @@ import VipSubscription from './pages/VipSubscription/VipSubscription'
 import Support from './pages/Support/Support'
 import About from './pages/About/About'
 import PaymentStatus from './pages/PaymentStatus/PaymentStatus'
+import TermsOfService from './pages/TermsOfService/TermsOfService'
+import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy'
 
 function App() {
   return (
@@ -77,10 +79,10 @@ function App() {
         <Route path='/about' element={<About />} />
         
         {/* Privacy Policy */}
-        {/* <Route path='/privacy' element={<PrivacyPolicy />} /> */}
+         <Route path='/privacy' element={<PrivacyPolicy />} /> 
         
         {/* Terms of Service */}
-        {/* <Route path='/terms' element={<TermsOfService />} /> */}
+         <Route path='/terms' element={<TermsOfService />} /> 
         
       </Routes>
       <ToastContainer
