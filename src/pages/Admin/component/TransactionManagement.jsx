@@ -31,58 +31,117 @@ const TransactionManagement = () => {
       setIsLoading(true)
       try {
         // Gọi song song các API để tải nhanh hơn
-        const [allTxSet, successSet, cancelSet, revenueSet, totalSet, pendingSet] = await Promise.allSettled([
-          PaymentApi.getAllPaymentTransactions().catch(() => PaymentApi.getPurchasesByUserToken()),
+        // Có fallback: nếu getAllPaymentTransactions() thất bại, sẽ dùng getPurchasesByUserToken()
+        let allTransactionsPromise = PaymentApi.getAllPaymentTransactions().catch((error) => {
+          console.warn('getAllPaymentTransactions failed, trying fallback:', error)
+          return PaymentApi.getPurchasesByUserToken()
+        })
+
+        const [allTxSet, successSet, cancelSet, revenueSet, totalSet] = await Promise.allSettled([
+          allTransactionsPromise,
           PaymentApi.countSuccessTransactions(),
           PaymentApi.countCancelTransactions(),
           PaymentApi.getSumAmountSuccessTransactions(),
           PaymentApi.countTotalTransactions(),
-          PaymentApi.countPendingTransactions(),
         ])
 
-        const allTransactionsResponse = allTxSet.status === 'fulfilled' ? allTxSet.value : []
+        // Xử lý response từ getAllPaymentTransactions hoặc fallback
+        let allTransactions = []
+        if (allTxSet.status === 'fulfilled') {
+          const response = allTxSet.value
+          // Axios interceptor đã trả về response.data, nhưng có thể BE trả về thêm wrapper
+          if (Array.isArray(response)) {
+            allTransactions = response
+          } else if (response?.data && Array.isArray(response.data)) {
+            allTransactions = response.data
+          } else if (response?.items && Array.isArray(response.items)) {
+            allTransactions = response.items
+          } else if (response?.result && Array.isArray(response.result)) {
+            allTransactions = response.result
+          } else {
+            console.warn('Unexpected response format from getAllPaymentTransactions:', response)
+            allTransactions = []
+          }
+        } else {
+          console.error('Error fetching transactions:', allTxSet.reason)
+          // Nếu cả hai đều thất bại, thử lấy lại một lần nữa
+          try {
+            const fallbackResponse = await PaymentApi.getPurchasesByUserToken()
+            if (Array.isArray(fallbackResponse)) {
+              allTransactions = fallbackResponse
+            } else if (fallbackResponse?.data && Array.isArray(fallbackResponse.data)) {
+              allTransactions = fallbackResponse.data
+            } else if (fallbackResponse?.items && Array.isArray(fallbackResponse.items)) {
+              allTransactions = fallbackResponse.items
+            }
+          } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError)
+            allTransactions = []
+          }
+        }
+
+        // Sắp xếp theo ngày mới nhất
+        const sortedTransactions = allTransactions.sort((a, b) => {
+          const dateA = new Date(a.createdAt || a.purchaseDate || a.createdDate || 0)
+          const dateB = new Date(b.createdAt || b.purchaseDate || b.createdDate || 0)
+          return dateB - dateA
+        })
+        
+        setTransactions(sortedTransactions)
+        setFilteredTransactions(sortedTransactions)
+
+        // Xử lý các thống kê
         const successCountResponse = successSet.status === 'fulfilled' ? successSet.value : null
         const cancelCountResponse = cancelSet.status === 'fulfilled' ? cancelSet.value : null
         const revenueResponse = revenueSet.status === 'fulfilled' ? revenueSet.value : null
         const totalCountResponse = totalSet.status === 'fulfilled' ? totalSet.value : null
-        const pendingCountResponse = pendingSet.status === 'fulfilled' ? pendingSet.value : null
 
-        // 1. Xử lý danh sách giao dịch (Admin)
-        const allTransactions = Array.isArray(allTransactionsResponse)
-          ? allTransactionsResponse
-          : (allTransactionsResponse?.data ?? allTransactionsResponse?.items ?? [])
-        const sortedTransactions = allTransactions.sort((a, b) => {
-          const dateA = new Date(a.createdAt || a.purchaseDate)
-          const dateB = new Date(b.createdAt || b.purchaseDate)
-          return dateB - dateA
-        })
-        setTransactions(sortedTransactions)
-        setFilteredTransactions(sortedTransactions)
+        // Helper function để chuyển đổi sang số
+        const toNum = (v) => {
+          if (v == null) return null
+          if (typeof v === 'number') return v
+          if (typeof v === 'object' && v !== null) {
+            // Nếu là object, thử lấy các thuộc tính phổ biến
+            return v.count || v.total || v.amount || Number(v) || null
+          }
+          return Number(v) || null
+        }
 
-        // 2. Cập nhật các thẻ thống kê từ API
-        const toNum = (v) => (typeof v === 'number' ? v : Number(v))
-        // Tính từ danh sách nếu API count không khả dụng
-        const successFromList = allTransactions.filter(t => {
+        // Tính toán từ danh sách giao dịch nếu API count không khả dụng
+        const successFromList = sortedTransactions.filter(t => {
           const s = (t.status || '').toString().toUpperCase()
           return s === 'SUCCESS' || s === 'ACTIVE'
         }).length
-        const cancelFromList = allTransactions.filter(t => (t.status || '').toString().toUpperCase() === 'CANCEL').length
-        const pendingFromList = allTransactions.filter(t => (t.status || '').toString().toUpperCase() === 'PENDING').length
-        const revenueFromList = allTransactions
+        
+        const cancelFromList = sortedTransactions.filter(t => {
+          const s = (t.status || '').toString().toUpperCase()
+          return s === 'CANCEL' || s === 'CANCELLED'
+        }).length
+        
+        const revenueFromList = sortedTransactions
           .filter(t => {
             const s = (t.status || '').toString().toUpperCase()
             return s === 'SUCCESS' || s === 'ACTIVE'
           })
-          .reduce((sum, t) => sum + Number(t.amount || t.totalAmount || 0), 0)
+          .reduce((sum, t) => sum + Number(t.amount || t.totalAmount || t.amountValue || 0), 0)
 
+        // Cập nhật stats với fallback
         setStats({
-          total: toNum(totalCountResponse) || allTransactions.length || 0,
-          completed: successCountResponse?.successTransactionCount || toNum(successCountResponse) || successFromList,
-          cancelled: cancelCountResponse?.cancelTransactionCount || toNum(cancelCountResponse) || cancelFromList,
-          totalRevenue: toNum(revenueResponse) || revenueFromList,
+          total: toNum(totalCountResponse) ?? sortedTransactions.length,
+          completed: toNum(successCountResponse) ?? successFromList,
+          cancelled: toNum(cancelCountResponse) ?? cancelFromList,
+          totalRevenue: toNum(revenueResponse) ?? revenueFromList,
         })
+
+        console.log('✅ Loaded transactions:', sortedTransactions.length)
+        if (sortedTransactions.length > 0) {
+          console.log('Sample transaction:', sortedTransactions[0])
+        }
       } catch (error) {
         console.error('Lỗi khi tải dữ liệu giao dịch:', error)
+        // Đảm bảo vẫn hiển thị trạng thái rỗng nếu có lỗi
+        setTransactions([])
+        setFilteredTransactions([])
       } finally {
         setIsLoading(false)
       }
@@ -98,11 +157,11 @@ const TransactionManagement = () => {
     // Filter by status
     if (filterStatus !== 'all') {
       filtered = filtered.filter((transaction) => {
-        const status = transaction.status?.toUpperCase() // 'PENDING', 'SUCCESS', 'CANCEL', 'ACTIVE'
+        const status = (transaction.status || '').toString().toUpperCase()
         if (filterStatus === 'completed') {
-          return status === 'SUCCESS' || status === 'ACTIVE' // Coi 'Active' và 'Success' là hoàn thành
+          return status === 'SUCCESS' || status === 'ACTIVE'
         } else if (filterStatus === 'cancelled') {
-          return status === 'CANCEL' // Sửa từ 'CANCELLED' thành 'CANCEL'
+          return status === 'CANCEL' || status === 'CANCELLED'
         }
         return true
       })
@@ -110,13 +169,16 @@ const TransactionManagement = () => {
 
     // Filter by search term
     if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
       filtered = filtered.filter((transaction) => {
-        // Tìm theo orderCode hoặc description
-        const code = (transaction.orderCode || '').toString().toLowerCase()
-        const desc = (transaction.description || '').toLowerCase()
+        // Tìm theo nhiều trường: orderCode, transactionId, description, userId
+        const code = (transaction.orderCode || transaction.paymentTransactionId || transaction.id || transaction.transactionId || '').toString().toLowerCase()
+        const desc = (transaction.description || transaction.servicePackageName || transaction.packageName || '').toLowerCase()
+        const userId = (transaction.userId || transaction.user?.id || '').toString().toLowerCase()
         return (
-          code.includes(searchTerm.toLowerCase()) ||
-          desc.includes(searchTerm.toLowerCase())
+          code.includes(searchLower) ||
+          desc.includes(searchLower) ||
+          userId.includes(searchLower)
         )
       })
     }
@@ -156,8 +218,8 @@ const TransactionManagement = () => {
 
   // Get status info
   const getStatusInfo = (status) => {
-    const upperStatus = status?.toUpperCase()
-    if (upperStatus === 'SUCCESS' || upperStatus === 'ACTIVE') {
+    const upperStatus = (status || '').toString().toUpperCase()
+    if (upperStatus === 'SUCCESS' || upperStatus === 'ACTIVE' || upperStatus === 'COMPLETED') {
       return {
         label: 'Hoàn thành',
         class: 'completed',
@@ -169,8 +231,8 @@ const TransactionManagement = () => {
         class: 'pending', // Dùng class 'pending' (màu xanh dương)
         icon: <ClockIcon size={16} />,
       }
-    } else if (upperStatus === 'CANCEL') {
-      // Sửa 'CANCELLED' thành 'CANCEL'
+    } else if (upperStatus === 'CANCEL' || upperStatus === 'CANCELLED') {
+      // Xử lý cả CANCEL và CANCELLED
       return {
         label: 'Đã hủy',
         class: 'cancelled', // Dùng class 'cancelled' (màu đỏ)
@@ -250,18 +312,24 @@ const TransactionManagement = () => {
           </thead>
           <tbody>
             {currentTransactions.length > 0 ? (
-              currentTransactions.map((transaction) => {
+              currentTransactions.map((transaction, index) => {
                 const statusInfo = getStatusInfo(transaction.status)
+                const transactionId = transaction.paymentTransactionId || transaction.id || transaction.transactionId || transaction.orderCode || `tx-${index}`
+                const userId = transaction.userId || transaction.user?.id || 'N/A'
+                const date = transaction.createdAt || transaction.purchaseDate || transaction.createdDate || transaction.date
+                const description = transaction.description || transaction.servicePackageName || transaction.packageName || 'N/A'
+                const amount = transaction.amount || transaction.totalAmount || transaction.amountValue || 0
+                
                 return (
-                  <tr key={transaction.paymentTransactionId}>
+                  <tr key={transactionId || index}>
                     <td className='transaction-id'>
-                      #{transaction.paymentTransactionId}
+                      #{transactionId}
                     </td>
-                    <td>{transaction.userId}</td>
-                    <td>{formatDate(transaction.createdAt)}</td>
-                    <td>{transaction.description}</td>
+                    <td>{userId}</td>
+                    <td>{date ? formatDate(date) : 'N/A'}</td>
+                    <td>{description}</td>
                     <td className='amount'>
-                      {formatCurrency(transaction.amount)}
+                      {formatCurrency(amount)}
                     </td>
                     <td>
                       <span className={`status-badge ${statusInfo.class}`}>
