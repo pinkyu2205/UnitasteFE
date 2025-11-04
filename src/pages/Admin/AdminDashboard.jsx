@@ -2,16 +2,24 @@
 
 import { useState } from 'react'
 import './CSS/AdminDashboard.css'
+import { DashboardIcon, StarIcon, UsersIcon } from './component/AdminIcons'
 import AdminSidebar from './component/AdminSidebar'
 import DashboardContent from './component/DashboardContent'
 import ReviewManagement from './component/ReviewManagement'
 import TransactionManagement from './component/TransactionManagement'
-import { DashboardIcon, StarIcon } from './component/AdminIcons'
+import UserManagement from './component/UserManagement'
 
 const TransactionIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="5" width="20" height="14" rx="2" />
-    <line x1="2" y1="10" x2="22" y2="10" />
+  <svg
+    width='20'
+    height='20'
+    viewBox='0 0 24 24'
+    fill='none'
+    stroke='currentColor'
+    strokeWidth='2'
+  >
+    <rect x='2' y='5' width='20' height='14' rx='2' />
+    <line x1='2' y1='10' x2='22' y2='10' />
   </svg>
 )
 
@@ -31,6 +39,11 @@ const AdminDashboard = () => {
       label: 'Quản Lý Đánh Giá',
       icon: <StarIcon size={20} />,
     },
+    {
+      id: 'users',
+      label: 'Quản Lý Người Dùng',
+      icon: <UsersIcon size={20} />,
+    },
   ]
 
   const renderContent = () => {
@@ -41,6 +54,8 @@ const AdminDashboard = () => {
         return <TransactionManagement />
       case 'reviews':
         return <ReviewManagement />
+      case 'users':
+        return <UserManagement />
       default:
         return <DashboardContent setActiveMenu={setActiveMenu} />
     }
@@ -62,8 +77,18 @@ const AdminDashboard = () => {
             className='toggle-sidebar-btn'
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
-            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 6H20M4 12H20M4 18H20" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg
+              viewBox='0 0 24 24'
+              fill='none'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                d='M4 6H20M4 12H20M4 18H20'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+              />
             </svg>
           </button>
           <div className='header-title'>
@@ -71,7 +96,7 @@ const AdminDashboard = () => {
             <p>Hệ thống quản lý UniTaste</p>
           </div>
           <div className='header-right'>
-              <div className='admin-profile'>
+            <div className='admin-profile'>
               <div className='profile-avatar'>A</div>
               <span>Admin</span>
             </div>
