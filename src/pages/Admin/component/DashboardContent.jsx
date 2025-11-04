@@ -81,7 +81,10 @@ const DashboardContent = ({ setActiveMenu }) => {
         // Tính tổng doanh thu từ các giao dịch thành công
         // Ưu tiên lấy từ BE; fallback tự tính nếu BE trả sai định dạng
         const computedRevenue = allTransactions
-          .filter(t => t.status === 'SUCCESS' || t.status === 'ACTIVE')
+          .filter(t => {
+            const status = (t.status || '').toString().toUpperCase()
+            return status === 'SUCCESS' || status === 'ACTIVE' || status === 'COMPLETED'
+          })
           .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
         const totalRevenueFromBE =
           typeof sumRevenueResp === 'number'
@@ -106,7 +109,10 @@ const DashboardContent = ({ setActiveMenu }) => {
           })
           
           const dayRevenue = dayTransactions
-            .filter(t => t.status === 'SUCCESS' || t.status === 'ACTIVE')
+            .filter(t => {
+              const status = (t.status || '').toString().toUpperCase()
+              return status === 'SUCCESS' || status === 'ACTIVE' || status === 'COMPLETED'
+            })
             .reduce((sum, t) => sum + (t.amount || t.totalAmount || 0), 0)
           
           revenueData.push({
@@ -397,15 +403,28 @@ const DashboardContent = ({ setActiveMenu }) => {
                         {formatCurrency(transaction.amount || transaction.totalAmount || 0)}
                       </td>
                       <td>
-                        <span className={`status-badge ${transaction.status?.toLowerCase()}`}>
-                          {transaction.status === 'COMPLETED' || transaction.status === 'SUCCESS'
-                            ? 'Hoàn thành'
-                            : transaction.status === 'PROCESSING'
-                            ? 'Đang xử lý'
-                            : transaction.status === 'CANCELLED'
-                            ? 'Đã hủy'
-                            : 'Chờ thanh toán'}
-                        </span>
+                        {(() => {
+                          const status = (transaction.status || '').toString().toUpperCase()
+                          let statusClass = 'pending'
+                          let statusLabel = 'Chờ thanh toán'
+                          
+                          if (status === 'SUCCESS' || status === 'ACTIVE' || status === 'COMPLETED') {
+                            statusClass = 'completed'
+                            statusLabel = 'Hoàn thành'
+                          } else if (status === 'CANCEL' || status === 'CANCELLED') {
+                            statusClass = 'cancelled'
+                            statusLabel = 'Đã hủy'
+                          } else if (status === 'PENDING') {
+                            statusClass = 'pending'
+                            statusLabel = 'Chờ thanh toán'
+                          }
+                          
+                          return (
+                            <span className={`status-badge ${statusClass}`}>
+                              {statusLabel}
+                            </span>
+                          )
+                        })()}
                       </td>
                     </tr>
                   ))}
