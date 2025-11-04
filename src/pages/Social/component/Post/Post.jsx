@@ -25,20 +25,40 @@ function Post({ post }) {
   const [restaurantName, setRestaurantName] = useState(null)
   // Fetch author details when post data is available
   useEffect(() => {
+    // Ưu tiên sử dụng thông tin author từ post object nếu có
+    if (post.authorFullName || post.authorName || post.fullName) {
+      setAuthor({
+        fullName: post.authorFullName || post.authorName || post.fullName || 'Người dùng',
+        avatarUrl: post.authorAvatarUrl || post.avatarUrl || post.authorAvatar || null,
+      })
+      return
+    }
+
+    // Nếu không có thông tin author trong post, gọi API
     if (post.authorUserId) {
       SocialApi.getUserProfile(post.authorUserId)
         .then((profile) => {
           setAuthor({
-            fullName: profile.fullName || 'Unknown User',
+            fullName: profile.fullName || 'Người dùng',
             avatarUrl: profile.avatarUrl,
           })
         })
         .catch((err) => {
           console.error('Failed to fetch author for post', post.postId, err)
-          setAuthor({ fullName: 'Unknown User', avatarUrl: null })
+          // Fallback: thử dùng các field khác từ post object
+          setAuthor({
+            fullName: post.authorName || post.fullName || post.userName || 'Người dùng',
+            avatarUrl: post.authorAvatarUrl || post.avatarUrl || null,
+          })
         })
+    } else {
+      // Nếu không có authorUserId, đặt giá trị mặc định
+      setAuthor({
+        fullName: 'Người dùng',
+        avatarUrl: null,
+      })
     }
-  }, [post.authorUserId, post.postId])
+  }, [post.authorUserId, post.postId, post.authorFullName, post.authorName, post.fullName])
 
   // Sync reactions count when post changes
   useEffect(() => {
