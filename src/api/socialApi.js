@@ -120,18 +120,39 @@ const SocialApi = {
   /** GET /api/users/get-profile-user-by-id/{userId} (Assuming this is in UserApi on port 5001) */
   // Import UserApi if needed, or create a function here that uses the correct axiosClient
   getUserProfile: async (userId) => {
+    if (!userId) {
+      console.warn('getUserProfile: userId is missing');
+      return { fullName: 'Người dùng', avatarUrl: null };
+    }
+    
     try {
       const { axiosClient } = await import('./axios');
       const res = await axiosClient.get(`/Users/get-profile-user-by-id/${userId}`);
-      const d = res?.data ?? {};
-      // Trả đúng shape mà Post.jsx mong đợi
+      const d = res?.data ?? res ?? {};
+      
+      // Log để debug
+      console.log(`getUserProfile for userId ${userId}:`, d);
+      
+      // Trả đúng shape mà Post.jsx mong đợi - ưu tiên các field phổ biến
+      const fullName = d.fullName || d.name || d.userName || d.displayName || null;
+      const avatarUrl = d.avatarUrl || d.avatar || d.profilePicture || null;
+      
+      if (!fullName) {
+        console.warn(`getUserProfile: No name found for userId ${userId}, data:`, d);
+        return { fullName: 'Người dùng', avatarUrl };
+      }
+      
       return {
-        fullName: d.fullName ?? d.name ?? 'Người dùng ẩn',
-        avatarUrl: d.avatarUrl ?? d.avatar ?? null,
+        fullName,
+        avatarUrl,
       };
     } catch (e) {
-      console.error('Error fetching user profile', e);
-      return { fullName: 'Người dùng ẩn', avatarUrl: null };
+      console.error(`Error fetching user profile for userId ${userId}:`, e);
+      // Kiểm tra nếu là 404 hoặc lỗi khác
+      if (e?.response?.status === 404) {
+        console.warn(`User ${userId} not found`);
+      }
+      return { fullName: 'Người dùng', avatarUrl: null };
     }
   },
   
