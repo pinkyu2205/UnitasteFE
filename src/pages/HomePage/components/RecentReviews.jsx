@@ -2,66 +2,65 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import '../CSS/RecentReviews.css'
+import SocialApi from '../../../api/socialApi'
 
 const RecentReviews = () => {
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // TODO: Replace with actual API call
-    // Simulate API call with setTimeout
     const fetchRecentReviews = async () => {
       try {
-        // Mock data for demonstration
-        const mockReviews = [
-          {
-            id: 1,
-            userName: 'Minh Anh',
-            userAvatar: 'https://ui-avatars.com/api/?name=Minh+Anh&background=ff6b35&color=fff&rounded=true',
-            restaurantName: 'Quán Cơm Tấm Sườn Bì Chả',
-            restaurantId: 101,
-            reviewText: 'Quán này view đẹp, nước uống tạm ổn, giá cả phải chăng. Phục vụ nhiệt tình, không gian thoáng mát. Rất đáng để thử!',
-            rating: 4.5,
-            createdAt: '2 giờ trước'
-          },
-          {
-            id: 2,
-            userName: 'Thu Hà',
-            userAvatar: 'https://ui-avatars.com/api/?name=Thu+Ha&background=3b82f6&color=fff&rounded=true',
-            restaurantName: 'Bún Bò Huế An Nhiên',
-            restaurantId: 102,
-            reviewText: 'Bún bò chuẩn vị Huế, nước dùng đậm đà, sả thơm lừng. Giá hợp lý, chỉ hơi đông người vào giờ cao điểm.',
-            rating: 5,
-            createdAt: '5 giờ trước'
-          },
-          {
-            id: 3,
-            userName: 'Quang Huy',
-            userAvatar: 'https://ui-avatars.com/api/?name=Quang+Huy&background=10b981&color=fff&rounded=true',
-            restaurantName: 'Phở Gà Tân Phú',
-            restaurantId: 103,
-            reviewText: 'Phở gà ngon, nước dùng trong, thịt gà mềm. Không gian sạch sẽ, giá sinh viên. Sẽ quay lại!',
-            rating: 4,
-            createdAt: '1 ngày trước'
-          },
-          {
-            id: 4,
-            userName: 'Lan Phương',
-            userAvatar: 'https://ui-avatars.com/api/?name=Lan+Phuong&background=8b5cf6&color=fff&rounded=true',
-            restaurantName: 'Cafe The Long Roastery',
-            restaurantId: 104,
-            reviewText: 'Cafe ngon, không gian yên tĩnh, phù hợp làm việc. Wifi nhanh, nhân viên thân thiện. Giá hơi cao nhưng xứng đáng.',
-            rating: 4.5,
-            createdAt: '2 ngày trước'
-          }
-        ]
+        setLoading(true)
+        // Lấy các bài post mới nhất từ trang social
+        const res = await SocialApi.getAllPosts(1, 4)
+        const raw = res?.data ?? res ?? {}
+        const items = Array.isArray(raw?.items)
+          ? raw.items
+          : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw)
+          ? raw
+          : []
 
-        setTimeout(() => {
-          setReviews(mockReviews)
-          setLoading(false)
-        }, 500)
+        const mapped = await Promise.all(
+          items.slice(0, 4).map(async (p) => {
+            let name = p.authorName || p.userName || p.fullName || null
+            let avatar = p.authorAvatar || p.avatarUrl || p.userAvatar || null
+            if (!name || name.toLowerCase() === 'người dùng') {
+              try {
+                if (p.authorUserId) {
+                  const profile = await SocialApi.getUserProfile(p.authorUserId)
+                  name = profile.fullName || name
+                  avatar = profile.avatarUrl || avatar
+                }
+              } catch {
+                // ignore, keep fallback
+              }
+            }
+            if (!name) name = 'Người dùng'
+            if (!avatar) {
+              avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                name.charAt(0)
+              )}&background=ff6b35&color=fff&rounded=true`
+            }
+            return {
+              id: p.postId ?? p.id,
+              userName: name,
+              userAvatar: avatar,
+              restaurantName: p.restaurantName || p.locationName || 'Bài đăng mới',
+              restaurantId: p.restaurantId || p.placeId || undefined,
+              reviewText: p.content || p.description || '',
+              rating: typeof p.rating === 'number' ? p.rating : 4.5,
+              createdAt: p.createdAt || p.createdDate || p.createdOn || '',
+            }
+          })
+        )
+
+        setReviews(mapped)
       } catch (error) {
-        console.error('Error fetching recent reviews:', error)
+        console.error('Error fetching recent social posts:', error)
+      } finally {
         setLoading(false)
       }
     }
@@ -102,6 +101,28 @@ const RecentReviews = () => {
     return stars
   }
 
+  const formatRelativeTime = (input) => {
+    try {
+      const date = input ? new Date(input) : new Date()
+      const diffMs = Date.now() - date.getTime()
+      if (diffMs < 0) return 'vừa xong'
+      const sec = Math.floor(diffMs / 1000)
+      if (sec < 60) return 'vừa xong'
+      const min = Math.floor(sec / 60)
+      if (min < 60) return `${min} phút trước`
+      const hour = Math.floor(min / 60)
+      if (hour < 24) return `${hour} giờ trước`
+      const day = Math.floor(hour / 24)
+      if (day < 30) return `${day} ngày trước`
+      const month = Math.floor(day / 30)
+      if (month < 12) return `${month} tháng trước`
+      const year = Math.floor(month / 12)
+      return `${year} năm trước`
+    } catch {
+      return 'vừa xong'
+    }
+  }
+
   if (loading) {
     return (
       <section className='recent-reviews-section'>
@@ -135,7 +156,7 @@ const RecentReviews = () => {
                   />
                   <div className='user-details'>
                     <h4 className='user-name'>{review.userName}</h4>
-                    <span className='review-time'>{review.createdAt}</span>
+                    <span className='review-time'>{formatRelativeTime(review.createdAt)}</span>
                   </div>
                 </div>
                 <div className='rating-stars'>{renderStars(review.rating)}</div>

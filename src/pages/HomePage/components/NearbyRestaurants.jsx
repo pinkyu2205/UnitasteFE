@@ -14,9 +14,18 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 // Default center if location fails (e.g., Ho Chi Minh City center)
 const DEFAULT_CENTER = { lat: 10.7769, lng: 106.7009 }
 
-// Render stars function (can be moved to a utils file)
+// Render stars function (same as RestaurantShowcase)
 const renderStars = (rating) => {
-  /* ... same code as before ... */
+  if (typeof rating !== 'number' || rating < 0 || rating > 5) {
+    return 'N/A'
+  }
+  const fullStars = Math.floor(rating)
+  const halfStar = rating % 1 >= 0.5
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0)
+  let stars = '⭐'.repeat(fullStars)
+  if (halfStar) stars += '✨'
+  stars += '☆'.repeat(emptyStars)
+  return stars
 }
 
 const NearbyRestaurants = () => {
@@ -177,61 +186,49 @@ const NearbyRestaurants = () => {
         <h2 className='section-title'>Quán ăn quanh bạn</h2>
 
         <Swiper
-          // Same Swiper configuration as RestaurantShowcase
-          slidesPerView={1}
+          slidesPerView={5}
           grid={{ rows: 2, fill: 'row' }}
           spaceBetween={30}
           pagination={{ clickable: true }}
           navigation={true}
           modules={[Grid, Pagination, Navigation]}
-          className='restaurant-swiper' // Reuse the same class
+          className='restaurant-swiper'
+          breakpoints={{
+            640: { slidesPerView: 2, grid: { rows: 2 }, spaceBetween: 20 },
+            768: { slidesPerView: 3, grid: { rows: 2 }, spaceBetween: 20 },
+            1024: { slidesPerView: 4, grid: { rows: 2 }, spaceBetween: 30 },
+          }}
         >
-          {/* Similar logic to slice data for slides */}
-          {Array.from({ length: Math.ceil(nearbyRestaurants.length / 10) }).map(
-            (_, slideIndex) => (
-              <SwiperSlide key={slideIndex} className='main-slide'>
-                <div className='restaurant-grid-internal'>
-                  {nearbyRestaurants
-                    .slice(slideIndex * 10, (slideIndex + 1) * 10)
-                    .map((restaurant) => (
-                      <div
-                        key={restaurant.restaurantId}
-                        className='restaurant-card'
-                      >
-                        <div
-                          className='restaurant-image'
-                          style={{
-                            backgroundImage: restaurant.coverImageUrl
-                              ? `url(${restaurant.coverImageUrl})`
-                              : 'none',
-                            backgroundColor: '#eee',
-                          }}
-                        ></div>
-                        <div className='restaurant-info'>
-                          <h3 className='restaurant-name'>{restaurant.name}</h3>
-                          <div className='restaurant-rating'>
-                            <span className='stars'>
-                              {renderStars(restaurant.googleRating)}
-                            </span>
-                            <span className='rating-text'>
-                              {restaurant.googleRating
-                                ? restaurant.googleRating.toFixed(1)
-                                : 'N/A'}
-                            </span>
-                          </div>
-                          <button
-                            className='directions-btn'
-                            onClick={() => handleDirections(restaurant)}
-                          >
-                            Chỉ đường 🗺️
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+          {nearbyRestaurants.map((restaurant) => (
+            <SwiperSlide key={restaurant.restaurantId}>
+              <div className='restaurant-card'>
+                <div
+                  className='restaurant-image'
+                  style={{
+                    backgroundImage: `url(${
+                      restaurant.coverImageUrl || '/placeholder-image.jpg'
+                    })`,
+                  }}
+                ></div>
+                <div className='restaurant-info'>
+                  <h3 className='restaurant-name'>{restaurant.name}</h3>
+                  <div className='restaurant-rating'>
+                    <span className='stars'>{renderStars(restaurant.googleRating)}</span>
+                    <span className='rating-text'>
+                      {restaurant.googleRating ? restaurant.googleRating.toFixed(1) : 'N/A'}
+                    </span>
+                  </div>
+                  <button
+                    className='directions-btn'
+                    onClick={() => handleDirections(restaurant)}
+                  >
+                    <span className='directions-icon'></span>
+                    Chỉ đường 🗺️
+                  </button>
                 </div>
-              </SwiperSlide>
-            )
-          )}
+              </div>
+            </SwiperSlide>
+          ))}
         </Swiper>
       </div>
     </section>

@@ -41,14 +41,17 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
       try {
         // 1) Thử endpoint checkVipStatus
         const res = await PaymentApi.checkVipStatus()
-        const purchased = res?.hasPurchased ?? res?.data?.hasPurchased
-        if (purchased !== undefined) {
-          if (mounted) {
-            setIsVip(!!purchased)
-            localStorage.setItem('isVip', String(!!purchased))
-          }
-          return
+        const data = res?.data ?? res
+        // Chỉ coi là VIP khi trạng thái thật sự ACTIVE
+        const status = (data?.status || data?.serviceStatus || '').toString().toUpperCase()
+        const hasPurchased = data?.hasPurchased === true
+        const isActive = data?.isActive === true || status === 'ACTIVE'
+        if (mounted) {
+          const vip = hasPurchased && isActive
+          setIsVip(vip)
+          localStorage.setItem('isVip', String(vip))
         }
+        return
       } catch (_) {
         // ignore and fallback below
       }
@@ -62,18 +65,20 @@ const ProfileInfo = ({ userData, onUpdateProfile }) => {
           ? history.data
           : []
         const now = new Date()
-        const active = items.some(
-          (p) =>
-            p?.isActive === true ||
-            (p?.endDate && new Date(p.endDate) > now) ||
-            (p?.status && String(p.status).toUpperCase() === 'ACTIVE')
-        ) || items.length > 0
+        const active = items.some((p) => {
+          const status = String(p?.status || '').toUpperCase()
+          const canceled = status.includes('CANCEL') || status === 'CANCELED'
+          const expired = p?.endDate ? new Date(p.endDate) <= now : false
+          const isActiveFlag = p?.isActive === true || status === 'ACTIVE'
+          return isActiveFlag && !canceled && !expired
+        })
         if (mounted) {
           setIsVip(active)
           localStorage.setItem('isVip', String(!!active))
         }
       } catch (_) {
         if (mounted) setIsVip(false)
+        try { localStorage.setItem('isVip', 'false') } catch {}
       }
     }
     check()

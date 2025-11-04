@@ -13,6 +13,11 @@ const SocialApi = {
       params: { page, pageSize },
     })
   },
+  // Gửi lời mời kết bạn: POST /api/Friendships/pending/{userId}
+  sendFriendRequest: (UserId) => {
+    if (!UserId) throw new Error('UserId is required')
+    return axiosSocialClient.post(`/Friendships/pending/${Number(UserId)}`)
+  },
 
   /** POST /api/Post/create (multipart/form-data) */
   createPost: (formData) => {

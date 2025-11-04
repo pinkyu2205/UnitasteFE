@@ -17,6 +17,11 @@ const FeaturesSection = () => {
       icon: '📍',
       title: 'Bản đồ thông minh',
       description: 'Xem vị trí nhà hàng trên bản đồ và tìm đường đi thuận tiện nhất'
+    },
+    {
+      icon: '🎁',
+      title: 'Ưu đãi hấp dẫn',
+      description: 'Nhận khuyến mãi và ưu đãi đặc biệt từ các nhà hàng đối tác'
     }
   ];
 
