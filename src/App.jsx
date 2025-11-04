@@ -1,4 +1,4 @@
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes, Navigate } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import TestPage from '../testpage'
 import AdminDashboard from './pages/Admin/AdminDashboard'
@@ -23,6 +23,37 @@ import TermsOfService from './pages/TermsOfService/TermsOfService'
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy'
 
 function App() {
+  const getEmailFromToken = () => {
+    try {
+      const storedEmail = localStorage.getItem('email')
+      if (storedEmail) return storedEmail.toLowerCase()
+      let token = localStorage.getItem('token')
+      if (!token) return null
+      if (token.startsWith('Bearer ')) token = token.slice(7)
+      const part = token.split('.')[1]
+      const b64 = part.replace(/-/g, '+').replace(/_/g, '/')
+      const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4)
+      const payload = JSON.parse(atob(padded))
+      const email =
+        payload.email ||
+        payload.Email ||
+        payload.userEmail ||
+        payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ||
+        payload['unique_name']
+      return email ? String(email).toLowerCase() : null
+    } catch {
+      return null
+    }
+  }
+
+  const AdminRoute = ({ children }) => {
+    const token = localStorage.getItem('token')
+    if (!token) return <Navigate to='/login' replace />
+    const email = getEmailFromToken()
+    const allowedEmails = ['admin@gmail.com', 'manager@gmail.com']
+    const allowed = email && allowedEmails.includes(email)
+    return allowed ? children : <Navigate to='/' replace />
+  }
   return (
     <BrowserRouter>
       <Routes>
@@ -55,8 +86,15 @@ function App() {
         <Route path='/profile' element={<ProfilePage />} />
         {/* Survey */}
         <Route path='/survey' element={<PreferenceSurvey />} />
-        {/* Admin */}
-        <Route path='/admin' element={<AdminDashboard />} />
+        {/* Admin (email allowlist) */}
+        <Route
+          path='/admin/*'
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
         {/* Chat */}
         <Route path='/chat' element={<ChatPage />} />
         {/* Social */}

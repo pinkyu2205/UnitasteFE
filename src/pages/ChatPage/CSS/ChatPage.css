@@ -484,3 +484,54 @@
 .status-dot.offline {
   background-color: #ccc; /* xám */
 }
+
+/* Nút kết bạn ở mỗi user */
+.add-friend-btn {
+  margin-left: auto;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: #fff;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-button);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Search + filter */
+.sidebar-search {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.sidebar-search input {
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  background: #f8f8f8;
+}
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+}
+.filter-tab {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  cursor: pointer;
+}
+.filter-tab.active {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: #fff;
+  border-color: transparent;
+}
+
+.add-friend-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(230, 57, 70, 0.5);
+}

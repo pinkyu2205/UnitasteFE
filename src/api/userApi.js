@@ -91,6 +91,27 @@ const UserApi = {
       return await axiosClient.get('/Users/get-all')
     }
   },
+  // Tìm kiếm user theo tên/email (đính kèm token)
+  searchUsers: async (keyword) => {
+    if (!keyword || !keyword.trim()) return []
+    const q = keyword.trim()
+    try {
+      const res = await axiosClient.get('/Users/search', { params: { keyword: q } })
+      return res?.data ?? []
+    } catch (_) {
+      try {
+        const res = await axiosClient.get('/Users/search-users', { params: { keyword: q } })
+        return res?.data ?? []
+      } catch (_e) {
+        try {
+          const res = await axiosClient.get('/Users/find', { params: { q } })
+          return res?.data ?? []
+        } catch {
+          return []
+        }
+      }
+    }
+  },
   // Đếm số người dùng đang hoạt động
   countActiveUsers: async () => {
     return await axiosClient.get('/Users/count-active')

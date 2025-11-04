@@ -20,6 +20,9 @@
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  max-height: 90vh; /* prevent off-screen overflow */
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -52,6 +55,8 @@
 
 .modal-body {
   padding: 16px;
+  flex: 1 1 auto; /* take remaining height */
+  overflow-y: auto; /* scroll body, keep footer visible */
 }
 
 .post-textarea {
@@ -99,6 +104,8 @@
 
 .modal-footer {
   padding: 16px;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-color);
 }
 
 .post-submit-button {
