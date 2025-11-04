@@ -21,6 +21,10 @@ function RightSidebar() {
   const [permissionStatus, setPermissionStatus] = useState('checking') // 'checking', 'prompt', 'granted', 'denied'
   const [nearbyError, setNearbyError] = useState(null)
 
+  // State cho Địa điểm nổi bật (từ HomePage RestaurantShowcase)
+  const [topRestaurants, setTopRestaurants] = useState([])
+  const [loadingTopRestaurants, setLoadingTopRestaurants] = useState(true)
+
   const navigate = useNavigate()
 
   // 1. Lấy danh sách gợi ý bạn bè (Giữ nguyên logic cũ)
@@ -42,6 +46,55 @@ function RightSidebar() {
       }
     }
     fetchUsers()
+  }, [])
+
+  // 1.5. Lấy địa điểm nổi bật từ API (giống HomePage RestaurantShowcase)
+  useEffect(() => {
+    const fetchTopRestaurants = async () => {
+      setLoadingTopRestaurants(true)
+      try {
+        // Dùng cùng API như RestaurantShowcase trong HomePage
+        const response = await RestaurantsApi.getAllSimpleRestaurants(1, 20)
+        const restaurants = response.items || []
+        
+        // Sắp xếp theo tiêu chí nổi bật: ưu tiên rating cao, sau đó savedCount
+        const sortedRestaurants = [...restaurants].sort((a, b) => {
+          const ratingA = a.googleRating || a.rating || 0
+          const ratingB = b.googleRating || b.rating || 0
+          const savedA = a.savedCount || a.saves || 0
+          const savedB = b.savedCount || b.saves || 0
+          
+          // Ưu tiên rating trước, nếu bằng nhau thì xét savedCount
+          if (ratingB !== ratingA) {
+            return ratingB - ratingA
+          }
+          return savedB - savedA
+        })
+        
+        // Lấy 5 quán đầu tiên sau khi sắp xếp
+        const top5 = sortedRestaurants.slice(0, 5)
+        
+        // Map API data to component state format
+        const mappedRestaurants = top5.map((restaurant, index) => ({
+          id: restaurant.restaurantId || restaurant.id || index + 1,
+          name: restaurant.name || 'Không có tên',
+          address: restaurant.address || restaurant.formattedAddress || 'Chưa có địa chỉ',
+          saves: restaurant.savedCount || restaurant.saves || 0,
+          rating: restaurant.googleRating || restaurant.rating || 0,
+          coverImageUrl: restaurant.coverImageUrl || null,
+          latitude: restaurant.latitude,
+          longitude: restaurant.longitude,
+        }))
+        setTopRestaurants(mappedRestaurants)
+      } catch (error) {
+        console.error('Lỗi khi tải địa điểm nổi bật:', error)
+        setTopRestaurants([])
+      } finally {
+        setLoadingTopRestaurants(false)
+      }
+    }
+
+    fetchTopRestaurants()
   }, [])
 
   // 2. Logic MỚI: Lấy vị trí và quán ăn gần bạn
@@ -224,7 +277,55 @@ function RightSidebar() {
         )}
       </div>
 
-      {/* --- Widget 2: Quán ăn gần bạn (Đã cập nhật) --- */}
+      {/* --- Widget 2: Địa điểm nổi bật (từ HomePage) --- */}
+      <div className='sidebar-widget'>
+        <h4 className='widget-title'>Địa điểm nổi bật</h4>
+        {loadingTopRestaurants ? (
+          <p className='widget-loading-text'>Đang tải...</p>
+        ) : topRestaurants.length > 0 ? (
+          <div className='top-restaurants-list'>
+            {topRestaurants.map((restaurant, index) => (
+              <div
+                key={restaurant.id}
+                className='top-restaurant-item'
+                onClick={() => {
+                  // Navigate to restaurant detail or map (giống HomePage)
+                  navigate('/map', {
+                    state: {
+                      destinationRestaurant: {
+                        latitude: restaurant.latitude,
+                        longitude: restaurant.longitude,
+                        name: restaurant.name,
+                        address: restaurant.address,
+                      },
+                    },
+                  })
+                }}
+              >
+                <div className='restaurant-rank-badge'>#{index + 1}</div>
+                <div className='restaurant-info-compact'>
+                  <h5 className='restaurant-name-compact'>{restaurant.name}</h5>
+                  <p className='restaurant-address-compact'>{restaurant.address}</p>
+                  {restaurant.rating > 0 && (
+                    <span className='restaurant-rating-compact'>
+                      ⭐ {restaurant.rating.toFixed(1)}
+                    </span>
+                  )}
+                  {restaurant.saves > 0 && (
+                    <span className='restaurant-saves-compact'>
+                      💾 {restaurant.saves.toLocaleString()} lượt lưu
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className='widget-empty-message'>Chưa có địa điểm nổi bật</p>
+        )}
+      </div>
+
+      {/* --- Widget 3: Quán ăn gần bạn (Đã cập nhật) --- */}
       <div className='sidebar-widget'>
         <h4 className='widget-title'>Quán ăn gần bạn</h4>
         {renderNearbyRestaurants()}
