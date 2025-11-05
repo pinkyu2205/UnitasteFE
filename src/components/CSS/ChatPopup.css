@@ -338,7 +338,8 @@
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -347,7 +348,8 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -356,7 +358,8 @@
 }
 
 @keyframes ping {
-  75%, 100% {
+  75%,
+  100% {
     transform: scale(1.5);
     opacity: 0;
   }
@@ -388,4 +391,150 @@
 
 .chat-popup-messages::-webkit-scrollbar-thumb:hover {
   background: #f97316;
+}
+
+.chat-popup-header {
+  padding: 0.5rem 0.75rem; /* Giảm padding */
+}
+.chat-popup-header-content {
+  gap: 0.5rem; /* Giảm gap */
+}
+.chat-popup-avatar {
+  width: 2.25rem; /* 36px */
+  height: 2.25rem;
+}
+.chat-popup-avatar-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+.chat-popup-title {
+  font-size: 1rem; /* 16px */
+}
+.chat-popup-subtitle {
+  font-size: 0.75rem; /* 12px */
+}
+
+/* Khu vực nút hành động (Xóa, Đóng) */
+.chat-popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 8px */
+  position: relative;
+  z-index: 10;
+}
+
+.chat-action-btn,
+.chat-popup-close {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%; /* Nút tròn */
+  padding: 0.4rem; /* 6px */
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+  display: flex; /* Căn giữa icon */
+  align-items: center;
+  justify-content: center;
+  width: 32px; /* Kích thước cố định */
+  height: 32px;
+}
+
+.chat-action-btn:hover,
+.chat-popup-close:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.chat-action-btn.delete:hover {
+  background-color: #dc2626; /* Màu đỏ khi hover nút xóa */
+}
+/* ----------------------------------------- */
+
+/* --- DANH SÁCH NHÀ HÀNG GỢI Ý --- */
+.chat-restaurant-list {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.chat-restaurant-title {
+  font-size: 0.8rem; /* 13px */
+  font-weight: 700;
+  color: #555;
+  margin: 0;
+}
+.chat-restaurant-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #f9f9f9;
+  padding: 8px;
+  border-radius: 8px;
+}
+.chat-restaurant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden; /* Ngăn text dài phá layout */
+}
+.chat-restaurant-name {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  color: #1f2937;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-restaurant-address {
+  font-size: 0.75rem; /* 12px */
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-directions-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background-color: var(--primary-color, #f97316);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  flex-shrink: 0; /* Ngăn nút bị co lại */
+  transition: background-color 0.2s;
+}
+.chat-directions-btn:hover {
+  background-color: var(--accent-color, #ef4444);
+}
+
+/* --- CÁC NÚT GỢI Ý NHANH --- */
+.chat-quick-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px; /* Khoảng cách với ô input */
+  padding: 0 5px; /* Căn lề nhỏ */
+}
+.quick-suggestion-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--primary-color, #f97316);
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.quick-suggestion-btn:hover {
+  background-color: #ffedd5;
+  border-color: #fb923c;
+  transform: translateY(-1px);
 }
