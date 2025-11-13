@@ -134,28 +134,31 @@ const DashboardContent = ({ setActiveMenu }) => {
         // Mock data cho reviews và rating stats
         const recentReviews = [
           {
-            id: 1,
-            userName: 'Nguyễn Văn A',
-            restaurantName: 'Phở Gia Truyền',
+            id: 9,
+            userName: 'Nguyen Kinh Tam',
+            restaurantName: 'Jollibee Bình Thạnh',
             rating: 5,
-            comment: 'Món ăn rất ngon!',
-            date: '2024-01-15',
+            comment:
+              'Hôm nay thèm Jollibee và quyết định đi ăn liền! ✨ Gọi món: Burger bò phô mai...',
+            date: '2025-11-04',
           },
           {
-            id: 2,
-            userName: 'Trần Thị B',
-            restaurantName: 'Bánh Mì Ơi',
-            rating: 4,
-            comment: 'Phục vụ tốt',
-            date: '2024-01-14',
+            id: 5,
+            userName: 'Nguyễn Văn Thành',
+            restaurantName: 'KFC',
+            rating: 5,
+            comment:
+              'Hôm nay mình ghé KFC và phải nói là ngon hơn mấy lần trước rất nhiều...',
+            date: '2025-11-04',
           },
           {
             id: 3,
-            userName: 'Lê Minh C',
-            restaurantName: 'Cơm Tấm 24h',
-            rating: 3,
-            comment: 'Ổn',
-            date: '2024-01-13',
+            userName: 'Nguyễn Đăng Khoa',
+            restaurantName: 'Lẩu siêu đỉnh',
+            rating: 5,
+            comment:
+              'Đi ăn Lẩu Thái Nước lẩu chua vừa, cay nhẹ, topping siêu nhiều...',
+            date: '2025-11-04',
           },
         ]
 
